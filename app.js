@@ -11,7 +11,7 @@ http.listen(3000, function() {
 	console.log("Listening on port 3000...");
 }); //Listen on port 3000
 
-app.use('/client',express.static(__dirname + '/client'));
+app.use(express.static(__dirname + '/client'));
 
 io.on('connection', function(socket) {
 	console.log("A user has connected.");
