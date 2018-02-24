@@ -2,15 +2,17 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
+<script src="//cdn.jsdelivr.net/npm/phaser@3.0.0/dist/phaser.min.js"></script>
 <script>
 	var socket = io();
-	/*
-	$(document).ready(function() {
-		$('#btnSubmit').click(function() {
-			socket.emit('msg', $('#message').val());
-		});
-	});
-	*/
+
+	var config = {
+		type: Phaser.CANVAS,
+		width: 800,
+		height: 600,
+	};
+
+	var game = new Phaser.Game(config);
 </script>
 
 <html>
