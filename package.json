@@ -1,5 +1,5 @@
 {
-  "name": "pong",
+  "name": "blade",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,7 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "express.js": "^1.0.0",
-    "phaser": "^3.1.2",
     "socket.io": "^2.0.4"
   }
 }
