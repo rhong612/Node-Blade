@@ -2,17 +2,54 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
-<script src="//cdn.jsdelivr.net/npm/phaser@3.0.0/dist/phaser.min.js"></script>
+<script src="phaser.js"></script>
 <script>
 	var socket = io();
 
-	var config = {
-		type: Phaser.CANVAS,
-		width: 800,
-		height: 600,
-	};
 
-	var game = new Phaser.Game(config);
+	const GAME_WIDTH = 800;
+	const GAME_HEIGHT = 600;
+
+	var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, '', {preload: preload, create: create});
+
+
+	//List of cards
+	const BACK = 'BACK';
+	const BOLT = 'BOLT';
+	const BLAST = 'BLAST';
+	const MIRROR = 'MIRROR';
+	const FORCE = 'FORCE';
+	const TWO_CARD = 'BLADE_PISTOL';
+	const THREE_CARD = 'BOW';
+	const FOUR_CARD = 'SWORD';
+	const FIVE_CARD = 'SHOTGUN';
+	const SIX_CARD = 'SPEAR';
+	const SEVEN_CARD = 'BROADSWORD';
+
+	function preload() {
+		this.load.image(BACK, 'images/back.png');
+		this.load.image(BOLT, 'images/bolt.png');
+		this.load.image(BLAST, 'images/blast.png');
+		this.load.image(MIRROR, 'images/mirror.png');
+		this.load.image(FORCE, 'images/force.png');
+		this.load.image(TWO_CARD, 'images/blade_pistols.png');
+		this.load.image(THREE_CARD, 'images/bow.png');
+		this.load.image(FOUR_CARD, 'images/sword.png');
+		this.load.image(FIVE_CARD, 'images/shotgun.png');
+		this.load.image(SIX_CARD, 'images/spear.png');
+		this.load.image(SEVEN_CARD, 'images/broadsword.png');
+	}
+
+	function create() {
+		var image = this.add.image(0, 0, BOLT);
+		image.inputEnabled = true;
+		image.events.onInputDown.add(listener);
+	}
+
+	function listener() {
+		console.log("Clicked");
+	}
+
 </script>
 
 <html>
