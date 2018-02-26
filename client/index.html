@@ -4,15 +4,6 @@
         crossorigin="anonymous"></script>
 <script src="lib/phaser.js"></script>
 <script>
-	var socket = io();
-
-
-	const GAME_WIDTH = 800;
-	const GAME_HEIGHT = 600;
-
-	var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, '', {preload: preload, create: create});
-
-
 	//List of cards
 	const BACK = 'BACK';
 	const BOLT = 'BOLT';
@@ -25,6 +16,16 @@
 	const FIVE_CARD = 'SHOTGUN';
 	const SIX_CARD = 'SPEAR';
 	const SEVEN_CARD = 'BROADSWORD';
+
+	var socket = io();
+
+
+	const GAME_WIDTH = 800;
+	const GAME_HEIGHT = 600;
+
+	var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, '', {preload: preload, create: create});
+
+
 
 	function preload() {
 		this.load.image(BACK, 'images/back.png');
@@ -41,9 +42,14 @@
 	}
 
 	function create() {
+		/*
 		var image = this.add.image(0, 0, BOLT);
 		image.inputEnabled = true;
 		image.events.onInputDown.add(listener);
+		*/
+		this.stage.backgroundColor = "#4488AA";
+		var text = this.add.text(game.world.centerX, game.world.centerY, 'Blade', {fontSize: '100px'});
+		text.anchor.setTo(0.5);
 	}
 
 	function listener() {
