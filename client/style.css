@@ -1,5 +1,9 @@
-.col-4 {
+.col-3 {
 	background-color: grey;
+}
+
+.col-1 {
+	background-color: white;
 }
 
 body, .col-8 {
