@@ -6,9 +6,9 @@ socket.on('display_name', function(name) {
 });
 
 
-socket.on('add_player', function(username) {
-	$("#player_list tbody").append("<tr><td>" + username + "</td></tr>");
+socket.on('update_players', function(usernames) {
+	$("#player_list tbody").empty();
+	for (var i = 0; i < usernames.length; i++) {
+		$("#player_list tbody").append("<tr><td><button data-name='" + usernames[i] + "'>" + usernames[i] + "</button></td></tr>");
+	}
 });
-
-socket.on('remove_player', function(username) {
-})
