@@ -11,17 +11,16 @@ const FIVE_CARD = 'SHOTGUN';
 const SIX_CARD = 'SPEAR';
 const SEVEN_CARD = 'BROADSWORD';
 
-var socket = io();
-
 
 const GAME_WIDTH = 800;
-const GAME_HEIGHT = 600;
+const GAME_HEIGHT = 500;
 
-var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, '', { preload: preload, create: create });
+var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, 'game', { preload: preload, create: create });
 
 
 
 function preload() {
+    this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     this.load.image(BACK, 'images/back.png');
     this.load.image(BOLT, 'images/bolt.png');
     this.load.image(BLAST, 'images/blast.png');
@@ -44,8 +43,4 @@ function create() {
     this.stage.backgroundColor = "#4488AA";
     var text = this.add.text(game.world.centerX, game.world.centerY, 'Blade', { fontSize: '100px' });
     text.anchor.setTo(0.5);
-}
-
-function listener() {
-    console.log("Clicked");
 }

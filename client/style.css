@@ -1,0 +1,7 @@
+.col-4 {
+	background-color: grey;
+}
+
+body, .col-8 {
+	background-color: black;
+}
