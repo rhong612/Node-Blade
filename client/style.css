@@ -1,11 +1,16 @@
-.col-3 {
+.col-4 {
 	background-color: grey;
 }
 
-.col-1 {
+.col-2 {
 	background-color: white;
 }
 
 body, .col-8 {
 	background-color: black;
+}
+
+#messages {
+	list-style-type: none;
+	padding: 0;
 }

@@ -22,11 +22,13 @@ io.on('connection', function(socket) {
 	createGuest(socket);
 
 	socket.on('disconnect', removePlayer);
+
+	socket.on('chat_msg', updateMessages);
 });
 
 function createGuest(socket) {
 	var username = 'guest' + new Date().valueOf();
-	players.push(new Player(this.id, username));
+	players.push(new Player(socket.id, username));
 	socket.emit('display_name', username);
 
 	updatePlayerList();
@@ -42,6 +44,10 @@ function removePlayer() {
 function updatePlayerList() {
 	var username_list = players.map(player => player.username);
 	io.emit('update_players', username_list);
+}
+
+function updateMessages(msg) {
+	io.emit('chat_msg', {'username': 'todo','message': msg});
 }
 
 class Player {
