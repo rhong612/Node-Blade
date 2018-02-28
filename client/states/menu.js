@@ -1,11 +1,7 @@
 
 
-var menuState = function(game) {
-
-}
-
-menuState.prototype = {
-    create: function() {
+var menuState = {
+	create: function() {
         var image = this.add.image(0, 0, AI_BUTTON);
         image.inputEnabled = true;
         image.events.onInputDown.add(versusAI);
@@ -18,5 +14,5 @@ menuState.prototype = {
 
 
 function versusAI() {
-    console.log("Starting game against AI...");
+	this.game.state.start('single_play');
 }

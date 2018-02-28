@@ -14,11 +14,7 @@ const SEVEN_CARD = 'BROADSWORD';
 //Other assets
 const AI_BUTTON = 'AI_BUTTON';
 
-var loadState = function(game) {
-
-}
-
-loadState.prototype = {
+var loadState = {
     preload: function() {
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 

@@ -24,6 +24,8 @@ io.on('connection', function(socket) {
 	socket.on('disconnect', removePlayer);
 
 	socket.on('chat_msg', updateMessages);
+
+	socket.on('get_cards', generateDeck);
 });
 
 function createGuest(socket) {
@@ -51,6 +53,11 @@ function updatePlayerList() {
 
 function updateMessages(msg) {
 	io.emit('chat_msg', {'username': active_players[this.id].username,'message': msg});
+}
+
+function generateDeck() {
+	var cards = [];
+	this.emit('receive_cards', cards);
 }
 
 class Player {

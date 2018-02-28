@@ -1,0 +1,7 @@
+
+
+var multiPlayState = {
+	create: function() {
+
+	}
+}
