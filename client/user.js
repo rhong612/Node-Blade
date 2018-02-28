@@ -1,5 +1,4 @@
 var socket = io();
-socket.emit('new_guest');
 
 socket.on('display_name', function(name) {
 	$("#displayName").html("Welcome " + name + "!");

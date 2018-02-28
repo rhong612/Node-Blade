@@ -19,25 +19,27 @@ app.use(express.static(__dirname + '/client'));
 io.on('connection', function(socket) {
 	console.log("A user has connected.");
 
-	socket.on('new_guest', createGuest);
+	createGuest(socket);
 
-	socket.on('disconnect', function() {
-		console.log('A user has disconnected.');
-		players = players.filter(player => player.id != this.id);
-		var username_list = players.map(player => player.username);
-		io.emit('update_players', username_list);
-	});
-
-	socket.on('msg', function(msg) {
-		console.log('message: ' + msg);
-	});
+	socket.on('disconnect', removePlayer);
 });
 
-function createGuest(msg) {
+function createGuest(socket) {
 	var username = 'guest' + new Date().valueOf();
 	players.push(new Player(this.id, username));
-	this.emit('display_name', username);
+	socket.emit('display_name', username);
 
+	updatePlayerList();
+}
+
+function removePlayer() {
+	console.log('A user has disconnected.');
+	players = players.filter(player => player.id != this.id);
+
+	updatePlayerList();
+}
+
+function updatePlayerList() {
 	var username_list = players.map(player => player.username);
 	io.emit('update_players', username_list);
 }
