@@ -1,15 +1,23 @@
 {
-  "name": "blade",
+  "name": "node-blade",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhong612/Node-Blade.git"
+  },
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rhong612/Node-Blade/issues"
+  },
+  "homepage": "https://github.com/rhong612/Node-Blade#readme",
   "dependencies": {
-    "express.js": "^1.0.0",
-    "socket.io": "^2.0.4"
+    "express": "^4.16.2",
+    "socket.io": "^1.7.4"
   }
 }
