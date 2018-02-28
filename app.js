@@ -3,7 +3,7 @@ var app = express();
 var http = require('http').Server(app); //Creates a server and passes in app as the request handler
 var io = require('socket.io')(http);
 
-var players = [];
+var active_players = {};
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
@@ -28,7 +28,7 @@ io.on('connection', function(socket) {
 
 function createGuest(socket) {
 	var username = 'guest' + new Date().valueOf();
-	players.push(new Player(socket.id, username));
+	active_players[socket.id] = new Player(username);
 	socket.emit('display_name', username);
 
 	updatePlayerList();
@@ -36,23 +36,25 @@ function createGuest(socket) {
 
 function removePlayer() {
 	console.log('A user has disconnected.');
-	players = players.filter(player => player.id != this.id);
+	delete active_players[this.id];
 
 	updatePlayerList();
 }
 
 function updatePlayerList() {
-	var username_list = players.map(player => player.username);
+	var username_list = [];
+	for (var player in active_players) {
+		username_list.push(active_players[player].username);
+	}
 	io.emit('update_players', username_list);
 }
 
 function updateMessages(msg) {
-	io.emit('chat_msg', {'username': 'todo','message': msg});
+	io.emit('chat_msg', {'username': active_players[this.id].username,'message': msg});
 }
 
 class Player {
-	constructor(id, username) {
-		this.id = id;
+	constructor(username) {
 		this.username = username;
 	}
 }
