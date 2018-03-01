@@ -4,6 +4,7 @@ const BOLT = 'BOLT';
 const BLAST = 'BLAST';
 const MIRROR = 'MIRROR';
 const FORCE = 'FORCE';
+const WAND = 'WAND';
 const TWO_CARD = 'BLADE_PISTOL';
 const THREE_CARD = 'BOW';
 const FOUR_CARD = 'SWORD';
@@ -24,6 +25,7 @@ var loadState = {
         this.load.image(BLAST, 'images/cards/blast.png');
         this.load.image(MIRROR, 'images/cards/mirror.png');
         this.load.image(FORCE, 'images/cards/force.png');
+        this.load.image(WAND, 'images/cards/wand.png');
         this.load.image(TWO_CARD, 'images/cards/blade_pistols.png');
         this.load.image(THREE_CARD, 'images/cards/bow.png');
         this.load.image(FOUR_CARD, 'images/cards/sword.png');

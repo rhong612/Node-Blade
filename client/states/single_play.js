@@ -1,12 +1,12 @@
 
 
-socket.on('receive_cards', function(cards) {
+socket.on('receive_hand', function(cards) {
 	console.log(cards);
 });
 
 var singlePlayState = {
 	create: function() {
-		socket.emit('get_cards');
+		socket.emit('start_single_game');
 	},
 	update: function() {
 	}

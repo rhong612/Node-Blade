@@ -3,6 +3,21 @@ var app = express();
 var http = require('http').Server(app); //Creates a server and passes in app as the request handler
 var io = require('socket.io')(http);
 
+var current_ongoing_games = {};
+
+var cards_list = require('./cards');
+var deck = {};
+deck[cards_list.BOLT] = 6;
+deck[cards_list.BLAST] = 2;
+deck[cards_list.FORCE] = 2;
+deck[cards_list.SEVEN_CARD] = 2;
+deck[cards_list.SIX_CARD] = 3;
+deck[cards_list.FIVE_CARD] = 4;
+deck[cards_list.FOUR_CARD] = 4;
+deck[cards_list.THREE_CARD] = 4;
+deck[cards_list.TWO_CARD] = 3;
+deck[cards_list.WAND] = 2;
+
 var active_players = {};
 
 app.get('/', function(req, res) {
@@ -25,7 +40,7 @@ io.on('connection', function(socket) {
 
 	socket.on('chat_msg', updateMessages);
 
-	socket.on('get_cards', generateDeck);
+	socket.on('start_single_game', createSingleGame);
 });
 
 function createGuest(socket) {
@@ -55,13 +70,19 @@ function updateMessages(msg) {
 	io.emit('chat_msg', {'username': active_players[this.id].username,'message': msg});
 }
 
-function generateDeck() {
-	var cards = [];
-	this.emit('receive_cards', cards);
+function createSingleGame() {
+	var hand = "test";
+	this.emit('receive_hand', hand);
 }
 
 class Player {
 	constructor(username) {
 		this.username = username;
+	}
+}
+
+class SingleGame {
+	constructor(playerID) {
+		this.playerID = playerID;
 	}
 }
