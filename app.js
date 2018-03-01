@@ -3,20 +3,9 @@ var app = express();
 var http = require('http').Server(app); //Creates a server and passes in app as the request handler
 var io = require('socket.io')(http);
 
-var current_ongoing_games = {};
+var current_ongoing_games = [];
 
 var cards_list = require('./cards');
-var deck = {};
-deck[cards_list.BOLT] = 6;
-deck[cards_list.BLAST] = 2;
-deck[cards_list.FORCE] = 2;
-deck[cards_list.SEVEN_CARD] = 2;
-deck[cards_list.SIX_CARD] = 3;
-deck[cards_list.FIVE_CARD] = 4;
-deck[cards_list.FOUR_CARD] = 4;
-deck[cards_list.THREE_CARD] = 4;
-deck[cards_list.TWO_CARD] = 3;
-deck[cards_list.WAND] = 2;
 
 var active_players = {};
 
@@ -71,18 +60,83 @@ function updateMessages(msg) {
 }
 
 function createSingleGame() {
-	var hand = "test";
-	this.emit('receive_hand', hand);
+	var gameID = current_ongoing_games.length;
+	var newGame = new SingleGame(gameID);
+	current_ongoing_games.push(newGame);
+	active_players[this.id].currentGame = gameID;
+
+	newGame.playerDeck = initializeDeck();
+	shuffleDeck(newGame.playerDeck);
+	newGame.enemyDeck = initializeDeck();
+	shuffleDeck(newGame.enemyDeck);
+
+	newGame.playerHand = newGame.playerDeck.splice(0, 10);
+	newGame.enemyHand = newGame.enemyDeck.splice(0, 10);
+
+	this.emit('receive_hand', newGame.playerHand);
 }
 
+
+function shuffleDeck(deck) {
+    for (let i = deck.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+}
+
+
+function initializeDeck() {
+	var deck = [];
+	for (let i = 0; i < 6; i++) {
+		deck.push(cards_list.BOLT);
+	}
+	for (let i = 0; i < 2; i++) {
+		deck.push(cards_list.BLAST);
+	}
+	for (let i = 0; i < 2; i++) {
+		deck.push(cards_list.FORCE);
+	}
+	for (let i = 0; i < 2; i++) {
+		deck.push(cards_list.SEVEN_CARD);
+	}
+	for (let i = 0; i < 3; i++) {
+		deck.push(cards_list.SIX_CARD);
+	}
+	for (let i = 0; i < 4; i++) {
+		deck.push(cards_list.FIVE_CARD);
+	}
+	for (let i = 0; i < 4; i++) {
+		deck.push(cards_list.FOUR_CARD);
+	}
+	for (let i = 0; i < 4; i++) {
+		deck.push(cards_list.THREE_CARD);
+	}
+	for (let i = 0; i < 3; i++) {
+		deck.push(cards_list.TWO_CARD);
+	}
+	for (let i = 0; i < 2; i++) {
+		deck.push(cards_list.WAND);
+	}
+	return deck;
+}
+
+
+const NO_GAME = -1;
 class Player {
 	constructor(username) {
 		this.username = username;
+		this.currentGame = NO_GAME;
 	}
 }
 
 class SingleGame {
-	constructor(playerID) {
-		this.playerID = playerID;
+	constructor(gameID) {
+		this.gameID = gameID;
+		this.playerDeck = null;
+		this.playerHand = null;
+		this.playerScore = 0;
+		this.enemyDeck = null;
+		this.enemyHand = null;
+		this.enemyScore = 0;
 	}
 }

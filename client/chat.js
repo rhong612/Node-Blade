@@ -7,7 +7,7 @@ socket.on('display_name', function(name) {
 
 socket.on('update_players', function(usernames) {
 	$("#player_list tbody").empty();
-	for (var i = 0; i < usernames.length; i++) {
+	for (let i = 0; i < usernames.length; i++) {
 		$("#player_list tbody").append("<tr><td><label data-name='" + usernames[i] + "'>" + usernames[i] + "</label></td></tr>");
 	}
 });
