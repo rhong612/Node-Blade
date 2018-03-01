@@ -15,6 +15,14 @@ const SEVEN_CARD = 'BROADSWORD';
 //Other assets
 const AI_BUTTON = 'AI_BUTTON';
 
+//Sound effects
+const SHUFFLE = 'SHUFFLE';
+
+//Frequently used constants
+const CARD_WIDTH = 191;
+const CARD_SCALE = 0.5;
+const DECK_SIZE = 32;
+
 var loadState = {
     preload: function() {
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -35,6 +43,9 @@ var loadState = {
 
         //Other assets
         this.load.image(AI_BUTTON, 'images/ai_button.png');
+
+        //Sound effects
+        this.load.audio(SHUFFLE, 'sounds/card_shuffle.mp3');
     },
     create: function() {
         this.game.state.start('menu');
