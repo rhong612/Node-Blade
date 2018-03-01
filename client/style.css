@@ -1,12 +1,4 @@
-.col-4 {
-	background-color: grey;
-}
-
-.col-2 {
-	background-color: white;
-}
-
-body, .col-8 {
+body, .col-md-8 {
 	background-color: black;
 }
 
