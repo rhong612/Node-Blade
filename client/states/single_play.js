@@ -1,9 +1,8 @@
 
 
 
-var backSprites = [];
+var cardSprites = [];
 
-var handSprites = [];
 var hand = [];
 
 var singlePlayState = {
@@ -11,27 +10,56 @@ var singlePlayState = {
 		socket.emit('start_single_game');
 
 		socket.on('receive_hand', function(cards) {
-			/* Draw hand
-			for (let i = 0; i < cards.length; i++) {
-				handSprites.push(game.add.sprite(i * cardWidth * cardScale, 0, cards[i]));
-				handSprites[i].scale.setTo(cardScale, cardScale);
-			}
-			*/
 			var shuffleSound = game.add.audio(SHUFFLE);
 
 
 			hand = cards.slice();
-			let tweens = [];
+			let deck_tweens = [];
+			let hand_tweens = [];
+			const DELAY = 100;
+			const SPEED = 300;
+			const DECK_LOCATION = game.world.centerX / 20;
 			for (let i = 0; i < DECK_SIZE; i++) {
-				backSprites.push(game.add.sprite(-1 * CARD_WIDTH, 0, BACK));
-				backSprites[i].scale.setTo(CARD_SCALE, CARD_SCALE);
-				tweens.push(game.add.tween(backSprites[i]).to({ x: game.world.centerX / 20 }, 300, Phaser.Easing.Linear.Out, false, i * 100));
+				cardSprites.push(game.add.sprite(-1 * CARD_WIDTH, 0, BACK));
+				cardSprites[i].scale.setTo(CARD_SCALE, CARD_SCALE);
+				deck_tweens.push(game.add.tween(cardSprites[i]).to({ x: DECK_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
 			}
 
+			for (let i = 0; i < hand.length; i++) {
+				hand_tweens.push(game.add.tween(cardSprites[i]).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH + DECK_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+			}
+
+			deck_tweens[DECK_SIZE - 1].onComplete.add(function() {
+				for (let i = 0; i < hand_tweens.length; i++) {
+					hand_tweens[i].start();
+				}
+			});
+
+			hand_tweens[hand_tweens.length - 1].onComplete.add(function() {
+				console.log("Done");
+				for (let i = 0; i < hand.length; i++) {
+					let flipTween = game.add.tween(cardSprites[i].scale).to({
+						x: 0,
+						y: 1.2
+					}, 1000, Phaser.Easing.Linear.None);
+
+					let flipTween2 = game.add.tween(cardSprites[i].scale).to({
+						x: 1,
+						y: 1
+					}, 1000, Phaser.Easing.Linear.None);
+
+					flipTween.onComplete.add(function() {
+						cardSprites[i].loadTexture(hand[i]);
+						flipTween2.start();
+					});
+
+					flipTween.start();
+				}
+			});
 
 			shuffleSound.play();
-			for(let i = 0; i < tweens.length; i++) {
-				tweens[i].start();
+			for(let i = 0; i < deck_tweens.length; i++) {
+				deck_tweens[i].start();
 			}
 
 
