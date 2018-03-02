@@ -1,4 +1,4 @@
-var socket = io();
+const socket = io();
 
 socket.on('display_name', function(name) {
 	$("#displayName").html("Welcome " + name + "!");

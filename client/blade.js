@@ -1,7 +1,7 @@
-var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.CANVAS, 'game');
+const game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.CANVAS, 'game');
 
 
-var cardSprites = [];
+const cardSprites = [];
 var hand = []; //Array representing the cards currently in the player's hand
 
 game.state.add('load', loadState);
