@@ -1,13 +1,13 @@
-var express = require('express');
-var app = express();
-var http = require('http').Server(app); //Creates a server and passes in app as the request handler
-var io = require('socket.io')(http);
+const express = require('express');
+const app = express();
+const http = require('http').Server(app); //Creates a server and passes in app as the request handler
+const io = require('socket.io')(http);
 
-var current_ongoing_games = [];
+const current_ongoing_games = [];
 
-var cards_list = require('./cards');
+const cards_list = require('./cards');
 
-var active_players = {};
+const active_players = {};
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
@@ -48,8 +48,8 @@ function removePlayer() {
 }
 
 function updatePlayerList() {
-	var username_list = [];
-	for (var player in active_players) {
+	const username_list = [];
+	for (const player in active_players) {
 		username_list.push(active_players[player].username);
 	}
 	io.emit('update_players', username_list);
@@ -86,7 +86,7 @@ function shuffleDeck(deck) {
 
 
 function initializeDeck() {
-	var deck = [];
+	const deck = [];
 	for (let i = 0; i < 6; i++) {
 		deck.push(cards_list.BOLT);
 	}
