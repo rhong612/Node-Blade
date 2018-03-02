@@ -1,6 +1,3 @@
-const GAME_WIDTH = 1280;
-const GAME_HEIGHT = 720;
-
 var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.CANVAS, 'game');
 
 

@@ -10,7 +10,7 @@ var singlePlayState = {
 		socket.emit('start_single_game');
 
 		socket.on('receive_hand', function(cards) {
-			var shuffleSound = game.add.audio(SHUFFLE);
+			var shuffleSound = game.add.audio(SHUFFLE_SOUND);
 
 
 			hand = cards.slice();
