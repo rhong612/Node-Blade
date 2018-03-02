@@ -1,10 +1,3 @@
-
-
-
-var cardSprites = [];
-
-var hand = [];
-
 var singlePlayState = {
 	create: function() {
 		socket.emit('start_single_game');
