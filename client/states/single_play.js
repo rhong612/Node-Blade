@@ -36,13 +36,13 @@ var singlePlayState = {
 				for (let i = 0; i < hand.length; i++) {
 					let flipTween = game.add.tween(cardSprites[i].scale).to({
 						x: 0,
-						y: 1.2
-					}, 1000, Phaser.Easing.Linear.None);
+						y: CARD_SCALE * 1.2
+					}, 100, Phaser.Easing.Linear.None, false, i * DELAY);
 
 					let flipTween2 = game.add.tween(cardSprites[i].scale).to({
-						x: 1,
-						y: 1
-					}, 1000, Phaser.Easing.Linear.None);
+						x: CARD_SCALE,
+						y: CARD_SCALE
+					}, 100, Phaser.Easing.Linear.None);
 
 					flipTween.onComplete.add(function() {
 						cardSprites[i].loadTexture(hand[i]);
