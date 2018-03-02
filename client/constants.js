@@ -19,11 +19,13 @@ const AI_BUTTON = 'AI_BUTTON';
 const SHUFFLE_SOUND = 'SHUFFLE';
 const BGM = 'BGM';
 
-//Card related constants
-const CARD_WIDTH = 191;
-const CARD_SCALE = 0.5;
-const DECK_SIZE = 32;
-
 //Resolution
 const GAME_WIDTH = 1280;
 const GAME_HEIGHT = 720;
+
+//Card related constants
+const CARD_WIDTH = 191;
+const CARD_SCALE = 0.5;
+const INITIAL_DECK_SIZE = 32;
+const DECK_X_LOCATION = GAME_WIDTH / 2 / 20;
+const INITIAL_HAND_SIZE = 10;
