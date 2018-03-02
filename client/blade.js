@@ -1,7 +1,8 @@
 const game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.CANVAS, 'game');
 
 
-const cardSprites = [];
+const playerCardSprites = [];
+const enemyCardSprites = [];
 var hand = []; //Array representing the cards currently in the player's hand
 
 game.state.add('load', loadState);
@@ -15,39 +16,55 @@ game.state.start('load');
 
 
 function initializeCardSprites() {
-	if (cardSprites.length <= 0) {
+	if (playerCardSprites.length == 0) {
 	    for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-	        cardSprites.push(game.add.sprite(-1 * CARD_WIDTH, 0, BACK));
-	        cardSprites[i].scale.setTo(CARD_SCALE, CARD_SCALE);
+	        playerCardSprites.push(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - CARD_HEIGHT / 2, BACK));
+	        playerCardSprites[i].scale.setTo(CARD_SCALE, CARD_SCALE);
 	    }
+	}
+
+	if (enemyCardSprites.length == 0) {
+		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
+			enemyCardSprites.push(game.add.sprite(-1 * CARD_WIDTH, 0, BACK));
+			enemyCardSprites[i].scale.setTo(CARD_SCALE, CARD_SCALE);
+		}
 	}
 }
 
 function playSetupAnimation() {
     const SPEED = 300;
     const DELAY = 100;
-    let hand_tweens = [];
-    let deck_tweens = [];
+    let player_hand_tweens = [];
+    let player_deck_tweens = [];
+    let enemy_hand_tweens = [];
+    let enemy_deck_tweens = [];
     for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-        deck_tweens.push(game.add.tween(cardSprites[i]).to({ x: DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        player_deck_tweens.push(game.add.tween(playerCardSprites[i]).to({ x: DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        enemy_deck_tweens.push(game.add.tween(enemyCardSprites[i]).to({ x: DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
     }
 
     for (let i = 0; i < INITIAL_HAND_SIZE; i++) {
-        hand_tweens.push(game.add.tween(cardSprites[i]).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        player_hand_tweens.push(game.add.tween(playerCardSprites[i]).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        enemy_hand_tweens.push(game.add.tween(enemyCardSprites[i]).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
     }
 
-    deck_tweens[INITIAL_DECK_SIZE - 1].onComplete.add(function() {
-        startAllTweens(hand_tweens);
+    player_deck_tweens[INITIAL_DECK_SIZE - 1].onComplete.add(function() {
+        startAllTweens(player_hand_tweens);
+    });
+
+    enemy_deck_tweens[INITIAL_DECK_SIZE - 1].onComplete.add(function() {
+    	startAllTweens(enemy_hand_tweens);
     });
 
 
-    hand_tweens[hand_tweens.length - 1].onComplete.add(function() {
+    player_hand_tweens[player_hand_tweens.length - 1].onComplete.add(function() {
         for (let i = 0; i < INITIAL_HAND_SIZE; i++) {
-        	getFlipTween(cardSprites[i], hand[i], i * DELAY).start();
+        	getFlipTween(playerCardSprites[i], hand[i], i * DELAY).start();
         }
     });
 
-    startAllTweens(deck_tweens);
+    startAllTweens(player_deck_tweens);
+    startAllTweens(enemy_deck_tweens);
     var shuffleSound = game.add.audio(SHUFFLE_SOUND);
     shuffleSound.play();
 }

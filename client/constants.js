@@ -25,6 +25,7 @@ const GAME_HEIGHT = 720;
 
 //Card related constants
 const CARD_WIDTH = 191;
+const CARD_HEIGHT = 252;
 const CARD_SCALE = 0.5;
 const INITIAL_DECK_SIZE = 32;
 const DECK_X_LOCATION = GAME_WIDTH / 2 / 20;
