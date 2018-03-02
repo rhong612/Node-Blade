@@ -17,6 +17,7 @@ const AI_BUTTON = 'AI_BUTTON';
 
 //Sound effects
 const SHUFFLE_SOUND = 'SHUFFLE';
+const BGM = 'BGM';
 
 //Card related constants
 const CARD_WIDTH = 191;

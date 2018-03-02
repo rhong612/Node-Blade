@@ -21,8 +21,12 @@ var loadState = {
 
         //Sound effects
         this.load.audio(SHUFFLE_SOUND, 'sounds/card_shuffle.mp3');
+
+        //Music
+        this.load.audio(BGM, 'music/Trails of Cold Steel OST - Game of Blades.mp3');
     },
     create: function() {
+        this.game.stage.disableVisibilityChange = true; //Make game run in background
         this.game.state.start('menu');
     }
 }

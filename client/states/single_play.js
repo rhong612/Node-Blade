@@ -4,6 +4,9 @@ var singlePlayState = {
 
 		socket.on('receive_hand', function(cards) {
 			var shuffleSound = game.add.audio(SHUFFLE_SOUND);
+			var bgm = game.add.audio(BGM);
+			bgm.loopFull();
+			bgm.volume = 0.2;
 
 
 			hand = cards.slice();
@@ -50,6 +53,7 @@ var singlePlayState = {
 				}
 			});
 
+			bgm.play();
 			shuffleSound.play();
 			for(let i = 0; i < deck_tweens.length; i++) {
 				deck_tweens[i].start();
