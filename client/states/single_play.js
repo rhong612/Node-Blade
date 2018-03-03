@@ -1,5 +1,7 @@
 var singlePlayState = {
     create: function() {
+        playerCardSprites = game.add.group();
+        enemyCardSprites = game.add.group();
         socket.emit('start_single_game');
 
         socket.on('receive_hand', function(cards) {
@@ -26,21 +28,21 @@ var singlePlayState = {
 }
 
 function getDrawAnimationChain() {
-    let playerTween = drawPlayerCardAnimation(playerCardSprites[currentDeckIndex]); 
-    let enemyTween = drawEnemyCardAnimation(enemyCardSprites[currentDeckIndex]);
-    endOfChain(playerTween, getFlipTween(playerCardSprites[currentDeckIndex], playerDraw[0], 0));
-    endOfChain(enemyTween, getFlipTween(enemyCardSprites[currentDeckIndex], enemyDraw[0], 0));
+    let playerTween = drawPlayerCardAnimation(playerCardSprites.getChildAt(currentDeckIndex)); 
+    let enemyTween = drawEnemyCardAnimation(enemyCardSprites.getChildAt(currentDeckIndex));
+    endOfChain(playerTween, getFlipTween(playerCardSprites.getChildAt(currentDeckIndex), playerDraw[0], 0));
+    endOfChain(enemyTween, getFlipTween(enemyCardSprites.getChildAt(currentDeckIndex), enemyDraw[0], 0));
 
     for (let i = 1; i < playerDraw.length; i++) {
-        endOfChain(playerTween, dumpPlayerCardAnimation(playerCardSprites[currentDeckIndex]));
-        endOfChain(enemyTween, dumpEnemyCardAnimation(enemyCardSprites[currentDeckIndex]));
+        endOfChain(playerTween, dumpPlayerCardAnimation(playerCardSprites.getChildAt(currentDeckIndex)));
+        endOfChain(enemyTween, dumpEnemyCardAnimation(enemyCardSprites.getChildAt(currentDeckIndex)));
 
         currentDeckIndex++;
-        endOfChain(playerTween, drawPlayerCardAnimation(playerCardSprites[currentDeckIndex]));
-        endOfChain(enemyTween, drawEnemyCardAnimation(enemyCardSprites[currentDeckIndex]));
+        endOfChain(playerTween, drawPlayerCardAnimation(playerCardSprites.getChildAt(currentDeckIndex)));
+        endOfChain(enemyTween, drawEnemyCardAnimation(enemyCardSprites.getChildAt(currentDeckIndex)));
 
-        endOfChain(playerTween, getFlipTween(playerCardSprites[currentDeckIndex], playerDraw[i], 0));
-        endOfChain(enemyTween, getFlipTween(enemyCardSprites[currentDeckIndex], enemyDraw[i], 0));
+        endOfChain(playerTween, getFlipTween(playerCardSprites.getChildAt(currentDeckIndex), playerDraw[i], 0));
+        endOfChain(enemyTween, getFlipTween(enemyCardSprites.getChildAt(currentDeckIndex), enemyDraw[i], 0));
     }
     playerDraw = [];
     enemyDraw = [];

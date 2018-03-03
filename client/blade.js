@@ -1,8 +1,11 @@
+
+
 const game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.CANVAS, 'game');
 
 
-const playerCardSprites = [];
-const enemyCardSprites = [];
+var playerCardSprites;
+var enemyCardSprites;
+
 var hand = []; //Array representing the cards currently in the player's hand
 var currentDeckIndex = 0;
 var playerDraw = [];
@@ -19,19 +22,19 @@ game.state.start('load');
 
 
 function initializeCardSprites() {
-	if (playerCardSprites.length == 0) {
+	if (playerCardSprites.getTop() == undefined) {
 	    for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-	        playerCardSprites.push(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
-	        playerCardSprites[i].scale.setTo(CARD_SCALE, CARD_SCALE);
-            playerCardSprites[i].anchor.setTo(ANCHOR);
+	        playerCardSprites.add(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
+	        playerCardSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
+            playerCardSprites.getChildAt(i).anchor.setTo(ANCHOR);
 	    }
 	}
 
-	if (enemyCardSprites.length == 0) {
+	if (enemyCardSprites.getTop() == undefined) {
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-			enemyCardSprites.push(game.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
-			enemyCardSprites[i].scale.setTo(CARD_SCALE, CARD_SCALE);
-            enemyCardSprites[i].anchor.setTo(ANCHOR);
+			enemyCardSprites.add(game.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
+			enemyCardSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
+            enemyCardSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
 	}
 }
@@ -44,13 +47,13 @@ function playSetupAnimation() {
     let enemy_hand_tweens = [];
     let enemy_deck_tweens = [];
     for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-        player_deck_tweens.push(game.add.tween(playerCardSprites[i]).to({ x: DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
-        enemy_deck_tweens.push(game.add.tween(enemyCardSprites[i]).to({ x: GAME_WIDTH - DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        player_deck_tweens.push(game.add.tween(playerCardSprites.getChildAt(i)).to({ x: DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        enemy_deck_tweens.push(game.add.tween(enemyCardSprites.getChildAt(i)).to({ x: GAME_WIDTH - DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
     }
 
     for (let i = 0; i < INITIAL_HAND_SIZE; i++) {
-        player_hand_tweens.push(game.add.tween(playerCardSprites[i]).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH * CARD_SCALE * 2 + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
-        enemy_hand_tweens.push(game.add.tween(enemyCardSprites[i]).to({ x: (GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE * 2) - (i * CARD_WIDTH * CARD_SCALE)}, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        player_hand_tweens.push(game.add.tween(playerCardSprites.getChildAt(i)).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH * CARD_SCALE * 2 + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        enemy_hand_tweens.push(game.add.tween(enemyCardSprites.getChildAt(i)).to({ x: (GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE * 2) - (i * CARD_WIDTH * CARD_SCALE)}, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
     }
 
     player_deck_tweens[INITIAL_DECK_SIZE - 1].onComplete.add(function() {
@@ -64,9 +67,9 @@ function playSetupAnimation() {
 
     player_hand_tweens[player_hand_tweens.length - 1].onComplete.add(function() {
         for (let i = 0; i < INITIAL_HAND_SIZE - 1; i++) {
-        	getFlipTween(playerCardSprites[i], hand[i], i * DELAY).start();
+        	getFlipTween(playerCardSprites.getChildAt(i), hand[i], i * DELAY).start();
         }
-        let lastFlip = getFlipTween(playerCardSprites[INITIAL_HAND_SIZE - 1], hand[INITIAL_HAND_SIZE - 1], (INITIAL_HAND_SIZE - 1) * DELAY);
+        let lastFlip = getFlipTween(playerCardSprites.getChildAt(INITIAL_HAND_SIZE - 1), hand[INITIAL_HAND_SIZE - 1], (INITIAL_HAND_SIZE - 1) * DELAY);
         lastFlip.onComplete.add(function() {
             let drawAnim = getDrawAnimationChain();
             drawAnim.playerTween.start();
