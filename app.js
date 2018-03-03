@@ -73,7 +73,10 @@ function createSingleGame() {
 	newGame.playerHand = newGame.playerDeck.splice(0, 10);
 	newGame.enemyHand = newGame.enemyDeck.splice(0, 10);
 
-	this.emit('receive_hand', newGame.playerHand);
+	//var draw = newGame.draw();
+	var draw = {playerDraw: [cards_list.BOLT, cards_list.BOLT], enemyDraw: [cards_list.BOLT, cards_list.WAND]}; //For testing purposes
+
+	this.emit('receive_hand', {hand: newGame.playerHand, playerDraw: draw.playerDraw, enemyDraw: draw.enemyDraw});
 }
 
 
@@ -138,5 +141,26 @@ class SingleGame {
 		this.enemyDeck = null;
 		this.enemyHand = null;
 		this.enemyScore = 0;
+		this.playerField = [];
+		this.enemyField = [];
+	}
+
+	draw() {
+		let playerDraw = [];
+		let enemyDraw = [];
+		let i = 0;
+		while (this.playerDeck.length > 0) {
+			playerDraw.push(this.playerDeck.shift());
+			enemyDraw.push(this.enemyDeck.shift());
+
+			if (playerDraw[i] != enemyDraw[i]) {
+				this.playerField.push(playerDraw[i]);
+				this.enemyField.push(enemyDraw[i]);
+				break;
+			}
+
+			i++;
+		}
+		return {playerDraw: playerDraw, enemyDraw: enemyDraw};
 	}
 }

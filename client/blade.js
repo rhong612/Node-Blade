@@ -4,6 +4,9 @@ const game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.CANVAS, 'game');
 const playerCardSprites = [];
 const enemyCardSprites = [];
 var hand = []; //Array representing the cards currently in the player's hand
+var currentDeckSize = 0;
+var playerDraw = [];
+var enemyDraw = [];
 
 game.state.add('load', loadState);
 game.state.add('menu', menuState);
@@ -58,9 +61,16 @@ function playSetupAnimation() {
 
 
     player_hand_tweens[player_hand_tweens.length - 1].onComplete.add(function() {
-        for (let i = 0; i < INITIAL_HAND_SIZE; i++) {
+        for (let i = 0; i < INITIAL_HAND_SIZE - 1; i++) {
         	getFlipTween(playerCardSprites[i], hand[i], i * DELAY).start();
         }
+        let lastFlip = getFlipTween(playerCardSprites[INITIAL_HAND_SIZE - 1], hand[INITIAL_HAND_SIZE - 1], (INITIAL_HAND_SIZE - 1) * DELAY);
+        lastFlip.onComplete.add(function() {
+            let drawAnim = getDrawAnimationChain();
+            drawAnim.playerTween.start();
+            drawAnim.enemyTween.start();
+        });
+        lastFlip.start();
     });
 
     startAllTweens(player_deck_tweens);
