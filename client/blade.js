@@ -21,15 +21,17 @@ game.state.start('load');
 function initializeCardSprites() {
 	if (playerCardSprites.length == 0) {
 	    for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-	        playerCardSprites.push(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - CARD_HEIGHT / 2, BACK));
+	        playerCardSprites.push(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
 	        playerCardSprites[i].scale.setTo(CARD_SCALE, CARD_SCALE);
+            playerCardSprites[i].anchor.setTo(ANCHOR);
 	    }
 	}
 
 	if (enemyCardSprites.length == 0) {
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-			enemyCardSprites.push(game.add.sprite(-1 * CARD_WIDTH, 0, BACK));
+			enemyCardSprites.push(game.add.sprite(-1 * CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
 			enemyCardSprites[i].scale.setTo(CARD_SCALE, CARD_SCALE);
+            enemyCardSprites[i].anchor.setTo(ANCHOR);
 		}
 	}
 }

@@ -49,12 +49,12 @@ function getDrawAnimationChain() {
 
 function drawPlayerCardAnimation(sprite) {
     const SPEED = 400;
-    return game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - CARD_HEIGHT * CARD_SCALE * 2.5) }, SPEED, Phaser.Easing.Linear.Out, false);
+    return game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, false);
 }
 
 function drawEnemyCardAnimation(sprite) {
     const SPEED = 400;
-    return game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * 1.5 }, SPEED, Phaser.Easing.Linear.Out, false);
+    return game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * ANCHOR * 4}, SPEED, Phaser.Easing.Linear.Out, false);
 }
 
 function dumpPlayerCardAnimation(sprite, delay) {
