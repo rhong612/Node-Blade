@@ -1,7 +1,5 @@
 var singlePlayState = {
     create: function() {
-        playerCardSprites = game.add.group();
-        enemyCardSprites = game.add.group();
         socket.emit('start_single_game');
 
         socket.on('receive_hand', function(cards) {

@@ -22,20 +22,18 @@ game.state.start('load');
 
 
 function initializeCardSprites() {
-	if (playerCardSprites.getTop() == undefined) {
-	    for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-	        playerCardSprites.add(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
-	        playerCardSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
-            playerCardSprites.getChildAt(i).anchor.setTo(ANCHOR);
-	    }
+	playerCardSprites = game.add.group();
+	enemyCardSprites = game.add.group();
+	for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
+	    playerCardSprites.add(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
+	    playerCardSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
+        playerCardSprites.getChildAt(i).anchor.setTo(ANCHOR);
 	}
 
-	if (enemyCardSprites.getTop() == undefined) {
-		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-			enemyCardSprites.add(game.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
-			enemyCardSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
-            enemyCardSprites.getChildAt(i).anchor.setTo(ANCHOR);
-		}
+	for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
+		enemyCardSprites.add(game.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
+		enemyCardSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
+        enemyCardSprites.getChildAt(i).anchor.setTo(ANCHOR);
 	}
 }
 
