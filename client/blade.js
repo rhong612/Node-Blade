@@ -29,7 +29,7 @@ function initializeCardSprites() {
 
 	if (enemyCardSprites.length == 0) {
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-			enemyCardSprites.push(game.add.sprite(-1 * CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
+			enemyCardSprites.push(game.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
 			enemyCardSprites[i].scale.setTo(CARD_SCALE, CARD_SCALE);
             enemyCardSprites[i].anchor.setTo(ANCHOR);
 		}
@@ -45,12 +45,12 @@ function playSetupAnimation() {
     let enemy_deck_tweens = [];
     for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
         player_deck_tweens.push(game.add.tween(playerCardSprites[i]).to({ x: DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
-        enemy_deck_tweens.push(game.add.tween(enemyCardSprites[i]).to({ x: DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        enemy_deck_tweens.push(game.add.tween(enemyCardSprites[i]).to({ x: GAME_WIDTH - DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
     }
 
     for (let i = 0; i < INITIAL_HAND_SIZE; i++) {
-        player_hand_tweens.push(game.add.tween(playerCardSprites[i]).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
-        enemy_hand_tweens.push(game.add.tween(enemyCardSprites[i]).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        player_hand_tweens.push(game.add.tween(playerCardSprites[i]).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH * CARD_SCALE * 2 + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        enemy_hand_tweens.push(game.add.tween(enemyCardSprites[i]).to({ x: (GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE * 2) - (i * CARD_WIDTH * CARD_SCALE)}, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
     }
 
     player_deck_tweens[INITIAL_DECK_SIZE - 1].onComplete.add(function() {
