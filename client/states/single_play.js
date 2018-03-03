@@ -26,34 +26,46 @@ var singlePlayState = {
 }
 
 function getDrawAnimationChain() {
-    const DELAY = 500;
     let cardsLeft = playerDraw.length;
 
-    let playerTween = drawCardAnimation(playerCardSprites[currentDeckIndex]); 
-    let enemyTween = drawCardAnimation(enemyCardSprites[currentDeckIndex]);
+    let playerTween = drawPlayerCardAnimation(playerCardSprites[currentDeckIndex]); 
+    let enemyTween = drawEnemyCardAnimation(enemyCardSprites[currentDeckIndex]);
     cardsLeft--;
 
     while (cardsLeft > 0) {
-        endOfChain(playerTween, dumpCardAnimation(playerCardSprites[currentDeckIndex], DELAY));
-        endOfChain(enemyTween, dumpCardAnimation(enemyCardSprites[currentDeckIndex], DELAY));
+        endOfChain(playerTween, dumpPlayerCardAnimation(playerCardSprites[currentDeckIndex]));
+        endOfChain(enemyTween, dumpEnemyCardAnimation(enemyCardSprites[currentDeckIndex]));
 
         currentDeckIndex++;
-        endOfChain(playerTween, drawCardAnimation(playerCardSprites[currentDeckIndex]));
-        endOfChain(enemyTween, drawCardAnimation(enemyCardSprites[currentDeckIndex]));
+        endOfChain(playerTween, drawPlayerCardAnimation(playerCardSprites[currentDeckIndex]));
+        endOfChain(enemyTween, drawEnemyCardAnimation(enemyCardSprites[currentDeckIndex]));
         cardsLeft--;
     }
     return {playerTween: playerTween, enemyTween: enemyTween};
 }
 
-function drawCardAnimation(sprite) {
+function drawPlayerCardAnimation(sprite) {
     const SPEED = 400;
-    return game.add.tween(sprite).to({ x: GAME_WIDTH / 2, y: GAME_HEIGHT / 2  }, SPEED, Phaser.Easing.Linear.Out, false);
+    return game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - CARD_HEIGHT * CARD_SCALE * 2.5) }, SPEED, Phaser.Easing.Linear.Out, false);
 }
 
-function dumpCardAnimation(sprite, delay) {
+function drawEnemyCardAnimation(sprite) {
     const SPEED = 400;
-    return game.add.tween(sprite).to({x: -1 * CARD_WIDTH }, SPEED, Phaser.Easing.Linear.Out, false, delay);
+    return game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * 1.5 }, SPEED, Phaser.Easing.Linear.Out, false);
 }
+
+function dumpPlayerCardAnimation(sprite, delay) {
+    const SPEED = 400;
+    const DELAY = 1500;
+    return game.add.tween(sprite).to({x: GAME_WIDTH + CARD_WIDTH }, SPEED, Phaser.Easing.Linear.Out, false, DELAY);
+}
+
+function dumpEnemyCardAnimation(sprite, delay) {
+    const SPEED = 400;
+    const DELAY = 1500;
+    return game.add.tween(sprite).to({x: -1 * CARD_WIDTH }, SPEED, Phaser.Easing.Linear.Out, false, DELAY);
+}
+
 
 function endOfChain(chain, newTween) {
     let end = chain;
