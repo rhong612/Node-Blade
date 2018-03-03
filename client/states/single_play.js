@@ -26,21 +26,24 @@ var singlePlayState = {
 }
 
 function getDrawAnimationChain() {
-    let cardsLeft = playerDraw.length;
-
     let playerTween = drawPlayerCardAnimation(playerCardSprites[currentDeckIndex]); 
     let enemyTween = drawEnemyCardAnimation(enemyCardSprites[currentDeckIndex]);
-    cardsLeft--;
+    endOfChain(playerTween, getFlipTween(playerCardSprites[currentDeckIndex], playerDraw[0], 0));
+    endOfChain(enemyTween, getFlipTween(enemyCardSprites[currentDeckIndex], enemyDraw[0], 0));
 
-    while (cardsLeft > 0) {
+    for (let i = 1; i < playerDraw.length; i++) {
         endOfChain(playerTween, dumpPlayerCardAnimation(playerCardSprites[currentDeckIndex]));
         endOfChain(enemyTween, dumpEnemyCardAnimation(enemyCardSprites[currentDeckIndex]));
 
         currentDeckIndex++;
         endOfChain(playerTween, drawPlayerCardAnimation(playerCardSprites[currentDeckIndex]));
         endOfChain(enemyTween, drawEnemyCardAnimation(enemyCardSprites[currentDeckIndex]));
-        cardsLeft--;
+
+        endOfChain(playerTween, getFlipTween(playerCardSprites[currentDeckIndex], playerDraw[i], 0));
+        endOfChain(enemyTween, getFlipTween(enemyCardSprites[currentDeckIndex], enemyDraw[i], 0));
     }
+    playerDraw = [];
+    enemyDraw = [];
     return {playerTween: playerTween, enemyTween: enemyTween};
 }
 
