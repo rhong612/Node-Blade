@@ -4,7 +4,7 @@ const game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.CANVAS, 'game');
 const playerCardSprites = [];
 const enemyCardSprites = [];
 var hand = []; //Array representing the cards currently in the player's hand
-var currentDeckSize = 0;
+var currentDeckIndex = 0;
 var playerDraw = [];
 var enemyDraw = [];
 
