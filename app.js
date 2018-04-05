@@ -71,12 +71,15 @@ function createSingleGame() {
 	shuffleDeck(newGame.enemyDeck);
 
 	newGame.playerHand = newGame.playerDeck.splice(0, 10);
+	let unsortedHand = newGame.playerHand;
 	newGame.enemyHand = newGame.enemyDeck.splice(0, 10);
+	newGame.sortPlayerHand();
+	newGame.sortEnemyHand();
 
 	//var draw = newGame.draw();
 	var draw = {playerDraw: [cards_list.BOLT, cards_list.BOLT], enemyDraw: [cards_list.BOLT, cards_list.WAND]}; //For testing purposes
 
-	this.emit('receive_hand', {hand: newGame.playerHand, playerDraw: draw.playerDraw, enemyDraw: draw.enemyDraw});
+	this.emit('receive_hand', {hand: unsortedHand, sortedHand: newGame.playerHand, playerDraw: draw.playerDraw, enemyDraw: draw.enemyDraw});
 }
 
 
@@ -162,5 +165,13 @@ class SingleGame {
 			i++;
 		}
 		return {playerDraw: playerDraw, enemyDraw: enemyDraw};
+	}
+
+	sortPlayerHand() {
+		
+	}
+
+	sortEnemyHand() {
+
 	}
 }

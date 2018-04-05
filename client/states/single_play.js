@@ -9,6 +9,7 @@ var singlePlayState = {
 
 
             hand = cards.hand.slice();
+            sortedHand = cards.sortedHand.slice();
             playerDraw = cards.playerDraw;
             enemyDraw = cards.enemyDraw;
 

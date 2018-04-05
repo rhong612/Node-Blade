@@ -9,6 +9,7 @@ var playerHandSprites;
 var enemyHandSprites;
 
 var hand = []; //Array representing the cards currently in the player's hand
+var sortedHand = [];
 var currentDeckIndex = 0;
 var playerDraw = [];
 var enemyDraw = [];
@@ -194,6 +195,7 @@ function getFlipTween(sprite, newCard, delay) {
 }
 
 function cardSort() {
+	hand = sortedHand;
 }
 
 function startAllTweens(tweens_array) {
