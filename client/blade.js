@@ -18,6 +18,7 @@ game.state.add('load', loadState);
 game.state.add('menu', menuState);
 game.state.add('single_play', singlePlayState);
 game.state.add('multi_play', multiPlayState);
+game.state.add('multi_play_menu', multiPlayMenuState)
 
 game.state.start('load');
 

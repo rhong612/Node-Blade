@@ -14,6 +14,7 @@ const SEVEN_CARD = 'BROADSWORD';
 
 //Other images
 const AI_BUTTON = 'AI_BUTTON';
+const MULTI_BUTTON = 'MULTI_BUTTON';
 
 //Sound effects
 const SHUFFLE_SOUND = 'SHUFFLE';

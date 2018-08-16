@@ -7,6 +7,8 @@ const io = require('socket.io')(http);
 
 const current_ongoing_games = [];
 
+const player_lobby = {};
+
 const cards_list = require('./cards');
 
 const active_players = {};
@@ -30,7 +32,19 @@ io.on('connection', function(socket) {
 	socket.on('disconnect', removePlayer);
 
 	socket.on('start_single_game', createSingleGame);
+
+	socket.on('join_waiting_list', joinWaitingList);
 });
+
+function joinWaitingList() {
+	this.join('waiting_room');
+	player_lobby[this.id] = active_players[this.id];
+	refreshWaitingList();
+}
+
+function refreshWaitingList() {
+	io.in('waiting_room').emit('client_waiting_list', player_lobby);
+}
 
 function createGuest(socket) {
 	var username = 'guest' + new Date().valueOf();
@@ -43,8 +57,10 @@ function createGuest(socket) {
 function removePlayer() {
 	console.log('A user has disconnected.');
 	delete active_players[this.id];
+	delete player_lobby[this.id];
 
 	updatePlayerList();
+	refreshWaitingList();
 }
 
 function updatePlayerList() {

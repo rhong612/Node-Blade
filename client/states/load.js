@@ -18,6 +18,7 @@ var loadState = {
 
         //Other assets
         this.load.image(AI_BUTTON, 'assets/images/ai_button.png');
+        this.load.image(MULTI_BUTTON, 'assets/images/multi_button.png');
 
         //Sound effects
         this.load.audio(SHUFFLE_SOUND, 'assets/sounds/card_shuffle.mp3');
