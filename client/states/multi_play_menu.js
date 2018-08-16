@@ -11,13 +11,15 @@ var multiPlayMenuState = {
 	        game.stage.backgroundColor = "#4488AA";
 	        let spacing = 50;
         	for (const key in player_lobby) {
-        		let text = game.add.text(game.world.centerX, game.world.centerY + spacing, player_lobby[key].username, { fontSize: '50px' });
-        		text.anchor.setTo(0.5);
-		        text.inputEnabled = true;
-		        text.events.onInputDown.add(function() {
-		            console.log("Clicked");
-		        });
-        		spacing += 50;
+        		if (player_lobby[key].username !== username) {
+	        		let text = game.add.text(game.world.centerX, game.world.centerY + spacing, player_lobby[key].username, { fontSize: '50px' });
+	        		text.anchor.setTo(0.5);
+			        text.inputEnabled = true;
+			        text.events.onInputDown.add(function() {
+			            console.log("Clicked");
+			        });
+	        		spacing += 50;
+        		}
         	}
         });
 	}

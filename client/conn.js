@@ -1,7 +1,9 @@
 const socket = io();
+var username = '';
 
 socket.on('display_name', function(name) {
 	$("#displayName").html("Welcome " + name + "!");
+	username = name;
 });
 
 
