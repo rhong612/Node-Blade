@@ -12,10 +12,6 @@ socket.on('update_players', function(usernames) {
 	}
 });
 
-socket.on('chat_msg', function(chat) {
-	$('#messages').append("<li>" + chat['username'] + ':' + chat['message'] + "</li>");
-});
-
 $(document).ready(function() {
 	$("#chat_btn").on('click', function() {
 		socket.emit('chat_msg', $('#chat_input').val());

@@ -1,7 +1,9 @@
+//Boilerplate
 const express = require('express');
 const app = express();
 const http = require('http').Server(app); //Creates a server and passes in app as the request handler
 const io = require('socket.io')(http);
+
 
 const current_ongoing_games = [];
 
@@ -27,8 +29,6 @@ io.on('connection', function(socket) {
 
 	socket.on('disconnect', removePlayer);
 
-	socket.on('chat_msg', updateMessages);
-
 	socket.on('start_single_game', createSingleGame);
 });
 
@@ -53,10 +53,6 @@ function updatePlayerList() {
 		username_list.push(active_players[player].username);
 	}
 	io.emit('update_players', username_list);
-}
-
-function updateMessages(msg) {
-	io.emit('chat_msg', {'username': active_players[this.id].username,'message': msg});
 }
 
 function createSingleGame() {
