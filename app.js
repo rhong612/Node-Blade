@@ -31,8 +31,6 @@ io.on('connection', function(socket) {
 
 	socket.on('disconnect', removePlayer);
 
-	socket.on('start_single_game', createSingleGame);
-
 	socket.on('join_waiting_list', function(username) {
 		console.log(username + ' has joined the waiting list');
 		let id = findSocketID(username);
@@ -147,29 +145,6 @@ function updatePlayerList() {
 	io.emit('update_players', username_list);
 }
 
-function createSingleGame() {
-	var gameID = current_ongoing_games.length;
-	var newGame = new SingleGame(gameID);
-	current_ongoing_games.push(newGame);
-	active_players[this.id].currentGame = gameID;
-
-	newGame.playerDeck = initializeDeck();
-	shuffleDeck(newGame.playerDeck);
-	newGame.enemyDeck = initializeDeck();
-	shuffleDeck(newGame.enemyDeck);
-
-	newGame.playerHand = newGame.playerDeck.splice(0, 10);
-	let unsortedHand = newGame.playerHand;
-	newGame.enemyHand = newGame.enemyDeck.splice(0, 10);
-	newGame.sortPlayerHand();
-	newGame.sortEnemyHand();
-
-	//var draw = newGame.draw();
-	var draw = {playerDraw: [cards_list.BOLT.name, cards_list.BOLT.name], enemyDraw: [cards_list.BOLT.name, cards_list.WAND.name]}; //For testing purposes
-
-	this.emit('receive_hand', {hand: unsortedHand, sortedHand: newGame.playerHand, playerDraw: draw.playerDraw, enemyDraw: draw.enemyDraw});
-}
-
 
 function shuffleDeck(deck) {
     for (let i = deck.length - 1; i > 0; i--) {
@@ -223,46 +198,6 @@ class Player {
 	}
 }
 
-class SingleGame {
-	constructor(gameID) {
-		this.gameID = gameID;
-		this.playerDeck = null;
-		this.playerHand = null;
-		this.playerScore = 0;
-		this.enemyDeck = null;
-		this.enemyHand = null;
-		this.enemyScore = 0;
-		this.playerField = [];
-		this.enemyField = [];
-	}
-
-	draw() {
-		let playerDraw = [];
-		let enemyDraw = [];
-		let i = 0;
-		while (this.playerDeck.length > 0) {
-			playerDraw.push(this.playerDeck.shift());
-			enemyDraw.push(this.enemyDeck.shift());
-
-			if (playerDraw[i] != enemyDraw[i]) {
-				this.playerField.push(playerDraw[i]);
-				this.enemyField.push(enemyDraw[i]);
-				break;
-			}
-
-			i++;
-		}
-		return {playerDraw: playerDraw, enemyDraw: enemyDraw};
-	}
-
-	sortPlayerHand() {
-		
-	}
-
-	sortEnemyHand() {
-
-	}
-}
 
 class MultiGame {
 	constructor(gameID) {
@@ -283,7 +218,24 @@ class MultiGame {
 	}
 
 	draw() {
+		/*
+		let playerDraw = [];
+		let enemyDraw = [];
+		let i = 0;
+		while (this.playerDeck.length > 0) {
+			playerDraw.push(this.playerDeck.shift());
+			enemyDraw.push(this.enemyDeck.shift());
 
+			if (playerDraw[i] != enemyDraw[i]) {
+				this.playerField.push(playerDraw[i]);
+				this.enemyField.push(enemyDraw[i]);
+				break;
+			}
+
+			i++;
+		}
+		return {playerDraw: playerDraw, enemyDraw: enemyDraw};
+		*/
 	}
 
 	sort(hand) {

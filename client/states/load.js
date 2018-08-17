@@ -17,7 +17,6 @@ var loadState = {
         this.load.image(SEVEN_CARD, 'assets/images/cards/broadsword.png');
 
         //Other assets
-        this.load.image(AI_BUTTON, 'assets/images/ai_button.png');
         this.load.image(MULTI_BUTTON, 'assets/images/multi_button.png');
 
         //Sound effects
