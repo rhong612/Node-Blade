@@ -92,7 +92,7 @@ function createMultiGame(names) {
 	console.log(newGame.playerOneID);
 	console.log(newGame.playerTwoID);
 	io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: newGame.playerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw});
-	io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: newGame.playerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerTwoDraw});
+	io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: newGame.playerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw});
 }
 
 function findSocketIDInLobby(target_name) {
@@ -132,6 +132,8 @@ function removePlayer() {
 	console.log('A user has disconnected.');
 	delete active_players[this.id];
 	delete player_lobby[this.id];
+
+	//TODO: Look for active games involving the player and remove it
 
 	updatePlayerList();
 	refreshWaitingList();
