@@ -88,13 +88,24 @@ function createMultiGame(names) {
 	newGame.playerTwoID = id2;
 
 	var draw = newGame.draw();
-	//From the draw, determine whose turn it is
-	//newGame.turn = ...
+	//From the draw, set initial scores
+	let playerOneLastCard = draw.playerOneDraw[draw.playerOneDraw.length - 1];
+	let playerTwoLastCard = draw.playerTwoDraw[draw.playerTwoDraw.length - 1];
+	newGame.playerOneScore = playerOneLastCard.draw_value;
+	newGame.playerTwoScore = playerTwoLastCard.draw_value;
+
+	//Determine whose turn it is
+	if (newGame.playerOneScore > newGame.playerTwoScore) {
+		io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: false});
+		io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: true});
+	}
+	else {
+		io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: true});
+		io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: false});
+	}
 
 	console.log(newGame.playerOneID);
 	console.log(newGame.playerTwoID);
-	io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw});
-	io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw});
 }
 
 function findSocketIDInLobby(target_name) {
@@ -231,7 +242,7 @@ class MultiGame {
 			playerOneDraw.push(this.playerOneDeck.shift());
 			playerTwoDraw.push(this.playerTwoDeck.shift());
 
-			if (playerOneDraw[i] != playerTwoDraw[i]) {
+			if (playerOneDraw[i].draw_value != playerTwoDraw[i].draw_value) {
 				this.playerOneField.push(playerOneDraw[i]);
 				this.playerTwoField.push(playerTwoDraw[i]);
 				break;

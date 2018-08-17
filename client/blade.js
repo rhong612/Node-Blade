@@ -13,6 +13,9 @@ var sortedHand = [];
 var currentDeckIndex = 0;
 var playerDraw = [];
 var enemyDraw = [];
+var turn = false;
+var playerScore = 0;
+var enemyScore = 0;
 
 game.state.add('load', loadState);
 game.state.add('menu', menuState);
@@ -63,6 +66,15 @@ function playDrawAnimation() {
         endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(currentDeckIndex), playerDraw[i].name, 0));
         endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(currentDeckIndex), enemyDraw[i].name, 0));
     }
+
+    onChainComplete(playerTween, function() {
+        let text = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, playerScore, { fontSize: '50px' });
+	    text.anchor.setTo(0.5);
+        let text2 = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, enemyScore, { fontSize: '50px' });
+	    text2.anchor.setTo(0.5);
+    	console.log("Chain complete " + turn);
+    });
+
     playerDraw = [];
     enemyDraw = [];
     playerTween.start();

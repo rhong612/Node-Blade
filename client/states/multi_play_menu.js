@@ -67,6 +67,11 @@ var multiPlayMenuState = {
             playerDraw = cards.playerDraw;
             enemyDraw = cards.enemyDraw;
 
+            turn = cards.turn;
+
+            playerScore = cards.playerScore;
+            enemyScore = cards.enemyScore;
+
             initializeCardSprites();
             playDeckSetupAnimation();
             bgm.play();
