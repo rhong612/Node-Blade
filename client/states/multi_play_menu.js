@@ -16,11 +16,15 @@ var multiPlayMenuState = {
 	        		text.anchor.setTo(0.5);
 			        text.inputEnabled = true;
 			        text.events.onInputDown.add(function() {
-			            console.log("Clicked");
+			        	socket.emit('challenge', {target: player_lobby[key].username, challenger: username});
 			        });
 	        		spacing += 50;
         		}
         	}
         });
+
+        socket.on('client_challenge_prompt', function(username) {
+        	console.log('prompt here');
+        })
 	}
 }

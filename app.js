@@ -34,6 +34,23 @@ io.on('connection', function(socket) {
 	socket.on('start_single_game', createSingleGame);
 
 	socket.on('join_waiting_list', joinWaitingList);
+
+	socket.on('challenge', function(names) {
+		for (let id in player_lobby) {
+			let username = player_lobby[id].username;
+			if (username === names.target) {
+				this.leave('waiting_room');
+				io.sockets.connected[id].leave('waiting_room');
+				delete player_lobby[this.id];
+				delete player_lobby[id];
+				io.to(id).emit('client_challenge_prompt', names.challenger);
+				refreshWaitingList();
+				break;
+			}
+		}
+
+
+	});
 });
 
 function joinWaitingList() {
