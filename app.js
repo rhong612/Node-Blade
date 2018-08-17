@@ -159,11 +159,11 @@ function createSingleGame() {
 	newGame.playerHand = newGame.playerDeck.splice(0, 10);
 	let unsortedHand = newGame.playerHand;
 	newGame.enemyHand = newGame.enemyDeck.splice(0, 10);
-	newGame.sortPlayerOneHand();
-	newGame.sortPlayerTwoHand();
+	newGame.sortPlayerHand();
+	newGame.sortEnemyHand();
 
 	//var draw = newGame.draw();
-	var draw = {playerOneDraw: [cards_list.BOLT, cards_list.BOLT], playerTwoDraw: [cards_list.BOLT, cards_list.WAND]}; //For testing purposes
+	var draw = {playerDraw: [cards_list.BOLT, cards_list.BOLT], enemyDraw: [cards_list.BOLT, cards_list.WAND]}; //For testing purposes
 
 	this.emit('receive_hand', {hand: unsortedHand, sortedHand: newGame.playerHand, playerDraw: draw.playerDraw, enemyDraw: draw.enemyDraw});
 }
