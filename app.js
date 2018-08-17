@@ -76,7 +76,9 @@ function createMultiGame(names) {
 	shuffleDeck(newGame.playerTwoDeck);
 
 	newGame.playerOneHand = newGame.playerOneDeck.splice(0, 10);
+	let unsortedPlayerOneHand = newGame.playerOneHand.slice();
 	newGame.playerTwoHand = newGame.playerTwoDeck.splice(0, 10);
+	let unsortedPlayerTwoHand = newGame.playerTwoHand.slice();
 	newGame.sort(newGame.playerOneHand);
 	newGame.sort(newGame.playerTwoHand);
 
@@ -85,12 +87,14 @@ function createMultiGame(names) {
 	newGame.playerOneID = id1;
 	newGame.playerTwoID = id2;
 
-	//var draw = newGame.draw();
-	var draw = {playerOneDraw: [cards_list.BOLT.name, cards_list.BOLT.name], playerTwoDraw: [cards_list.BOLT.name, cards_list.WAND.name]}; //For testing purposes
+	var draw = newGame.draw();
+	//From the draw, determine whose turn it is
+	//newGame.turn = ...
+
 	console.log(newGame.playerOneID);
 	console.log(newGame.playerTwoID);
-	io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: newGame.playerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw});
-	io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: newGame.playerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw});
+	io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw});
+	io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw});
 }
 
 function findSocketIDInLobby(target_name) {
@@ -215,27 +219,27 @@ class MultiGame {
 		this.playerTwoUsername = null;
 		this.playerOneID = null;
 		this.playerTwoID = null;
+
+		this.turn = null;
 	}
 
 	draw() {
-		/*
-		let playerDraw = [];
-		let enemyDraw = [];
+		let playerOneDraw = [];
+		let playerTwoDraw = [];
 		let i = 0;
-		while (this.playerDeck.length > 0) {
-			playerDraw.push(this.playerDeck.shift());
-			enemyDraw.push(this.enemyDeck.shift());
+		while (this.playerOneDeck.length > 0) {
+			playerOneDraw.push(this.playerOneDeck.shift());
+			playerTwoDraw.push(this.playerTwoDeck.shift());
 
-			if (playerDraw[i] != enemyDraw[i]) {
-				this.playerField.push(playerDraw[i]);
-				this.enemyField.push(enemyDraw[i]);
+			if (playerOneDraw[i] != playerTwoDraw[i]) {
+				this.playerOneField.push(playerOneDraw[i]);
+				this.playerTwoField.push(playerTwoDraw[i]);
 				break;
 			}
 
 			i++;
 		}
-		return {playerDraw: playerDraw, enemyDraw: enemyDraw};
-		*/
+		return {playerOneDraw: playerOneDraw, playerTwoDraw: playerTwoDraw};
 	}
 
 	sort(hand) {
