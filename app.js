@@ -33,30 +33,49 @@ io.on('connection', function(socket) {
 
 	socket.on('start_single_game', createSingleGame);
 
-	socket.on('join_waiting_list', joinWaitingList);
+	socket.on('join_waiting_list', function(username) {
+		console.log(username + ' has joined the waiting list');
+		let id = findSocketID(username);
+		io.sockets.connected[id].join('waiting_room');
+		player_lobby[id] = active_players[id];
+		refreshWaitingList();
+	});
 
 	socket.on('challenge', function(names) {
-		for (let id in player_lobby) {
-			let username = player_lobby[id].username;
-			if (username === names.target) {
-				this.leave('waiting_room');
-				io.sockets.connected[id].leave('waiting_room');
-				delete player_lobby[this.id];
-				delete player_lobby[id];
-				io.to(id).emit('client_challenge_prompt', names.challenger);
-				refreshWaitingList();
-				break;
-			}
-		}
-
-
+		console.log(names.challenger + ' is challenging ' + names.target);
+		let id = findSocketIDInLobby(names.target);
+		this.leave('waiting_room');
+		io.sockets.connected[id].leave('waiting_room');
+		delete player_lobby[this.id];
+		delete player_lobby[id];
+		io.to(id).emit('client_challenge_prompt', names.challenger);
+		refreshWaitingList();
 	});
+
+	socket.on('join_private_match', function(names) {
+		console.log(names[0] + " and " + names[1] + " have entered a match!");
+	})
 });
 
-function joinWaitingList() {
-	this.join('waiting_room');
-	player_lobby[this.id] = active_players[this.id];
-	refreshWaitingList();
+function findSocketIDInLobby(target_name) {
+	for (let id in player_lobby) {
+		let username = player_lobby[id].username;
+		if (username === target_name) {
+			return id;
+		}
+	}
+	return undefined;
+}
+
+
+function findSocketID(target_name) {
+	for (let id in active_players) {
+		let username = active_players[id].username;
+		if (username === target_name) {
+			return id;
+		}
+	}
+	return undefined;
 }
 
 function refreshWaitingList() {
