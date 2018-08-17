@@ -1,7 +1,5 @@
 var singlePlayState = {
     create: function() {
-        socket.emit('start_single_game');
-
         socket.on('receive_hand', function(cards) {
             const bgm = game.add.audio(BGM);
             bgm.loopFull();
@@ -21,6 +19,8 @@ var singlePlayState = {
             console.log(playerDraw);
             console.log(enemyDraw);
         });
+        
+        socket.emit('start_single_game');
     },
     update: function() {
     }

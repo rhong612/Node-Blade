@@ -4,8 +4,6 @@ var multiPlayMenuState = {
 	create: function() {
 		//Show list of players in the lobby
 		
-        socket.emit('join_waiting_list', username);
-
         socket.on('client_waiting_list', function(player_lobby) {
         	game.world.removeAll(); //Clear the screen
 	        game.stage.backgroundColor = "#4488AA";
@@ -56,5 +54,34 @@ var multiPlayMenuState = {
 			});
 
         })
+
+
+        socket.on('receive_hand_multi', function(cards) {
+            const bgm = game.add.audio(BGM);
+            bgm.loopFull();
+            bgm.volume = 0.2;
+
+
+            hand = cards.hand.slice();
+            sortedHand = cards.sortedHand.slice();
+            playerDraw = cards.playerDraw;
+            enemyDraw = cards.enemyDraw;
+
+            initializeCardSprites();
+            playDeckSetupAnimation();
+            bgm.play();
+
+            currentDeckIndex = INITIAL_DECK_SIZE - INITIAL_HAND_SIZE - 1;
+            console.log(playerDraw);
+            console.log(enemyDraw);
+        });
+
+        socket.on('client_start_multiplayer', function() {
+        	console.log("Switching states");
+        	game.world.removeAll();
+        	//TODO: Refactor to switch states
+        })
+
+        socket.emit('join_waiting_list', username);
 	}
 }

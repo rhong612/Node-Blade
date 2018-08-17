@@ -54,8 +54,46 @@ io.on('connection', function(socket) {
 
 	socket.on('join_private_match', function(names) {
 		console.log(names[0] + " and " + names[1] + " have entered a match!");
+		createMultiGame(names);
 	})
 });
+
+function createMultiGame(names) {
+	var gameID = current_ongoing_games.length;
+	var newGame = new MultiGame(gameID);
+	current_ongoing_games.push(newGame);
+
+	let id1 = findSocketID(names[0]);
+	let id2 = findSocketID(names[1]);
+
+	io.to(id1).emit('client_start_multiplayer');
+	io.to(id2).emit('client_start_multiplayer');
+
+	active_players[id1].currentGame = gameID;
+	active_players[id2].currentGame = gameID;
+
+	newGame.playerOneDeck = initializeDeck();
+	shuffleDeck(newGame.playerOneDeck);
+	newGame.playerTwoDeck = initializeDeck();
+	shuffleDeck(newGame.playerTwoDeck);
+
+	newGame.playerOneHand = newGame.playerOneDeck.splice(0, 10);
+	newGame.playerTwoHand = newGame.playerTwoDeck.splice(0, 10);
+	newGame.sortPlayerOneHand();
+	newGame.sortPlayerTwoHand();
+
+	newGame.playerOneUsername = names[0];
+	newGame.playerTwoUsername = names[1];
+	newGame.playerOneID = id1;
+	newGame.playerTwoID = id2;
+
+	//var draw = newGame.draw();
+	var draw = {playerOneDraw: [cards_list.BOLT, cards_list.BOLT], playerTwoDraw: [cards_list.BOLT, cards_list.WAND]}; //For testing purposes
+	console.log(newGame.playerOneID);
+	console.log(newGame.playerTwoID);
+	io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: newGame.playerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw});
+	io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: newGame.playerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerTwoDraw});
+}
 
 function findSocketIDInLobby(target_name) {
 	for (let id in player_lobby) {
@@ -121,11 +159,11 @@ function createSingleGame() {
 	newGame.playerHand = newGame.playerDeck.splice(0, 10);
 	let unsortedHand = newGame.playerHand;
 	newGame.enemyHand = newGame.enemyDeck.splice(0, 10);
-	newGame.sortPlayerHand();
-	newGame.sortEnemyHand();
+	newGame.sortPlayerOneHand();
+	newGame.sortPlayerTwoHand();
 
 	//var draw = newGame.draw();
-	var draw = {playerDraw: [cards_list.BOLT, cards_list.BOLT], enemyDraw: [cards_list.BOLT, cards_list.WAND]}; //For testing purposes
+	var draw = {playerOneDraw: [cards_list.BOLT, cards_list.BOLT], playerTwoDraw: [cards_list.BOLT, cards_list.WAND]}; //For testing purposes
 
 	this.emit('receive_hand', {hand: unsortedHand, sortedHand: newGame.playerHand, playerDraw: draw.playerDraw, enemyDraw: draw.enemyDraw});
 }
@@ -220,6 +258,37 @@ class SingleGame {
 	}
 
 	sortEnemyHand() {
+
+	}
+}
+
+class MultiGame {
+	constructor(gameID) {
+		this.gameID = gameID;
+		this.playerOneDeck = null;
+		this.playerOneHand = null;
+		this.playerOneScore = 0;
+		this.playerTwoDeck = null;
+		this.playerTwoHand = null;
+		this.playerTwoScore = 0;
+		this.playerOneField = [];
+		this.playerTwoField = [];
+
+		this.playerOneUsername = null;
+		this.playerTwoUsername = null;
+		this.playerOneID = null;
+		this.playerTwoID = null;
+	}
+
+	draw() {
+
+	}
+
+	sortPlayerOneHand() {
+		
+	}
+
+	sortPlayerTwoHand() {
 
 	}
 }
