@@ -79,8 +79,8 @@ function createMultiGame(names) {
 
 	newGame.playerOneHand = newGame.playerOneDeck.splice(0, 10);
 	newGame.playerTwoHand = newGame.playerTwoDeck.splice(0, 10);
-	newGame.sortPlayerOneHand();
-	newGame.sortPlayerTwoHand();
+	newGame.sort(newGame.playerOneHand);
+	newGame.sort(newGame.playerTwoHand);
 
 	newGame.playerOneUsername = names[0];
 	newGame.playerTwoUsername = names[1];
@@ -88,7 +88,7 @@ function createMultiGame(names) {
 	newGame.playerTwoID = id2;
 
 	//var draw = newGame.draw();
-	var draw = {playerOneDraw: [cards_list.BOLT, cards_list.BOLT], playerTwoDraw: [cards_list.BOLT, cards_list.WAND]}; //For testing purposes
+	var draw = {playerOneDraw: [cards_list.BOLT.name, cards_list.BOLT.name], playerTwoDraw: [cards_list.BOLT.name, cards_list.WAND.name]}; //For testing purposes
 	console.log(newGame.playerOneID);
 	console.log(newGame.playerTwoID);
 	io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: newGame.playerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw});
@@ -165,7 +165,7 @@ function createSingleGame() {
 	newGame.sortEnemyHand();
 
 	//var draw = newGame.draw();
-	var draw = {playerDraw: [cards_list.BOLT, cards_list.BOLT], enemyDraw: [cards_list.BOLT, cards_list.WAND]}; //For testing purposes
+	var draw = {playerDraw: [cards_list.BOLT.name, cards_list.BOLT.name], enemyDraw: [cards_list.BOLT.name, cards_list.WAND.name]}; //For testing purposes
 
 	this.emit('receive_hand', {hand: unsortedHand, sortedHand: newGame.playerHand, playerDraw: draw.playerDraw, enemyDraw: draw.enemyDraw});
 }
@@ -286,11 +286,17 @@ class MultiGame {
 
 	}
 
-	sortPlayerOneHand() {
-		
-	}
-
-	sortPlayerTwoHand() {
-
+	sort(hand) {
+		hand.sort(function(card1, card2) {
+			if (card1.value < card2.value) {
+				return -1;
+			}
+			else if (card1.value > card2.value) {
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		});
 	}
 }

@@ -43,7 +43,9 @@ function initializeCardSprites() {
 	}
 }
 
-
+/**
+*	Draws the specified number of cards given by the server. Dumps cards when necessary.
+*/
 function playDrawAnimation() {
 	const DELAY = 300;
     let playerTween = drawPlayerCardAnimation(playerDeckSprites.getChildAt(currentDeckIndex), DELAY); 
@@ -68,7 +70,9 @@ function playDrawAnimation() {
     enemyTween.start();
 }
 
-
+/**
+*	Spreads the cards back out. Then, plays the draw animation.
+*/
 function playSpreadAnimation() {
 	const SPEED = 300;
 	let spreadTweens = [];
@@ -86,6 +90,9 @@ function playSpreadAnimation() {
 	startAllTweens(enemySpreadTweens);
 }
 
+/**
+*	Plays the sort animation. Then, plays the spread animation to spread the cards back out.
+*/
 function playSortAnimation() {
 	const SPEED = 300;
 	const DELAY = 500;
@@ -106,7 +113,7 @@ function playSortAnimation() {
 			cardSort();
 			let backFlipTweens = [];
 			for (let k = 0; k < INITIAL_HAND_SIZE; k++) {
-				backFlipTweens.push(getFlipTween(playerHandSprites.getChildAt(k), hand[k], FLIP_DELAY));
+				backFlipTweens.push(getFlipTween(playerHandSprites.getChildAt(k), hand[k].name, FLIP_DELAY));
 			}
 			onChainComplete(backFlipTweens[INITIAL_HAND_SIZE - 1], playSpreadAnimation);
 			startAllTweens(backFlipTweens);
@@ -118,6 +125,10 @@ function playSortAnimation() {
 	startAllTweens(enemySortTweens);
 }
 
+
+/**
+*	Draws starting hands for both players, flips the cards, then plays the sort animation.
+*/
 function playHandSetupAnimation() {
 	let playerHandTweens = [];
 	let enemyHandTweens = [];
@@ -146,7 +157,7 @@ function playHandSetupAnimation() {
 	playerHandTweens[playerHandTweens.length - 1].onComplete.add(function() {
 		//Flip all the cards
 		for (let k = 0; k < INITIAL_HAND_SIZE; k++) {
-			let tween = getFlipTween(playerHandSprites.getChildAt(k), hand[k], k * DELAY);
+			let tween = getFlipTween(playerHandSprites.getChildAt(k), hand[k].name, k * DELAY);
 			if (k == INITIAL_HAND_SIZE - 1) {
 				tween.onComplete.add(playSortAnimation);
 			}
@@ -158,6 +169,9 @@ function playHandSetupAnimation() {
 	startAllTweens(enemyHandTweens);
 }
 
+/**
+*  Moves all the initialized card sprites to their initial deck position. Then, plays the hand setup animation.
+*/
 function playDeckSetupAnimation() {
     const SPEED = 300;
     const DELAY = 100;
