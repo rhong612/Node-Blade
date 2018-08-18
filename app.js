@@ -269,11 +269,12 @@ class MultiGame {
 	}
 
 	executeMove(card_index, player) {
+		var card = '';
 		if (!this.validateMove(card_index, player)) {
 			return false;
 		}
 		else if (player === 1){
-			let card = this.playerOneHand[card_index];
+			card = this.playerOneHand[card_index];
 			this.playerOneField.push(card);
 			this.playerOneHand.splice(card_index, 1);
 			console.log('Player one current field: ' + JSON.stringify(this.playerOneField));
@@ -285,7 +286,7 @@ class MultiGame {
 			console.log('Player two current score: ' + this.playerTwoScore);
 		}
 		else {
-			let card = this.playerTwoHand[card_index];
+			card = this.playerTwoHand[card_index];
 			this.playerTwoField.push(card);
 			this.playerTwoHand.splice(card_index, 1);
 			console.log('Player one current field: ' + JSON.stringify(this.playerOneField));
@@ -296,7 +297,31 @@ class MultiGame {
 			console.log('Player one current score: ' + this.playerOneScore);
 			console.log('Player two current score: ' + this.playerTwoScore);
 		}
+
+		if (this.playerOneScore === this.playerTwoScore) {
+			//If a draw occurred, tell the client to dump the cards
+
+		}
+		else if (this.checkWin()){
+			
+		}
+		else {
+			if (this.turn === 1) {
+				this.turn = 2;	
+				io.to(this.playerOneID).emit('client_game_continue', {turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: this.playerOneHand.length - card_index, card: card});
+			}
+			else {
+				this.turn = 1;
+				io.to(this.playerOneID).emit('client_game_continue', {turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: this.playerTwoHand.length - card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+			}
+		}
 		return true;
+	}
+
+	checkWin() {
+
 	}
 
 	validateMove(card_index, player) {

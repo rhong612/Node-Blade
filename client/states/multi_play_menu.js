@@ -87,6 +87,13 @@ var multiPlayMenuState = {
         	//TODO: Refactor to switch states
         })
 
+        socket.on('client_game_continue', function(response) {
+        	console.log(JSON.stringify(response));
+        	//{turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card};
+        	//Move the played card to the center
+        	
+        })
+
         socket.emit('join_waiting_list', username);
 	}
 }
