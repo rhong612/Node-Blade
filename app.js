@@ -193,7 +193,7 @@ function shuffleDeck(deck) {
 
 function initializeDeck() {
 	const deck = [];
-	// for (let i = 0; i < 6; i++) {
+	// for (let i = 0; i < 4; i++) {
 	// 	deck.push(cards_list.BOLT);
 	// }
 	// for (let i = 0; i < 2; i++) {
@@ -223,6 +223,9 @@ function initializeDeck() {
 	// for (let i = 0; i < 2; i++) {
 	// 	deck.push(cards_list.WAND);
 	// }
+	for (let i = 0; i < 2; i++) {
+		deck.push(cards_list.MIRROR);
+	}
 	return deck;
 }
 
