@@ -116,10 +116,12 @@ function createMultiGame(names) {
 
 	//Determine whose turn it is
 	if (newGame.playerOneScore > newGame.playerTwoScore) {
+		newGame.turn = 2;
 		io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: false});
 		io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: true});
 	}
 	else {
+		newGame.turn = 1;
 		io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: true});
 		io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: false});
 	}
@@ -274,31 +276,43 @@ class MultiGame {
 			let card = this.playerOneHand[card_index];
 			this.playerOneField.push(card);
 			this.playerOneHand.splice(card_index, 1);
-			console.log('Player one current field: ' + this.playerOneField);
-			console.log('Player one current hand: ' + this.playerOneHand);
-			//card.play(this);
+			console.log('Player one current field: ' + JSON.stringify(this.playerOneField));
+			console.log('Player one current hand: ' + JSON.stringify(this.playerOneHand));
+			console.log('Player two current field: ' + JSON.stringify(this.playerTwoField));
+			console.log('Player two current hand: ' + JSON.stringify(this.playerTwoHand));
+			card.activate(this);
+			console.log('Player one current score: ' + this.playerOneScore);
+			console.log('Player two current score: ' + this.playerTwoScore);
 		}
 		else {
 			let card = this.playerTwoHand[card_index];
 			this.playerTwoField.push(card);
 			this.playerTwoHand.splice(card_index, 1);
-			console.log('Player two current field: ' + this.playerTwoField);
-			console.log('Player two current hand: ' + this.playerTwoHand);
-			//card.play(this);
+			console.log('Player one current field: ' + JSON.stringify(this.playerOneField));
+			console.log('Player one current hand: ' + JSON.stringify(this.playerOneHand));
+			console.log('Player two current field: ' + JSON.stringify(this.playerTwoField));
+			console.log('Player two current hand: ' + JSON.stringify(this.playerTwoHand));
+			card.activate(this);
+			console.log('Player one current score: ' + this.playerOneScore);
+			console.log('Player two current score: ' + this.playerTwoScore);
 		}
 		return true;
 	}
 
 	validateMove(card_index, player) {
-		if (player === 1) {
-			return card_index < this.playerOneHand.length && card_index >= 0;
+		if (player === this.turn) {
+			if (player === 1) {
+				return card_index < this.playerOneHand.length && card_index >= 0;
+			}
+			else if (player === 2) {
+				return card_index < this.playerTwoHand.length && card_index >= 0;
+			}
+			else {
+				return false;
+			}
 		}
-		else if (player === 2) {
-			return card_index < this.playerTwoHand.length && card_index >= 0;
-		}
-		else {
-			return false;
-		}
+
+
 	}
 
 	draw() {
