@@ -49,6 +49,8 @@ function initializeCardSprites() {
 *	Draws the specified number of cards given by the server. Dumps cards when necessary.
 */
 function playDrawAnimation() {
+	game.world.bringToTop(playerDeckSprites);
+	game.world.bringToTop(enemyDeckSprites);
 	const DELAY = 300;
     let playerTween = drawPlayerCardAnimation(playerDeckSprites.getChildAt(currentDeckIndex), DELAY); 
     let enemyTween = drawEnemyCardAnimation(enemyDeckSprites.getChildAt(currentDeckIndex), DELAY);
@@ -93,8 +95,6 @@ function playSpreadAnimation() {
 		enemySpreadTweens.push(game.add.tween(enemyHandSprites.getChildAt(i)).to({ x: (GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE) - (CARD_WIDTH * CARD_SCALE * (i + 1)) }, SPEED, Phaser.Easing.Linear.Out, false, 0));
 	}
 	spreadTweens[INITIAL_HAND_SIZE - 1].onComplete.add(function() {
-		game.world.bringToTop(playerDeckSprites);
-		game.world.bringToTop(enemyDeckSprites);
 		playDrawAnimation();
 	});
 	startAllTweens(spreadTweens);
