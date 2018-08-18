@@ -75,6 +75,22 @@ function playDrawAnimation() {
         let text2 = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, enemyScore, { fontSize: '50px' });
 	    text2.anchor.setTo(0.5);
     	console.log("Chain complete " + turn);
+
+    	if (turn) {
+    		//Can click on cards
+    		for (let i = 0; i < playerHandSprites.length; i++) {
+    			let sprite = playerHandSprites.getChildAt(i);
+    			sprite.inputEnabled = true;
+    			sprite.events.onInputDown.add(function() {
+    				playerHandSprites.setAll('inputEnabled', false);
+    				socket.emit('server_play_card', i);
+    			});
+    		}
+    	}
+    	else {
+    		let waiting_text = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "Waiting for other player...", { fontSize: '50px' });
+    		waiting_text.anchor.setTo(0.5);
+    	}
     });
 
     playerDraw = [];

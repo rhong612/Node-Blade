@@ -54,6 +54,26 @@ io.on('connection', function(socket) {
 		console.log(names[0] + " and " + names[1] + " have entered a match!");
 		createMultiGame(names);
 	})
+
+	socket.on('server_play_card', function(card_index) {
+		console.log('Card ' + card_index + ' was played by ID:' + socket.id);
+		var game = undefined;
+		var player = 0;
+		for (let i = 0; i < current_ongoing_games.length; i++) {
+			let g = current_ongoing_games[i];
+			player = g.hasID(socket.id);
+			if (player > 0) {
+				game = g;
+				break;
+			}
+		}
+		if (game) {
+			let result = game.executeMove(card_index, player);
+			if (!result) {
+				console.log("An error has occurred");
+			}
+		}
+	})
 });
 
 function createMultiGame(names) {
@@ -232,6 +252,53 @@ class MultiGame {
 		this.playerTwoID = null;
 
 		this.turn = null;
+	}
+
+	hasID(id) {
+		if (id === this.playerOneID) {
+			return 1;
+		}
+		else if (id === this.playerTwoID) {
+			return 2;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	executeMove(card_index, player) {
+		if (!this.validateMove(card_index, player)) {
+			return false;
+		}
+		else if (player === 1){
+			let card = this.playerOneHand[card_index];
+			this.playerOneField.push(card);
+			this.playerOneHand.splice(card_index, 1);
+			console.log('Player one current field: ' + this.playerOneField);
+			console.log('Player one current hand: ' + this.playerOneHand);
+			//card.play(this);
+		}
+		else {
+			let card = this.playerTwoHand[card_index];
+			this.playerTwoField.push(card);
+			this.playerTwoHand.splice(card_index, 1);
+			console.log('Player two current field: ' + this.playerTwoField);
+			console.log('Player two current hand: ' + this.playerTwoHand);
+			//card.play(this);
+		}
+		return true;
+	}
+
+	validateMove(card_index, player) {
+		if (player === 1) {
+			return card_index < this.playerOneHand.length && card_index >= 0;
+		}
+		else if (player === 2) {
+			return card_index < this.playerTwoHand.length && card_index >= 0;
+		}
+		else {
+			return false;
+		}
 	}
 
 	draw() {
