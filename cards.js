@@ -31,11 +31,22 @@ const BLAST = new Card('BLAST', 9, 0, function(game) {
 })
 
 const MIRROR = new Card('MIRROR', 10, 0, function(game) {
-    
+    let tempScore = game.playerOneScore;
+    game.playerOneScore = game.playerTwoScore;
+    game.playerTwoScore = tempScore;
+
+    let tempField = game.playerOneField;
+    game.playerOneField = game.playerTwoField;
+    game.playerTwoField = tempField;
 })
 
 const FORCE = new Card('FORCE', 11, 0, function(game) {
-    
+    if (game.turn === 1) {
+        game.playerOneScore *= 2;
+    }
+    else {
+        game.playerTwoScore *= 2;
+    }
 })
 
 const WAND = new Card('WAND', 1, 1, function(game) {
