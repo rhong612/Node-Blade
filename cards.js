@@ -43,15 +43,10 @@ const WAND = new Card('WAND', 1, 1, function(game) {
 })
 
 const TWO_CARD = new Card('BLADE_PISTOL', 2, 2)
-
 const THREE_CARD = new Card('BOW', 3, 3)
-
 const FOUR_CARD = new Card('SWORD', 4, 4)
-
 const FIVE_CARD = new Card('SHOTGUN', 5, 5)
-
 const SIX_CARD = new Card('SPEAR', 6, 6)
-
 const SEVEN_CARD = new Card('BROADSWORD', 7, 7)
 
 
