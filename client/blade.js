@@ -124,11 +124,17 @@ function startTurn() {
     		sprite.inputEnabled = true;
     		sprite.events.onInputDown.add(function() {
 		    	for (let j = 0; j < playerHandSprites.length; j++) {
-		    		playerHandSprites.getChildAt(j).events.onInputDown.removeAll();
+		    		let s = playerHandSprites.getChildAt(j);
+		    		s.events.onInputDown.removeAll();
+		    		s.events.onInputOver.removeAll();
+		    		s.events.onInputOut.removeAll();
+		    		s.alpha = 1.0;
 		    	}
     			playerHandSprites.setAll('inputEnabled', false);
     			socket.emit('server_play_card', i);
     		});
+       		sprite.events.onInputOver.add(sprite => sprite.alpha = 0.5, this);
+        	sprite.events.onInputOut.add(sprite => sprite.alpha = 1.0, this);
     	}
     }
     else {

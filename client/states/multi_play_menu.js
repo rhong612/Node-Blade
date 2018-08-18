@@ -109,5 +109,17 @@ var multiPlayMenuState = {
         })
 
         socket.emit('join_waiting_list', username);
-	}
+	}/*,
+
+	update: function() {    
+		for (let i = 0; i < playerHandSprites.length; i++) {
+		    let sprite = playerHandSprites.getChildAt(i);
+		    if (sprite.input.pointerOver()) {
+		    	sprite.alpha = 0.5;
+		    }
+		    else {
+		    	sprite.alpha = 1.0;
+		    }
+		}
+	}*/
 }
