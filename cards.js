@@ -22,15 +22,15 @@ class Card {
 
 
 //List of cards
-const BOLT = new Card('BOLT', 8, 0, function(game) {
+const BOLT = new Card('BOLT', 8, 1, function(game) {
 
 });
 
-const BLAST = new Card('BLAST', 9, 0, function(game) {
+const BLAST = new Card('BLAST', 9, 1, function(game) {
 
 })
 
-const MIRROR = new Card('MIRROR', 10, 0, function(game) {
+const MIRROR = new Card('MIRROR', 10, 1, function(game) {
     let tempScore = game.playerOneScore;
     game.playerOneScore = game.playerTwoScore;
     game.playerTwoScore = tempScore;
@@ -40,7 +40,7 @@ const MIRROR = new Card('MIRROR', 10, 0, function(game) {
     game.playerTwoField = tempField;
 })
 
-const FORCE = new Card('FORCE', 11, 0, function(game) {
+const FORCE = new Card('FORCE', 11, 1, function(game) {
     if (game.turn === 1) {
         game.playerOneScore *= 2;
     }
