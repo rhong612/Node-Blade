@@ -117,13 +117,13 @@ function createMultiGame(names) {
 	//Determine whose turn it is
 	if (newGame.playerOneScore > newGame.playerTwoScore) {
 		newGame.turn = 2;
-		io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: false});
-		io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: true});
+		io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: false});
+		io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: true});
 	}
 	else {
 		newGame.turn = 1;
-		io.to(newGame.playerOneID).emit('receive_hand_multi', {hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: true});
-		io.to(newGame.playerTwoID).emit('receive_hand_multi', {hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: false});
+		io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: true});
+		io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: false});
 	}
 
 	console.log(newGame.playerOneID);
@@ -306,15 +306,16 @@ class MultiGame {
 			
 		}
 		else {
-			if (this.turn === 1) {
+			let previousTurn = this.turn;
+			if (previousTurn === 1) {
 				this.turn = 2;	
-				io.to(this.playerOneID).emit('client_game_continue', {turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-				io.to(this.playerTwoID).emit('client_game_continue', {turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: this.playerOneHand.length - card_index, card: card});
+				io.to(this.playerOneID).emit('client_game_continue', {previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
 			}
 			else {
 				this.turn = 1;
-				io.to(this.playerOneID).emit('client_game_continue', {turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: this.playerTwoHand.length - card_index, card: card});
-				io.to(this.playerTwoID).emit('client_game_continue', {turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+				io.to(this.playerOneID).emit('client_game_continue', {previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
 			}
 		}
 		return true;

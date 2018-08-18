@@ -17,6 +17,8 @@ var turn = false;
 var playerScore = 0;
 var enemyScore = 0;
 
+var playerNum = 0;
+
 game.state.add('load', loadState);
 game.state.add('menu', menuState);
 game.state.add('multi_play', multiPlayState);
@@ -44,6 +46,27 @@ function initializeCardSprites() {
         enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 	}
 }
+
+
+function playPlayerActivateAnimation(index, card) {
+	const SPEED = 400;
+	let sprite = playerHandSprites.getChildAt(index);
+	game.world.bringToTop(playerHandSprites);
+	playerHandSprites.bringToTop(sprite);
+	let tween = game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, true, 0);
+}
+
+function playEnemyActivateAnimation(index, card) {
+	const SPEED = 400;
+	let sprite = enemyHandSprites.getChildAt(index);
+	game.world.bringToTop(enemyHandSprites);
+	enemyHandSprites.bringToTop(sprite);
+	let tween = game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * ANCHOR * 4}, SPEED, Phaser.Easing.Linear.Out, false, 0);
+	let flipTween = getFlipTween(sprite, card.name, 0);
+	tween.start();
+	flipTween.start();
+}
+
 
 /**
 *	Draws the specified number of cards given by the server. Dumps cards when necessary.

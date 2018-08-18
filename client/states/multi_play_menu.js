@@ -72,6 +72,8 @@ var multiPlayMenuState = {
             playerScore = cards.playerScore;
             enemyScore = cards.enemyScore;
 
+            playerNum = cards.playerNum;
+
             initializeCardSprites();
             playDeckSetupAnimation();
             bgm.play();
@@ -89,9 +91,14 @@ var multiPlayMenuState = {
 
         socket.on('client_game_continue', function(response) {
         	console.log(JSON.stringify(response));
-        	//{turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card};
+        	//{previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card};
         	//Move the played card to the center
-        	
+        	if (response.previousTurn === playerNum) {
+        		playPlayerActivateAnimation(response.index, response.card);
+        	}
+        	else {
+        		playEnemyActivateAnimation(response.index, response.card);
+        	}
         })
 
         socket.emit('join_waiting_list', username);
