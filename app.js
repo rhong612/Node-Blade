@@ -322,10 +322,10 @@ class MultiGame {
 
 	sort(hand) {
 		hand.sort(function(card1, card2) {
-			if (card1.value < card2.value) {
+			if (card1.sort_value < card2.sort_value) {
 				return -1;
 			}
-			else if (card1.value > card2.value) {
+			else if (card1.sort_value > card2.sort_value) {
 				return 1;
 			}
 			else {
