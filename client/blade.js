@@ -8,6 +8,9 @@ var enemyDeckSprites;
 var playerHandSprites;
 var enemyHandSprites;
 
+let playerScoreText;
+let enemyScoreText;
+
 var hand = []; //Array representing the cards currently in the player's hand
 var sortedHand = [];
 var currentDeckIndex = 0;
@@ -93,10 +96,10 @@ function playDrawAnimation() {
     }
 
     onChainComplete(playerTween, function() {
-        let text = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, playerScore, { fontSize: '50px' });
-	    text.anchor.setTo(0.5);
-        let text2 = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, enemyScore, { fontSize: '50px' });
-	    text2.anchor.setTo(0.5);
+        playerScoreText = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, playerScore, { fontSize: '50px' });
+	    playerScoreText.anchor.setTo(0.5);
+        enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, enemyScore, { fontSize: '50px' });
+	    enemyScoreText.anchor.setTo(0.5);
     	console.log("Chain complete " + turn);
 
     	if (turn) {

@@ -99,6 +99,10 @@ var multiPlayMenuState = {
         	else {
         		playEnemyActivateAnimation(response.index, response.card);
         	}
+        	playerScore = response.playerScore;
+        	enemyScore = response.enemyScore;
+        	playerScoreText.setText(playerScore);
+        	enemyScoreText.setText(enemyScore);
         })
 
         socket.emit('join_waiting_list', username);
