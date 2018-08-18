@@ -10,6 +10,7 @@ var enemyHandSprites;
 
 let playerScoreText;
 let enemyScoreText;
+let waitingText;
 
 var hand = []; //Array representing the cards currently in the player's hand
 var sortedHand = [];
@@ -96,33 +97,43 @@ function playDrawAnimation() {
     }
 
     onChainComplete(playerTween, function() {
+    	//Initialize stuff
+    	waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
+    	waitingText.anchor.setTo(0.5);
         playerScoreText = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, playerScore, { fontSize: '50px' });
 	    playerScoreText.anchor.setTo(0.5);
         enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, enemyScore, { fontSize: '50px' });
 	    enemyScoreText.anchor.setTo(0.5);
     	console.log("Chain complete " + turn);
 
-    	if (turn) {
-    		//Can click on cards
-    		for (let i = 0; i < playerHandSprites.length; i++) {
-    			let sprite = playerHandSprites.getChildAt(i);
-    			sprite.inputEnabled = true;
-    			sprite.events.onInputDown.add(function() {
-    				playerHandSprites.setAll('inputEnabled', false);
-    				socket.emit('server_play_card', i);
-    			});
-    		}
-    	}
-    	else {
-    		let waiting_text = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "Waiting for other player...", { fontSize: '50px' });
-    		waiting_text.anchor.setTo(0.5);
-    	}
+    	startTurn();
     });
 
     playerDraw = [];
     enemyDraw = [];
     playerTween.start();
     enemyTween.start();
+}
+
+function startTurn() {
+	if (turn === playerNum) {
+    	waitingText.setText("");
+    	//Can click on cards
+    	for (let i = 0; i < playerHandSprites.length; i++) {
+    		let sprite = playerHandSprites.getChildAt(i);
+    		sprite.inputEnabled = true;
+    		sprite.events.onInputDown.add(function() {
+		    	for (let j = 0; j < playerHandSprites.length; j++) {
+		    		playerHandSprites.getChildAt(j).events.onInputDown.removeAll();
+		    	}
+    			playerHandSprites.setAll('inputEnabled', false);
+    			socket.emit('server_play_card', i);
+    		});
+    	}
+    }
+    else {
+    	waitingText.setText("Waiting for other player...");
+    }
 }
 
 /**

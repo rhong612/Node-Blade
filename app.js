@@ -117,13 +117,13 @@ function createMultiGame(names) {
 	//Determine whose turn it is
 	if (newGame.playerOneScore > newGame.playerTwoScore) {
 		newGame.turn = 2;
-		io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: false});
-		io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: true});
+		io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: newGame.turn});
+		io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: newGame.turn});
 	}
 	else {
 		newGame.turn = 1;
-		io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: true});
-		io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: false});
+		io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: newGame.turn});
+		io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: newGame.turn});
 	}
 
 	console.log(newGame.playerOneID);

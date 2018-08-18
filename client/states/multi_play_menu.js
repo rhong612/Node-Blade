@@ -103,6 +103,9 @@ var multiPlayMenuState = {
         	enemyScore = response.enemyScore;
         	playerScoreText.setText(playerScore);
         	enemyScoreText.setText(enemyScore);
+
+        	turn = response.turn;
+        	startTurn();
         })
 
         socket.emit('join_waiting_list', username);
