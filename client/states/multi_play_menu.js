@@ -55,8 +55,12 @@ var multiPlayMenuState = {
 
         })
 
-        socket.on('client_start_multiplayer', function() {
-        	console.log("Switching state");
+        socket.on('receive_hand_multi', function(cards) {
+        	console.log("Switching state"); 
+
+            hand = cards.hand.slice();
+            sortedHand = cards.sortedHand.slice();
+            playerNum = cards.playerNum;
         	game.state.start('multi_play');
         })
 

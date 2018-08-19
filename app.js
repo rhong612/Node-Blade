@@ -54,16 +54,10 @@ io.on('connection', function(socket) {
 
 	socket.on('join_private_match', function(names) {
 		console.log(names[0] + " and " + names[1] + " have entered a match!");
-		var gameID = num_games++;
-		var newGame = new MultiGame(gameID);
-		current_ongoing_games.push(newGame);
 
 		let id1 = findSocketID(names[0]);
 		let id2 = findSocketID(names[1]);
-		active_players[id1].currentGameID = gameID;
-		active_players[id2].currentGameID = gameID;
-		io.to(id1).emit('client_start_multiplayer');
-		io.to(id2).emit('client_start_multiplayer');
+		initializeMultiGame(id1, id2);
 	})
 
 	socket.on('server_play_card', function(card_index) {
@@ -92,14 +86,39 @@ io.on('connection', function(socket) {
 			for (id in clients) {
 				ids.push(id);
 			}
-			console.log('Initializing multiplayer game in room ' + active_players[this.id].currentGameID + ' for ' + active_players[ids[0]].username + ' and ' + active_players[ids[1]].username);
-			initializeMultiGame(ids[0], ids[1]);
+			console.log('Both players are present. Beginning initial draw for game in room ' + active_players[this.id].currentGameID + ' for ' + active_players[ids[0]].username + ' and ' + active_players[ids[1]].username);
+			initiateDrawProcess(current_ongoing_games[active_players[this.id].currentGameID]);
 		}
 	})
 });
 
+function initiateDrawProcess(game) {
+	var draw = game.draw();
+	//From the draw, set initial scores
+	let playerOneLastCard = draw.playerOneDraw[draw.playerOneDraw.length - 1];
+	let playerTwoLastCard = draw.playerTwoDraw[draw.playerTwoDraw.length - 1];
+	game.playerOneScore = playerOneLastCard.draw_value;
+	game.playerTwoScore = playerTwoLastCard.draw_value;
+
+	//Determine whose turn it is
+	if (game.playerOneScore > game.playerTwoScore) {
+		game.turn = 2;
+		io.to(game.playerOneID).emit('draw', {playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
+		io.to(game.playerTwoID).emit('draw', {playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
+	}
+	else {
+		game.turn = 1;
+		io.to(game.playerOneID).emit('draw', {playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
+		io.to(game.playerTwoID).emit('draw', {playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
+	}
+}
+
 function initializeMultiGame(id1, id2) {
-	let newGame = current_ongoing_games[active_players[id1].currentGameID];
+	var gameID = num_games++;
+	var newGame = new MultiGame(gameID);
+	current_ongoing_games.push(newGame);
+	active_players[id1].currentGameID = gameID;
+	active_players[id2].currentGameID = gameID;
 	newGame.playerOneDeck = initializeDeck();
 	shuffleDeck(newGame.playerOneDeck);
 	newGame.playerTwoDeck = initializeDeck();
@@ -115,29 +134,10 @@ function initializeMultiGame(id1, id2) {
 	newGame.playerOneUsername = active_players[id1].username;
 	newGame.playerTwoUsername = active_players[id2].username;
 	newGame.playerOneID = id1;
-	newGame.playerTwoID = id2;
+	newGame.playerTwoID = id2;	
 
-	var draw = newGame.draw();
-	//From the draw, set initial scores
-	let playerOneLastCard = draw.playerOneDraw[draw.playerOneDraw.length - 1];
-	let playerTwoLastCard = draw.playerTwoDraw[draw.playerTwoDraw.length - 1];
-	newGame.playerOneScore = playerOneLastCard.draw_value;
-	newGame.playerTwoScore = playerTwoLastCard.draw_value;
-
-	//Determine whose turn it is
-	if (newGame.playerOneScore > newGame.playerTwoScore) {
-		newGame.turn = 2;
-		io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: newGame.turn});
-		io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: newGame.turn});
-	}
-	else {
-		newGame.turn = 1;
-		io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, playerScore: newGame.playerOneScore, enemyScore: newGame.playerTwoScore, turn: newGame.turn});
-		io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, playerScore: newGame.playerTwoScore, enemyScore: newGame.playerOneScore, turn: newGame.turn});
-	}
-
-	console.log(newGame.playerOneID);
-	console.log(newGame.playerTwoID);
+	io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand});
+	io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand});
 }
 
 function findSocketIDInLobby(target_name) {

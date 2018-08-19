@@ -33,24 +33,6 @@ game.state.start('load');
 
 
 
-function initializeCardSprites() {
-	playerDeckSprites = game.add.group();
-	enemyDeckSprites = game.add.group();
-	playerHandSprites = game.add.group();
-	enemyHandSprites = game.add.group();
-	for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-	    playerDeckSprites.add(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
-	    playerDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
-        playerDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
-	}
-
-	for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-		enemyDeckSprites.add(game.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
-		enemyDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
-        enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
-	}
-}
-
 
 function playPlayerActivateAnimation(index, card) {
 	const SPEED = 400;
@@ -143,7 +125,7 @@ function startTurn() {
 }
 
 /**
-*	Spreads the cards back out. Then, plays the draw animation.
+*	Spreads the cards back out. Then, emits a 'ready' message to the server.
 */
 function playSpreadAnimation() {
 	const SPEED = 300;
@@ -154,7 +136,7 @@ function playSpreadAnimation() {
 		enemySpreadTweens.push(game.add.tween(enemyHandSprites.getChildAt(i)).to({ x: (GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE) - (CARD_WIDTH * CARD_SCALE * (i + 1)) }, SPEED, Phaser.Easing.Linear.Out, false, 0));
 	}
 	spreadTweens[INITIAL_HAND_SIZE - 1].onComplete.add(function() {
-		playDrawAnimation();
+        socket.emit('ready');
 	});
 	startAllTweens(spreadTweens);
 	startAllTweens(enemySpreadTweens);
