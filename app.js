@@ -52,40 +52,44 @@ io.on('connection', function(socket) {
 
 	socket.on('join_private_match', function(names) {
 		console.log(names[0] + " and " + names[1] + " have entered a match!");
-		createMultiGame(names);
+		io.to(findSocketID(names[0])).emit('client_start_multiplayer');
+		io.to(findSocketID(names[1])).emit('client_start_multiplayer');
 	})
 
 	socket.on('server_play_card', function(card_index) {
-		console.log('Card ' + card_index + ' was played by ID:' + socket.id);
-		var game = undefined;
-		var player = 0;
-		for (let i = 0; i < current_ongoing_games.length; i++) {
-			let g = current_ongoing_games[i];
-			player = g.hasID(socket.id);
-			if (player > 0) {
-				game = g;
-				break;
-			}
-		}
+		console.log('Card ' + card_index + ' was played by ID:' + this.id);
+		let gameID = active_players[this.id].currentGame;
+		let game = current_ongoing_games[gameID];
+		let playerNum = game.getPlayerNum(this.id);
 		if (game) {
-			let result = game.executeMove(card_index, player);
+			let result = game.executeMove(card_index, playerNum);
 			if (!result) {
 				console.log("An error has occurred");
 			}
 		}
+		else {
+			console.log("Game not found");
+		}
+	})
+
+	socket.on('ready', function() {
+		this.join('my_room');
+		let room = io.sockets.adapter.rooms['my_room'];
+		if (room.length === 2) {
+			var clients = room.sockets;
+			let ids = [];
+			for (id in clients) {
+				ids.push(id);
+			}
+			createMultiGame(ids[0], ids[1]);
+		}
 	})
 });
 
-function createMultiGame(names) {
+function createMultiGame(id1, id2) {
 	var gameID = current_ongoing_games.length;
 	var newGame = new MultiGame(gameID);
 	current_ongoing_games.push(newGame);
-
-	let id1 = findSocketID(names[0]);
-	let id2 = findSocketID(names[1]);
-
-	io.to(id1).emit('client_start_multiplayer');
-	io.to(id2).emit('client_start_multiplayer');
 
 	active_players[id1].currentGame = gameID;
 	active_players[id2].currentGame = gameID;
@@ -102,8 +106,8 @@ function createMultiGame(names) {
 	newGame.sort(newGame.playerOneHand);
 	newGame.sort(newGame.playerTwoHand);
 
-	newGame.playerOneUsername = names[0];
-	newGame.playerTwoUsername = names[1];
+	newGame.playerOneUsername = active_players[id1].username;
+	newGame.playerTwoUsername = active_players[id2].username;
 	newGame.playerOneID = id1;
 	newGame.playerTwoID = id2;
 
@@ -259,7 +263,7 @@ class MultiGame {
 		this.turn = null;
 	}
 
-	hasID(id) {
+	getPlayerNum(id) {
 		if (id === this.playerOneID) {
 			return 1;
 		}
