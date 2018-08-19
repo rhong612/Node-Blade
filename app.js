@@ -4,6 +4,7 @@ const app = express();
 const http = require('http').Server(app); //Creates a server and passes in app as the request handler
 const io = require('socket.io')(http);
 
+let num_games = 0;
 
 const current_ongoing_games = [];
 
@@ -46,19 +47,28 @@ io.on('connection', function(socket) {
 		io.sockets.connected[id].leave('waiting_room');
 		delete player_lobby[this.id];
 		delete player_lobby[id];
+		console.log(names.challenger + ' and ' + names.target + ' have left the waiting room');
 		io.to(id).emit('client_challenge_prompt', names.challenger);
 		refreshWaitingList();
 	});
 
 	socket.on('join_private_match', function(names) {
 		console.log(names[0] + " and " + names[1] + " have entered a match!");
-		io.to(findSocketID(names[0])).emit('client_start_multiplayer');
-		io.to(findSocketID(names[1])).emit('client_start_multiplayer');
+		var gameID = num_games++;
+		var newGame = new MultiGame(gameID);
+		current_ongoing_games.push(newGame);
+
+		let id1 = findSocketID(names[0]);
+		let id2 = findSocketID(names[1]);
+		active_players[id1].currentGameID = gameID;
+		active_players[id2].currentGameID = gameID;
+		io.to(id1).emit('client_start_multiplayer');
+		io.to(id2).emit('client_start_multiplayer');
 	})
 
 	socket.on('server_play_card', function(card_index) {
-		console.log('Card ' + card_index + ' was played by ID:' + this.id);
-		let gameID = active_players[this.id].currentGame;
+		console.log('Card ' + card_index + ' was played by ' + active_players[this.id].username);
+		let gameID = active_players[this.id].currentGameID;
 		let game = current_ongoing_games[gameID];
 		let playerNum = game.getPlayerNum(this.id);
 		if (game) {
@@ -73,27 +83,23 @@ io.on('connection', function(socket) {
 	})
 
 	socket.on('ready', function() {
-		this.join('my_room');
-		let room = io.sockets.adapter.rooms['my_room'];
+		console.log(active_players[this.id].username + ' is joining room ' + active_players[this.id].currentGameID);
+		this.join('room' + active_players[this.id].currentGameID);
+		let room = io.sockets.adapter.rooms['room' + active_players[this.id].currentGameID];
 		if (room.length === 2) {
 			var clients = room.sockets;
 			let ids = [];
 			for (id in clients) {
 				ids.push(id);
 			}
-			createMultiGame(ids[0], ids[1]);
+			console.log('Initializing multiplayer game in room ' + active_players[this.id].currentGameID + ' for ' + active_players[ids[0]].username + ' and ' + active_players[ids[1]].username);
+			initializeMultiGame(ids[0], ids[1]);
 		}
 	})
 });
 
-function createMultiGame(id1, id2) {
-	var gameID = current_ongoing_games.length;
-	var newGame = new MultiGame(gameID);
-	current_ongoing_games.push(newGame);
-
-	active_players[id1].currentGame = gameID;
-	active_players[id2].currentGame = gameID;
-
+function initializeMultiGame(id1, id2) {
+	let newGame = current_ongoing_games[active_players[id1].currentGameID];
 	newGame.playerOneDeck = initializeDeck();
 	shuffleDeck(newGame.playerOneDeck);
 	newGame.playerTwoDeck = initializeDeck();
@@ -169,11 +175,9 @@ function createGuest(socket) {
 
 function removePlayer() {
 	console.log('A user has disconnected.');
+	delete current_ongoing_games[active_players[this.id].currentGameID];
 	delete active_players[this.id];
 	delete player_lobby[this.id];
-
-	//TODO: Look for active games involving the player and remove it
-
 	updatePlayerList();
 	refreshWaitingList();
 }
@@ -238,7 +242,7 @@ const NO_GAME = -1;
 class Player {
 	constructor(username) {
 		this.username = username;
-		this.currentGame = NO_GAME;
+		this.currentGameID = NO_GAME;
 	}
 }
 
