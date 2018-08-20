@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app); //Creates a server and passes in app as the request handler
 const io = require('socket.io')(http);
+const sanitizer = require('sanitizer');
 
 let num_games = 0;
 
@@ -33,27 +34,33 @@ io.on('connection', function(socket) {
 	socket.on('disconnect', removePlayer);
 
 	socket.on('change_name', function(new_name) {
-		let taken = false;
-		for (let id in active_players) {
-			if (active_players[id].username === new_name) {
-				taken = true;
-				break;
-			}
-		}
-		if (!taken) {
-			let player = active_players[this.id];
-			if (player.onMenu) {
-				player.username = new_name;
-				socket.emit('display_name', new_name);
-				updatePlayerList();
-			}
-			else {
-				socket.emit('not_on_menu');
-			}
-
+		let sanitized_new_name = sanitizer.sanitize(new_name);
+		if (sanitized_new_name == '') {
+			socket.emit('invalid_name');
 		}
 		else {
-			socket.emit('name_taken');
+			let taken = false;
+			for (let id in active_players) {
+				if (active_players[id].username === sanitized_new_name) {
+					taken = true;
+					break;
+				}
+			}
+			if (!taken) {
+				let player = active_players[this.id];
+				if (player.onMenu) {
+					player.username = sanitized_new_name;
+					socket.emit('display_name', sanitized_new_name);
+					updatePlayerList();
+				}
+				else {
+					socket.emit('not_on_menu');
+				}
+
+			}
+			else {
+				socket.emit('name_taken');
+			}
 		}
 	})
 

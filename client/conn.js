@@ -13,6 +13,10 @@ socket.on('not_on_menu', function() {
 	alert('You can only change your screenname on the main menu!');
 })
 
+socket.on('invalid_name', function() {
+	alert('Invalid name!');
+})
+
 
 socket.on('update_players', function(usernames) {
 	$("#player_list tbody").empty();
