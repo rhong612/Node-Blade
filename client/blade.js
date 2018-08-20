@@ -43,7 +43,11 @@ function playPlayerActivateAnimation(index, card, func = function() {}) {
 	game.world.bringToTop(playerHandSprites);
 	playerHandSprites.bringToTop(sprite);
 	let tween = game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, false, 0);
-	tween.onComplete.add(func);
+	tween.onComplete.add(function() {
+		playerHandSprites.removeChild(sprite);
+		playerFieldSprites.add(sprite);
+		func();
+	});
 	tween.start();
 }
 
@@ -54,30 +58,14 @@ function playEnemyActivateAnimation(index, card, func) {
 	enemyHandSprites.bringToTop(sprite);
 	let tween = game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * ANCHOR * 4}, SPEED, Phaser.Easing.Linear.Out, false, 0);
 	let flipTween = getFlipTween(sprite, card.name, 0);
-	tween.onComplete.add(func);
+	tween.onComplete.add(function() {
+		enemyHandSprites.removeChild(sprite);
+		enemyFieldSprites.add(sprite);
+		func();
+	});
 	tween.start();
 	flipTween.start();
 }
-
-/**
-
-function endOfChain(chain, newTween) {
-    let end = chain;
-    while (end.chainedTween != undefined) {
-        end = end.chainedTween;
-    }
-    end.chain(newTween);
-}
-
-function onChainComplete(chain, func) {
-    let end = chain;
-    while (end.chainedTween != undefined) {
-        end = end.chainedTween;
-    }
-    end.onComplete.add(func);
-}
-**/
-
 
 function dumpField(func) {
 	if (playerFieldSprites.length >= 1) {
@@ -113,10 +101,10 @@ function playDrawAnimation() {
     endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(currentDeckIndex), enemyDraw[0].name, 0));
 
     for (let i = 1; i < playerDraw.length; i++) {
-    	playerDeckSprites.removeChild(playerDeckSprites.getChildAt(currentDeckIndex)); //Remove from deck
-    	enemyDeckSprites.removeChild(enemyDeckSprites.getChildAt(currentDeckIndex)); //Remove from deck
         endOfChain(playerTween, dumpPlayerCardAnimation(playerDeckSprites.getChildAt(currentDeckIndex)));
         endOfChain(enemyTween, dumpEnemyCardAnimation(enemyDeckSprites.getChildAt(currentDeckIndex)));
+    	playerDeckSprites.removeChildAt(currentDeckIndex); //Remove from deck
+    	enemyDeckSprites.removeChildAt(currentDeckIndex); //Remove from deck
 
         currentDeckIndex--;
 		console.log('Current deck index:' + currentDeckIndex);
@@ -126,15 +114,14 @@ function playDrawAnimation() {
         endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(currentDeckIndex), playerDraw[i].name, 0));
         endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(currentDeckIndex), enemyDraw[i].name, 0));
     }
-    currentDeckIndex--;
-	console.log('Current deck index:' + currentDeckIndex);
 
     onChainComplete(playerTween, function() {
     	//The last drawn cards go to the field
-    	let playerSprite = playerDeckSprites.removeChild(playerDeckSprites.getChildAt(currentDeckIndex));
-    	let enemySprite = enemyDeckSprites.removeChild(enemyDeckSprites.getChildAt(currentDeckIndex));
+    	let playerSprite = playerDeckSprites.removeChildAt(currentDeckIndex);
+    	let enemySprite = enemyDeckSprites.removeChildAt(currentDeckIndex);
     	playerFieldSprites.add(playerSprite);
     	enemyFieldSprites.add(enemySprite);
+    	currentDeckIndex--;
 
     	//Initialize stuff
     	waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
