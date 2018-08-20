@@ -12,6 +12,12 @@
 <script src="states/multi_play.js"></script>
 <script src="states/multi_play_menu.js"></script>
 <script src="blade.js"></script>
+<script>
+function changeNameFormSubmit() {
+	socket.emit('change_name', document.getElementById("new_name_input").value);
+	return false;
+}
+</script>
 
 <html>
 	<body>
@@ -27,6 +33,13 @@
 						</thead>
 						<tbody>
 						</tbody>
+					</table>
+					<table>
+						<form onsubmit="return changeNameFormSubmit()">
+							Change Screenname:
+							<input id="new_name_input" type="text"/>
+							<input type="submit" value="Submit">
+						</form>
 					</table>
 				</div>
 			</div>

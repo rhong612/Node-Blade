@@ -32,11 +32,37 @@ io.on('connection', function(socket) {
 
 	socket.on('disconnect', removePlayer);
 
+	socket.on('change_name', function(new_name) {
+		let taken = false;
+		for (let id in active_players) {
+			if (active_players[id].username === new_name) {
+				taken = true;
+				break;
+			}
+		}
+		if (!taken) {
+			let player = active_players[this.id];
+			if (player.onMenu) {
+				player.username = new_name;
+				socket.emit('display_name', new_name);
+				updatePlayerList();
+			}
+			else {
+				socket.emit('not_on_menu');
+			}
+
+		}
+		else {
+			socket.emit('name_taken');
+		}
+	})
+
 	socket.on('join_waiting_list', function(username) {
 		console.log(username + ' has joined the waiting list');
 		let id = findSocketID(username);
 		io.sockets.connected[id].join('waiting_room');
 		player_lobby[id] = active_players[id];
+		active_players[id].onMenu = false;
 		refreshWaitingList();
 	});
 
@@ -243,6 +269,7 @@ class Player {
 	constructor(username) {
 		this.username = username;
 		this.currentGameID = NO_GAME;
+		this.onMenu = true;
 	}
 }
 
