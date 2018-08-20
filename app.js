@@ -344,9 +344,26 @@ class MultiGame {
 		}
 
 		if (this.playerOneScore === this.playerTwoScore) {
+			let previousTurn = this.turn;
 			//If a draw occurred, tell the client to dump the cards
+			var draw = this.draw();
+			//From the draw, set initial scores
+			let playerOneLastCard = draw.playerOneDraw[draw.playerOneDraw.length - 1];
+			let playerTwoLastCard = draw.playerTwoDraw[draw.playerTwoDraw.length - 1];
+			this.playerOneScore = playerOneLastCard.draw_value;
+			this.playerTwoScore = playerTwoLastCard.draw_value;
 
-		}
+			//Determine whose turn it is
+			if (this.playerOneScore > this.playerTwoScore) {
+				this.turn = 2;
+				io.to(this.playerOneID).emit('client_game_continue', {tie: true, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {tie: true, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+			}
+			else {
+				this.turn = 1;
+				io.to(this.playerOneID).emit('client_game_continue', {tie: true, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {tie: true, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+			}}
 		else if (this.checkWin()){
 			
 		}
@@ -354,13 +371,13 @@ class MultiGame {
 			let previousTurn = this.turn;
 			if (previousTurn === 1) {
 				this.turn = 2;	
-				io.to(this.playerOneID).emit('client_game_continue', {previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-				io.to(this.playerTwoID).emit('client_game_continue', {previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+				io.to(this.playerOneID).emit('client_game_continue', {tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
 			}
 			else {
 				this.turn = 1;
-				io.to(this.playerOneID).emit('client_game_continue', {previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-				io.to(this.playerTwoID).emit('client_game_continue', {previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+				io.to(this.playerOneID).emit('client_game_continue', {tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
 			}
 		}
 		return true;

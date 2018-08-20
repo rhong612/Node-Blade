@@ -17,6 +17,7 @@ var sortedHand = [];
 var currentDeckIndex = 0;
 var playerDraw = [];
 var enemyDraw = [];
+var tie = false;
 var turn = false;
 var playerScore = 0;
 var enemyScore = 0;
@@ -34,21 +35,24 @@ game.state.start('load');
 
 
 
-function playPlayerActivateAnimation(index, card) {
+function playPlayerActivateAnimation(index, card, func = function() {}) {
 	const SPEED = 400;
 	let sprite = playerHandSprites.getChildAt(index);
 	game.world.bringToTop(playerHandSprites);
 	playerHandSprites.bringToTop(sprite);
-	let tween = game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, true, 0);
+	let tween = game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+	tween.onComplete.add(func);
+	tween.start();
 }
 
-function playEnemyActivateAnimation(index, card) {
+function playEnemyActivateAnimation(index, card, func) {
 	const SPEED = 400;
 	let sprite = enemyHandSprites.getChildAt(index);
 	game.world.bringToTop(enemyHandSprites);
 	enemyHandSprites.bringToTop(sprite);
 	let tween = game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * ANCHOR * 4}, SPEED, Phaser.Easing.Linear.Out, false, 0);
 	let flipTween = getFlipTween(sprite, card.name, 0);
+	tween.onComplete.add(func);
 	tween.start();
 	flipTween.start();
 }
@@ -87,7 +91,6 @@ function playDrawAnimation() {
         enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, enemyScore, { fontSize: '50px' });
 	    enemyScoreText.anchor.setTo(0.5);
     	console.log("Chain complete " + turn);
-
     	startTurn();
     });
 
