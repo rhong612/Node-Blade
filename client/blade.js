@@ -7,6 +7,8 @@ var playerDeckSprites;
 var enemyDeckSprites;
 var playerHandSprites;
 var enemyHandSprites;
+var playerFieldSprites;
+var enemyFieldSprites;
 
 let playerScoreText;
 let enemyScoreText;
@@ -14,7 +16,7 @@ let waitingText;
 
 var hand = []; //Array representing the cards currently in the player's hand
 var sortedHand = [];
-var currentDeckIndex = 0;
+var currentDeckIndex = INITIAL_DECK_SIZE - INITIAL_HAND_SIZE - 1;
 var playerDraw = [];
 var enemyDraw = [];
 var tie = false;
@@ -57,11 +59,51 @@ function playEnemyActivateAnimation(index, card, func) {
 	flipTween.start();
 }
 
+/**
+
+function endOfChain(chain, newTween) {
+    let end = chain;
+    while (end.chainedTween != undefined) {
+        end = end.chainedTween;
+    }
+    end.chain(newTween);
+}
+
+function onChainComplete(chain, func) {
+    let end = chain;
+    while (end.chainedTween != undefined) {
+        end = end.chainedTween;
+    }
+    end.onComplete.add(func);
+}
+**/
+
+
+function dumpField(func) {
+	if (playerFieldSprites.length >= 1) {
+		let tween = dumpPlayerCardAnimation(playerFieldSprites.getChildAt(0), 0);
+		for (let i = 1; i < playerFieldSprites.length; i++) {
+			endOfChain(tween, dumpPlayerCardAnimation(playerFieldSprites.getChildAt(i), 0));
+		}
+
+		for (let i = 0; i < enemyFieldSprites.length; i++) {
+			endOfChain(tween, dumpEnemyCardAnimation(enemyFieldSprites.getChildAt(i), 0));
+		}
+
+		onChainComplete(tween, func);
+		tween.start();
+	}
+	else {
+		func();
+	}
+}
+
 
 /**
 *	Draws the specified number of cards given by the server. Dumps cards when necessary.
 */
 function playDrawAnimation() {
+	console.log('Current deck index:' + currentDeckIndex);
 	game.world.bringToTop(playerDeckSprites);
 	game.world.bringToTop(enemyDeckSprites);
 	const DELAY = 300;
@@ -71,18 +113,29 @@ function playDrawAnimation() {
     endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(currentDeckIndex), enemyDraw[0].name, 0));
 
     for (let i = 1; i < playerDraw.length; i++) {
+    	playerDeckSprites.removeChild(playerDeckSprites.getChildAt(currentDeckIndex)); //Remove from deck
+    	enemyDeckSprites.removeChild(enemyDeckSprites.getChildAt(currentDeckIndex)); //Remove from deck
         endOfChain(playerTween, dumpPlayerCardAnimation(playerDeckSprites.getChildAt(currentDeckIndex)));
         endOfChain(enemyTween, dumpEnemyCardAnimation(enemyDeckSprites.getChildAt(currentDeckIndex)));
 
         currentDeckIndex--;
+		console.log('Current deck index:' + currentDeckIndex);
         endOfChain(playerTween, drawPlayerCardAnimation(playerDeckSprites.getChildAt(currentDeckIndex)));
         endOfChain(enemyTween, drawEnemyCardAnimation(enemyDeckSprites.getChildAt(currentDeckIndex)));
 
         endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(currentDeckIndex), playerDraw[i].name, 0));
         endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(currentDeckIndex), enemyDraw[i].name, 0));
     }
+    currentDeckIndex--;
+	console.log('Current deck index:' + currentDeckIndex);
 
     onChainComplete(playerTween, function() {
+    	//The last drawn cards go to the field
+    	let playerSprite = playerDeckSprites.removeChild(playerDeckSprites.getChildAt(currentDeckIndex));
+    	let enemySprite = enemyDeckSprites.removeChild(enemyDeckSprites.getChildAt(currentDeckIndex));
+    	playerFieldSprites.add(playerSprite);
+    	enemyFieldSprites.add(enemySprite);
+
     	//Initialize stuff
     	waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
     	waitingText.anchor.setTo(0.5);

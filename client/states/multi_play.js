@@ -7,6 +7,8 @@ var multiPlayState = {
 		enemyDeckSprites = game.add.group();
 		playerHandSprites = game.add.group();
 		enemyHandSprites = game.add.group();
+		playerFieldSprites = game.add.group();
+		enemyFieldSprites = game.add.group();
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
 		    playerDeckSprites.add(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
 		    playerDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
@@ -35,7 +37,9 @@ var multiPlayState = {
         	//Move the played card to the center
         	if (response.previousTurn === playerNum) {
 		    	if (tie) {
-        			playPlayerActivateAnimation(response.index, response.card, playDrawAnimation);
+        			playPlayerActivateAnimation(response.index, response.card, function() {
+        				dumpField(playDrawAnimation);
+        			});
 		    	}
 		    	else {
         			playPlayerActivateAnimation(response.index, response.card, startTurn);
@@ -43,7 +47,9 @@ var multiPlayState = {
         	}
         	else {
 		    	if (tie) {
-        			playEnemyActivateAnimation(response.index, response.card, playDrawAnimation);
+        			playEnemyActivateAnimation(response.index, response.card, function() {
+        				dumpField(playDrawAnimation);
+        			});
 		    	}
 		    	else {
         			playEnemyActivateAnimation(response.index, response.card, startTurn);
@@ -60,7 +66,7 @@ var multiPlayState = {
 			playerScore = response.playerScore;
 			enemyScore = response.enemyScore;
 			//Dump the field. Then, play the draw animation
-			playDrawAnimation();
+			dumpField(playDrawAnimation);
         });
 
 
@@ -69,6 +75,5 @@ var multiPlayState = {
         bgm.volume = 0.2;
         bgm.play();
         playDeckSetupAnimation();
-        currentDeckIndex = INITIAL_DECK_SIZE - INITIAL_HAND_SIZE - 1;
 	}
 }
