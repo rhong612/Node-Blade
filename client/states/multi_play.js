@@ -53,12 +53,13 @@ var multiPlayState = {
 
 
 
-        socket.on('draw', function(response) {  
+        socket.on('draw', function(response) {
 			playerDraw = response.playerDraw;
 			enemyDraw = response.enemyDraw;
 			turn = response.turn;
 			playerScore = response.playerScore;
 			enemyScore = response.enemyScore;
+			//Dump the field. Then, play the draw animation
 			playDrawAnimation();
         });
 
