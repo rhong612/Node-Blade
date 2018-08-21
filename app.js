@@ -344,6 +344,7 @@ class MultiGame {
 		}
 
 		if (this.playerOneScore === this.playerTwoScore) {
+			let drawScore = this.playerOneScore;
 			let previousTurn = this.turn;
 			var draw = this.draw();
 			//From the draw, set initial scores
@@ -352,8 +353,8 @@ class MultiGame {
 			this.playerOneScore = playerOneLastCard.draw_value;
 			this.playerTwoScore = playerTwoLastCard.draw_value;
 			this.turn = this.playerOneScore > this.playerTwoScore ? 2 : 1;
-			io.to(this.playerOneID).emit('client_game_continue', {tie: true, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-			io.to(this.playerTwoID).emit('client_game_continue', {tie: true, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+			io.to(this.playerOneID).emit('client_game_continue', {tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+			io.to(this.playerTwoID).emit('client_game_continue', {tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
 		}
 		else if (this.checkWin()){
 			

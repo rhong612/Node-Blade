@@ -25,10 +25,9 @@ var multiPlayState = {
 
         socket.on('client_game_continue', function(response) {
         	console.log(JSON.stringify(response));
+        	waitingText.setText("A draw!");
         	playerScore = response.playerScore;
         	enemyScore = response.enemyScore;
-        	playerScoreText.setText(playerScore);
-        	enemyScoreText.setText(enemyScore);
 
         	turn = response.turn;
         	tie = response.tie;
@@ -37,22 +36,30 @@ var multiPlayState = {
         	//Move the played card to the center
         	if (response.previousTurn === playerNum) {
 		    	if (tie) {
+        			playerScoreText.setText(response.drawScore);
+        			enemyScoreText.setText(response.drawScore);
         			playPlayerActivateAnimation(response.index, response.card, function() {
         				dumpField(playDrawAnimation);
         			});
 		    	}
 		    	else {
         			playPlayerActivateAnimation(response.index, response.card, startTurn);
+        			playerScoreText.setText(playerScore);
+        			enemyScoreText.setText(enemyScore);
 		    	}
         	}
         	else {
 		    	if (tie) {
+        			playerScoreText.setText(response.drawScore);
+        			enemyScoreText.setText(response.drawScore);
         			playEnemyActivateAnimation(response.index, response.card, function() {
         				dumpField(playDrawAnimation);
         			});
 		    	}
 		    	else {
         			playEnemyActivateAnimation(response.index, response.card, startTurn);
+        			playerScoreText.setText(playerScore);
+        			enemyScoreText.setText(enemyScore);
 		    	}
         	}
         })

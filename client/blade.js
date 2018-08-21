@@ -69,17 +69,22 @@ function playEnemyActivateAnimation(index, card, func) {
 
 function dumpField(func) {
 	if (playerFieldSprites.length >= 1) {
-		let tween = dumpPlayerCardAnimation(playerFieldSprites.getChildAt(0), 0);
+		let tweens = [];
+		tweens.push(dumpPlayerCardAnimation(playerFieldSprites.getChildAt(0), 0));
 		for (let i = 1; i < playerFieldSprites.length; i++) {
-			endOfChain(tween, dumpPlayerCardAnimation(playerFieldSprites.getChildAt(i), 0));
+			tweens.push(dumpPlayerCardAnimation(playerFieldSprites.getChildAt(i), 0));
 		}
 
 		for (let i = 0; i < enemyFieldSprites.length; i++) {
-			endOfChain(tween, dumpEnemyCardAnimation(enemyFieldSprites.getChildAt(i), 0));
+			tweens.push(dumpEnemyCardAnimation(enemyFieldSprites.getChildAt(i), 0));
 		}
 
-		onChainComplete(tween, func);
-		tween.start();
+		onChainComplete(tweens[tweens.length - 1], function() {
+			playerFieldSprites.removeAll(true);
+			enemyFieldSprites.removeAll(true);
+			func();
+		});
+		startAllTweens(tweens);
 	}
 	else {
 		func();
@@ -123,14 +128,19 @@ function playDrawAnimation() {
     	enemyFieldSprites.add(enemySprite);
     	currentDeckIndex--;
 
+    	if (waitingText) {
+    		playerScoreText.setText(playerScore);
+    		enemyScoreText.setText(enemyScore);
+    	}
     	//Initialize stuff
-    	waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
-    	waitingText.anchor.setTo(0.5);
-        playerScoreText = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, playerScore, { fontSize: '50px' });
-	    playerScoreText.anchor.setTo(0.5);
-        enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, enemyScore, { fontSize: '50px' });
-	    enemyScoreText.anchor.setTo(0.5);
-    	console.log("Chain complete " + turn);
+    	else {
+	    	waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
+	    	waitingText.anchor.setTo(0.5);
+	        playerScoreText = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, playerScore, { fontSize: '50px' });
+		    playerScoreText.anchor.setTo(0.5);
+	        enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, enemyScore, { fontSize: '50px' });
+		    enemyScoreText.anchor.setTo(0.5);
+    	}
     	startTurn();
     });
 
