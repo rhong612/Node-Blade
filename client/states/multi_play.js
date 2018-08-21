@@ -25,7 +25,7 @@ var multiPlayState = {
 
         socket.on('client_game_continue', function(response) {
         	console.log(JSON.stringify(response));
-        	waitingText.setText("A draw!");
+        	waitingText.setText("");
         	playerScore = response.playerScore;
         	enemyScore = response.enemyScore;
 
@@ -36,6 +36,7 @@ var multiPlayState = {
         	//Move the played card to the center
         	if (response.previousTurn === playerNum) {
 		    	if (tie) {
+        			waitingText.setText("A draw!");
         			playerScoreText.setText(response.drawScore);
         			enemyScoreText.setText(response.drawScore);
         			playPlayerActivateAnimation(response.index, response.card, function() {
@@ -43,13 +44,19 @@ var multiPlayState = {
         			});
 		    	}
 		    	else {
-        			playPlayerActivateAnimation(response.index, response.card, startTurn);
-        			playerScoreText.setText(playerScore);
-        			enemyScoreText.setText(enemyScore);
+		    		if (response.card.name === BOLT) {
+		    			playPlayerBoltAnimation(response.index, response.card, startTurn);
+		    		}
+		    		else {
+	        			playPlayerActivateAnimation(response.index, response.card, startTurn);
+	        			playerScoreText.setText(playerScore);
+	        			enemyScoreText.setText(enemyScore);
+		    		}
 		    	}
         	}
         	else {
 		    	if (tie) {
+        			waitingText.setText("A draw!");
         			playerScoreText.setText(response.drawScore);
         			enemyScoreText.setText(response.drawScore);
         			playEnemyActivateAnimation(response.index, response.card, function() {
@@ -57,9 +64,14 @@ var multiPlayState = {
         			});
 		    	}
 		    	else {
-        			playEnemyActivateAnimation(response.index, response.card, startTurn);
-        			playerScoreText.setText(playerScore);
-        			enemyScoreText.setText(enemyScore);
+		    		if (response.card.name === BOLT) {
+		    			playEnemyBoltAnimation(response.index, response.card, startTurn);
+		    		}
+		    		else {
+	        			playEnemyActivateAnimation(response.index, response.card, startTurn);
+	        			playerScoreText.setText(playerScore);
+	        			enemyScoreText.setText(enemyScore);
+		    		}
 		    	}
         	}
         })

@@ -23,7 +23,26 @@ class Card {
 
 //List of cards
 const BOLT = new Card('BOLT', 8, 1, function(game) {
-
+    if (game.turn === 1) {
+        game.playerTwoBolt = game.playerTwoField.pop(); //Remove top field card
+        //Cut score in half if bolted card was force
+        if (game.playerTwoBolt.name === FORCE.name) {
+            game.playerTwoScore /= 2;
+        }
+        //Else simply subtract the card's value (Blast, mirror, and bolt cannot be bolted)
+        else {
+            game.playerTwoScore -= game.playerTwoBolt.draw_value;
+        }
+    }
+    else {
+        game.playerOneBolt = game.playerOneField.pop();
+        if (game.playerOneBolt.name === FORCE.name) {
+            game.playerOneScore /= 2;
+        }
+        else {
+            game.playerOneScore -= game.playerOneBolt.draw_value;
+        }
+    }
 });
 
 const BLAST = new Card('BLAST', 9, 1, function(game) {

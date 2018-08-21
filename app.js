@@ -234,9 +234,9 @@ function shuffleDeck(deck) {
 
 function initializeDeck() {
 	const deck = [];
-	// for (let i = 0; i < 4; i++) {
-	// 	deck.push(cards_list.BOLT);
-	// }
+	for (let i = 0; i < 4; i++) {
+		deck.push(cards_list.BOLT);
+	}
 	// for (let i = 0; i < 2; i++) {
 	// 	deck.push(cards_list.BLAST);
 	// }
@@ -292,6 +292,9 @@ class MultiGame {
 		this.playerTwoScore = 0;
 		this.playerOneField = [];
 		this.playerTwoField = [];
+
+		this.playerOneBolt = null;
+		this.playerTwoBolt = null;
 
 		this.playerOneUsername = null;
 		this.playerTwoUsername = null;

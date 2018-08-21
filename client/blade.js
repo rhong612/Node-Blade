@@ -34,8 +34,38 @@ game.state.add('multi_play_menu', multiPlayMenuState)
 game.state.start('load');
 
 
-
-
+function playPlayerBoltAnimation(index, card, func) {
+	const SPEED = 800;
+	let sprite = playerHandSprites.getChildAt(index);
+	game.world.bringToTop(playerHandSprites);
+	playerHandSprites.bringToTop(sprite);
+	let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+	endOfChain(tween, getFlipTween(enemyFieldSprites.getTop(), BACK, 0));
+	onChainComplete(tween, function() {
+		playerHandSprites.remove(sprite, true); //Remove and destroy
+	    playerScoreText.setText(playerScore);
+	    enemyScoreText.setText(enemyScore);
+		func();
+	});
+	tween.start();
+}
+function playEnemyBoltAnimation(index, card, func) {
+	const SPEED = 800;
+	let sprite = enemyHandSprites.getChildAt(index);
+	game.world.bringToTop(enemyHandSprites);
+	enemyHandSprites.bringToTop(sprite);
+	let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+	let flipTween = getFlipTween(sprite, card.name, 0);
+	endOfChain(tween, getFlipTween(playerFieldSprites.getTop(), BACK, 0));
+	onChainComplete(tween, function() {
+		enemyHandSprites.remove(sprite, true); //Remove and destroy
+	    playerScoreText.setText(playerScore);
+	    enemyScoreText.setText(enemyScore);
+		func();
+	});
+	tween.start();
+	flipTween.start();
+}
 
 function playPlayerActivateAnimation(index, card, func = function() {}) {
 	const SPEED = 400;
