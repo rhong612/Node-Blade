@@ -323,27 +323,13 @@ class MultiGame {
 		}
 		else if (player === 1){
 			card = this.playerOneHand[card_index];
-			this.playerOneField.push(card);
 			this.playerOneHand.splice(card_index, 1);
-			console.log('Player one current field: ' + JSON.stringify(this.playerOneField));
-			console.log('Player one current hand: ' + JSON.stringify(this.playerOneHand));
-			console.log('Player two current field: ' + JSON.stringify(this.playerTwoField));
-			console.log('Player two current hand: ' + JSON.stringify(this.playerTwoHand));
 			card.activate(this);
-			console.log('Player one current score: ' + this.playerOneScore);
-			console.log('Player two current score: ' + this.playerTwoScore);
 		}
 		else {
 			card = this.playerTwoHand[card_index];
-			this.playerTwoField.push(card);
 			this.playerTwoHand.splice(card_index, 1);
-			console.log('Player one current field: ' + JSON.stringify(this.playerOneField));
-			console.log('Player one current hand: ' + JSON.stringify(this.playerOneHand));
-			console.log('Player two current field: ' + JSON.stringify(this.playerTwoField));
-			console.log('Player two current hand: ' + JSON.stringify(this.playerTwoHand));
 			card.activate(this);
-			console.log('Player one current score: ' + this.playerOneScore);
-			console.log('Player two current score: ' + this.playerTwoScore);
 		}
 
 		if (this.playerOneScore === this.playerTwoScore) {

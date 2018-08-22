@@ -8,9 +8,11 @@ class Card {
     constructor(name, sort_value, draw_value, activate = function(game) {
         if (game.turn === 1) {
             game.playerOneScore += this.draw_value;
+            game.playerOneField.push(this);
         }
         else {
             game.playerTwoScore += this.draw_value;
+            game.playerTwoField.push(this);
         }
     }) {
         this.name = name;
@@ -62,9 +64,11 @@ const MIRROR = new Card('MIRROR', 10, 1, function(game) {
 const FORCE = new Card('FORCE', 11, 1, function(game) {
     if (game.turn === 1) {
         game.playerOneScore *= 2;
+        game.playerOneField.push(this);
     }
     else {
         game.playerTwoScore *= 2;
+        game.playerTwoField.push(this);
     }
 })
 
