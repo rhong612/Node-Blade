@@ -49,8 +49,6 @@ var multiPlayState = {
 		    		}
 		    		else {
 	        			playPlayerActivateAnimation(response.index, response.card, startTurn);
-	        			playerScoreText.setText(playerScore);
-	        			enemyScoreText.setText(enemyScore);
 		    		}
 		    	}
         	}
@@ -69,8 +67,6 @@ var multiPlayState = {
 		    		}
 		    		else {
 	        			playEnemyActivateAnimation(response.index, response.card, startTurn);
-	        			playerScoreText.setText(playerScore);
-	        			enemyScoreText.setText(enemyScore);
 		    		}
 		    	}
         	}

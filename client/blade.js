@@ -43,8 +43,6 @@ function playPlayerBoltAnimation(index, card, func) {
 	endOfChain(tween, getFlipTween(enemyFieldSprites.getTop(), BACK, 0));
 	onChainComplete(tween, function() {
 		playerHandSprites.remove(sprite, true); //Remove and destroy
-	    playerScoreText.setText(playerScore);
-	    enemyScoreText.setText(enemyScore);
 		func();
 	});
 	tween.start();
@@ -59,8 +57,6 @@ function playEnemyBoltAnimation(index, card, func) {
 	endOfChain(tween, getFlipTween(playerFieldSprites.getTop(), BACK, 0));
 	onChainComplete(tween, function() {
 		enemyHandSprites.remove(sprite, true); //Remove and destroy
-	    playerScoreText.setText(playerScore);
-	    enemyScoreText.setText(enemyScore);
 		func();
 	});
 	tween.start();
@@ -158,12 +154,8 @@ function playDrawAnimation() {
     	enemyFieldSprites.add(enemySprite);
     	currentDeckIndex--;
 
-    	if (waitingText) {
-    		playerScoreText.setText(playerScore);
-    		enemyScoreText.setText(enemyScore);
-    	}
     	//Initialize stuff
-    	else {
+    	if(!waitingText) {
 	    	waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
 	    	waitingText.anchor.setTo(0.5);
 	        playerScoreText = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, playerScore, { fontSize: '50px' });
@@ -181,6 +173,8 @@ function playDrawAnimation() {
 }
 
 function startTurn() {
+	playerScoreText.setText(playerScore);
+	enemyScoreText.setText(enemyScore);
 	if (turn === playerNum) {
     	waitingText.setText("");
     	//Can click on cards
