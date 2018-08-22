@@ -130,6 +130,8 @@ function playDrawAnimation() {
     let enemyTween = drawEnemyCardAnimation(enemyDeckSprites.getChildAt(currentDeckIndex), DELAY);
     endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(currentDeckIndex), playerDraw[0].name, 0));
     endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(currentDeckIndex), enemyDraw[0].name, 0));
+    playerDeckSprites.getChildAt(currentDeckIndex).name = playerDraw[0].name;
+    enemyDeckSprites.getChildAt(currentDeckIndex).name = enemyDraw[0].name;
 
     for (let i = 1; i < playerDraw.length; i++) {
         endOfChain(playerTween, dumpPlayerCardAnimation(playerDeckSprites.getChildAt(currentDeckIndex)));
@@ -144,6 +146,8 @@ function playDrawAnimation() {
 
         endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(currentDeckIndex), playerDraw[i].name, 0));
         endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(currentDeckIndex), enemyDraw[i].name, 0));
+    	playerDeckSprites.getChildAt(currentDeckIndex).name = playerDraw[i].name;
+    	enemyDeckSprites.getChildAt(currentDeckIndex).name = enemyDraw[i].name;
     }
 
     onChainComplete(playerTween, function() {
@@ -287,6 +291,7 @@ function playHandSetupAnimation() {
 		//Flip all the cards
 		for (let k = 0; k < INITIAL_HAND_SIZE; k++) {
 			let tween = getFlipTween(playerHandSprites.getChildAt(k), hand[k].name, k * DELAY);
+			playerHandSprites.getChildAt(k).name = hand[k].name; //Set the name property for each card that was drawn
 			if (k == INITIAL_HAND_SIZE - 1) {
 				tween.onComplete.add(playSortAnimation);
 			}
