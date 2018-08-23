@@ -4,12 +4,7 @@ var username = '';
 
 
 
-socket.on('update_players', function(usernames) {
-	$("#player_list tbody").empty();
-	for (let i = 0; i < usernames.length; i++) {
-		$("#player_list tbody").append("<tr><td><label data-name='" + usernames[i] + "'>" + usernames[i] + "</label></td></tr>");
-	}
-});
+
 /*
 $(document).ready(function() {
 	$("#chat_btn").on('click', function() {
@@ -35,6 +30,12 @@ function setupConn() {
 	socket.on('invalid_name', function() {
 		alert('Invalid name!');
 	})
+	socket.on('update_players', function(usernames) {
+		$("#player_list tbody").empty();
+		for (let i = 0; i < usernames.length; i++) {
+			$("#player_list tbody").append("<tr><td><label data-name='" + usernames[i] + "'>" + usernames[i] + "</label></td></tr>");
+		}
+	});
 }
 
 setupConn();
