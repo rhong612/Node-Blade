@@ -1,7 +1,6 @@
 //List of cards
 const BACK = 'BACK';
 const BOLT = 'BOLT';
-const BLAST = 'BLAST';
 const MIRROR = 'MIRROR';
 const FORCE = 'FORCE';
 const WAND = 'WAND';

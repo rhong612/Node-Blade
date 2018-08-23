@@ -5,7 +5,6 @@ var loadState = {
         //Cards
         this.load.image(BACK, 'assets/images/cards/back.png');
         this.load.image(BOLT, 'assets/images/cards/bolt.png');
-        this.load.image(BLAST, 'assets/images/cards/blast.png');
         this.load.image(MIRROR, 'assets/images/cards/mirror.png');
         this.load.image(FORCE, 'assets/images/cards/force.png');
         this.load.image(WAND, 'assets/images/cards/wand.png');

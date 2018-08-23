@@ -33,10 +33,63 @@ game.state.add('multi_play_menu', multiPlayMenuState)
 
 game.state.start('load');
 
-function playMirrorAnimation(index, func) {
 
+function swapFieldTween(func) {
+	let playerX = playerFieldSprites.getTop().x;
+	let playerY = playerFieldSprites.getTop().y;
+	let enemyX = enemyFieldSprites.getTop().x;
+	let enemyY = enemyFieldSprites.getTop().y;
+
+	let swapTweens = [];
+	const SPEED = 800;
+	for (let i = 0; i < playerFieldSprites.length; i++) {
+		swapTweens.push(game.add.tween(playerFieldSprites.getChildAt(i)).to({x: enemyX, y: enemyY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
+	}
+	for (let i = 0; i < enemyFieldSprites.length; i++) {
+		swapTweens.push(game.add.tween(enemyFieldSprites.getChildAt(i)).to({x: playerX, y: playerY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
+	}
+
+	swapTweens[swapTweens.length - 1].onComplete.add(func);
+	return swapTweens;
 }
 
+function playPlayerMirrorAnimation(index, func) {
+	const SPEED = 800;
+	let sprite = playerHandSprites.getChildAt(index);
+	game.world.bringToTop(playerHandSprites);
+	playerHandSprites.bringToTop(sprite);
+	let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+
+	let swapTweens = swapFieldTween(function() {
+		playerHandSprites.remove(sprite, true); //Remove and destroy
+		func();
+	});
+	tween.onComplete.add(function() {
+		startAllTweens(swapTweens);
+	});
+
+	tween.start();
+}
+
+function playEnemyMirrorAnimation(index, card, func) {
+	const SPEED = 800;
+	let sprite = enemyHandSprites.getChildAt(index);
+	game.world.bringToTop(enemyHandSprites);
+	enemyHandSprites.bringToTop(sprite);
+	let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+	let flipTween = getFlipTween(sprite, card.name, 0);
+
+	let swapTweens = swapFieldTween(function() {
+		enemyHandSprites.remove(sprite, true); //Remove and destroy
+		func();
+	});
+	tween.onComplete.add(function() {
+		startAllTweens(swapTweens);
+	});
+
+	tween.start();
+	flipTween.start();
+}
 
 function playPlayerWandAnimation(index, func) {
 	if (playerFieldSprites.getTop().key === BACK) {

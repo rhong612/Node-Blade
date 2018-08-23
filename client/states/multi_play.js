@@ -47,6 +47,9 @@ var multiPlayState = {
 		    		if (response.card.name === BOLT) {
 		    			playPlayerBoltAnimation(response.index, startTurn);
 		    		}
+		    		else if (response.card.name === MIRROR) {
+		    			playPlayerMirrorAnimation(response.index, startTurn);
+		    		}
 		    		else if (response.card.name === WAND) {
 		    			playPlayerWandAnimation(response.index, startTurn);
 		    		}
@@ -67,6 +70,9 @@ var multiPlayState = {
 		    	else {
 		    		if (response.card.name === BOLT) {
 		    			playEnemyBoltAnimation(response.index, response.card, startTurn);
+		    		}
+		    		else if (response.card.name === MIRROR) {
+		    			playEnemyMirrorAnimation(response.index, response.card, startTurn);
 		    		}
 		    		else if (response.card.name === WAND) {
 		    			playEnemyWandAnimation(response.index, response.card, startTurn);
