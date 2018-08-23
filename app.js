@@ -237,9 +237,6 @@ function initializeDeck() {
 	for (let i = 0; i < 4; i++) {
 		deck.push(cards_list.BOLT);
 	}
-	// for (let i = 0; i < 2; i++) {
-	// 	deck.push(cards_list.BLAST);
-	// }
 	for (let i = 0; i < 2; i++) {
 		deck.push(cards_list.FORCE);
 	}

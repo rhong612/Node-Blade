@@ -47,9 +47,6 @@ const BOLT = new Card('BOLT', 8, 1, function(game) {
     }
 });
 
-const BLAST = new Card('BLAST', 9, 1, function(game) {
-
-})
 
 const MIRROR = new Card('MIRROR', 10, 1, function(game) {
     let tempScore = game.playerOneScore;
@@ -106,7 +103,6 @@ const SEVEN_CARD = new Card('BROADSWORD', 7, 7)
 
 module.exports = {
     BOLT: BOLT,
-    BLAST: BLAST,
     MIRROR: MIRROR,
     FORCE: FORCE,
     WAND: WAND,
