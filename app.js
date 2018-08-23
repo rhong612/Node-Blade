@@ -365,15 +365,19 @@ class MultiGame {
 
 	//param: player - the player that just moved
 	checkWin(player) {
-		if (player === 1 && (this.playerTwoHand.length === 0 || !this.containsNormalCards(this.playerTwoHand))) {
+		//Player 1 just played. Player 2 has no valid moves. Player 1's score is higher.
+		if (player === 1 && (this.playerTwoHand.length === 0 || !this.containsNormalCards(this.playerTwoHand)) && this.playerOneScore > this.playerTwoScore) {
 			return 1;
 		}
-		else if (player === 2 && (this.playerOneHand.length === 0 || !this.containsNormalCards(this.playerOneHand))) {
+		//Player 2 just played. Player 1 has no valid moves. Player 2's score is higher.
+		else if (player === 2 && (this.playerOneHand.length === 0 || !this.containsNormalCards(this.playerOneHand)) && this.playerTwoScore > this.playerOneScore) {
 			return 2;
 		}
+		//Player 1 just played. Player 1 couldn't beat Player 2's score with his/her move.
 		else if (player === 1 && this.playerOneScore < this.playerTwoScore) {
 			return 2;
 		}
+		//Player 2 just played. Player 2 couldn't beat Player 1's score with his/her move.
 		else if (player === 2 && this.playerTwoScore < this.playerOneScore) {
 			return 1;
 		}
