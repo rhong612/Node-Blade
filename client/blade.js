@@ -33,6 +33,10 @@ game.state.add('multi_play_menu', multiPlayMenuState)
 
 game.state.start('load');
 
+function playMirrorAnimation(index, func) {
+
+}
+
 
 function playPlayerWandAnimation(index, func) {
 	if (playerFieldSprites.getTop().key === BACK) {
@@ -171,8 +175,6 @@ function playDrawAnimation() {
     let enemyTween = drawEnemyCardAnimation(enemyDeckSprites.getChildAt(currentDeckIndex), DELAY);
     endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(currentDeckIndex), playerDraw[0].name, 0));
     endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(currentDeckIndex), enemyDraw[0].name, 0));
-    playerDeckSprites.getChildAt(currentDeckIndex).name = playerDraw[0].name;
-    enemyDeckSprites.getChildAt(currentDeckIndex).name = enemyDraw[0].name;
 
     for (let i = 1; i < playerDraw.length; i++) {
         endOfChain(playerTween, dumpPlayerCardAnimation(playerDeckSprites.getChildAt(currentDeckIndex)));
