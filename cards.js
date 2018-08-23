@@ -29,9 +29,9 @@ const BOLT = new Card('BOLT', 8, 1, function(game) {
         game.playerTwoBolt = game.playerTwoField.pop(); //Remove top field card
         //Cut score in half if bolted card was force
         if (game.playerTwoBolt.name === FORCE.name) {
-            game.playerTwoScore /= 2;
+            game.playerTwoScore = Math.floor(game.playerTwoScore / 2); //Note: Math.floor is used to ensure that the score hits 0 if a force that is drawn as the 1st card is bolted away
         }
-        //Else simply subtract the card's value (Blast, mirror, and bolt cannot be bolted)
+        //Else simply subtract the card's value
         else {
             game.playerTwoScore -= game.playerTwoBolt.draw_value;
         }
@@ -39,7 +39,7 @@ const BOLT = new Card('BOLT', 8, 1, function(game) {
     else {
         game.playerOneBolt = game.playerOneField.pop();
         if (game.playerOneBolt.name === FORCE.name) {
-            game.playerOneScore /= 2;
+            game.playerOneScore = Math.floor(game.playerOneScore / 2);
         }
         else {
             game.playerOneScore -= game.playerOneBolt.draw_value;
@@ -72,8 +72,16 @@ const FORCE = new Card('FORCE', 11, 1, function(game) {
 const WAND = new Card('WAND', 1, 1, function(game) {
     if (game.turn === 1) {
         if (game.playerOneBolt) {
-            game.playerOneBolt.activate(game);
-            game.playerOneBolt = undefined;
+            //Don't activate the card if it's the 1st card
+            if (game.playerOneField.length === 1) {
+                game.playerOneField.push(game.playerOneBolt);
+                game.playerOneScore += game.playerOneBolt.draw_value;
+                game.playerOneBolt = undefined;
+            }
+            else {
+                game.playerOneBolt.activate(game);
+                game.playerOneBolt = undefined;
+            }
         }
         else {
             game.playerOneScore += 1;
@@ -82,8 +90,16 @@ const WAND = new Card('WAND', 1, 1, function(game) {
     }
     else {
         if (game.playerTwoBolt) {
-            game.playerTwoBolt.activate(game);
-            game.playerTwoBolt = undefined;
+            //Don't activate the card if it's the 1st card
+            if (game.playerTwoField.length === 1) {
+                game.playerTwoField.push(game.playerTwoBolt);
+                game.playerTwoScore += game.playerTwoBolt.draw_value;
+                game.playerTwoBolt = undefined;
+            }
+            else {
+                game.playerTwoBolt.activate(game);
+                game.playerTwoBolt = undefined;
+            }
         }
         else {
             game.playerTwoScore += 1;

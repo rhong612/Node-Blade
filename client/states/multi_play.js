@@ -28,6 +28,10 @@ var multiPlayState = {
         	waitingText.setText("");
         	playerScore = response.playerScore;
         	enemyScore = response.enemyScore;
+        	gameover = response.gameover;
+        	if (gameover) {
+        		winner = response.winner;
+        	}
 
         	turn = response.turn;
         	tie = response.tie;

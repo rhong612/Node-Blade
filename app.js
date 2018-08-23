@@ -339,25 +339,57 @@ class MultiGame {
 			this.playerOneScore = playerOneLastCard.draw_value;
 			this.playerTwoScore = playerTwoLastCard.draw_value;
 			this.turn = this.playerOneScore > this.playerTwoScore ? 2 : 1;
-			io.to(this.playerOneID).emit('client_game_continue', {tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-			io.to(this.playerTwoID).emit('client_game_continue', {tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+			io.to(this.playerOneID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+			io.to(this.playerTwoID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
 		}
-		else if (this.checkWin()){
-			
-		}
-		//No tie or victory. Continue game
 		else {
-			let previousTurn = this.turn;
-			this.turn = previousTurn === 1 ? 2 : 1;
-			io.to(this.playerOneID).emit('client_game_continue', {tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-			io.to(this.playerTwoID).emit('client_game_continue', {tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
-			
+			let win = this.checkWin(player);
+			//Game over
+			if (win > 0) {
+				let winningUsername = win === 1 ? this.playerOneUsername : this.playerTwoUsername;
+				console.log('Player ' + win + ': ' + winningUsername + ' won.');
+				let previousTurn = this.turn;
+				io.to(this.playerOneID).emit('client_game_continue', {gameover: true, winner: win, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {gameover: true, winner: win, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+			}
+			//No tie or victory. Continue game
+			else {
+				let previousTurn = this.turn;
+				this.turn = previousTurn === 1 ? 2 : 1;
+				io.to(this.playerOneID).emit('client_game_continue', {gameover: false, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {gameover: false, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+			}	
 		}
 		return true;
 	}
 
-	checkWin() {
+	//param: player - the player that just moved
+	checkWin(player) {
+		if (player === 1 && (this.playerTwoHand.length === 0 || !this.containsNormalCards(this.playerTwoHand))) {
+			return 1;
+		}
+		else if (player === 2 && (this.playerOneHand.length === 0 || !this.containsNormalCards(this.playerOneHand))) {
+			return 2;
+		}
+		else if (player === 1 && this.playerOneScore < this.playerTwoScore) {
+			return 2;
+		}
+		else if (player === 2 && this.playerTwoScore < this.playerOneScore) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
 
+	containsNormalCards(hand) {
+		for (let i = 0; i < hand.length; i++) {
+			let name = hand[i].name;
+			if (name === cards_list.WAND.name || name === cards_list.TWO_CARD.name || name === cards_list.THREE_CARD.name || name === cards_list.FOUR_CARD.name || name === cards_list.FIVE_CARD.name || name === cards_list.SIX_CARD.name || name === cards_list.SEVEN_CARD.name) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	validateMove(card_index, player) {

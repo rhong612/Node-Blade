@@ -23,6 +23,8 @@ var tie = false;
 var turn = false;
 var playerScore = 0;
 var enemyScore = 0;
+var gameover = false;
+var winner = 0;
 
 var playerNum = 0;
 
@@ -275,7 +277,15 @@ function playDrawAnimation() {
 function startTurn() {
 	playerScoreText.setText(playerScore);
 	enemyScoreText.setText(enemyScore);
-	if (turn === playerNum) {
+	if (gameover) {
+		if (winner === playerNum) {
+			waitingText.setText("You win!");
+		}
+		else {
+			waitingText.setText("You lose!");
+		}
+	}
+	else if (turn === playerNum) {
     	waitingText.setText("");
     	//Can click on cards
     	for (let i = 0; i < playerHandSprites.length; i++) {
@@ -299,6 +309,7 @@ function startTurn() {
     else {
     	waitingText.setText("Waiting for other player...");
     }
+
 }
 
 /**
