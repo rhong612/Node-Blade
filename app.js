@@ -123,6 +123,13 @@ io.on('connection', function(socket) {
 			initiateDrawProcess(current_ongoing_games[active_players[this.id].currentGameID]);
 		}
 	})
+
+	socket.on('leave_game', function() {
+		this.leave('room' + active_players[this.id].currentGameID);
+		active_players[this.id].currentGameID = NO_GAME;
+		active_players[this.id].onMenu = true;
+		delete current_ongoing_games[this.gameID];
+	});
 });
 
 function initiateDrawProcess(game) {

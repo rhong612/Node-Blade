@@ -12,7 +12,7 @@ const SIX_CARD = 'SPEAR';
 const SEVEN_CARD = 'BROADSWORD';
 
 //Other images
-const AI_BUTTON = 'AI_BUTTON';
+const RETURN_BUTTON = 'RETURN_BUTTON';
 const MULTI_BUTTON = 'MULTI_BUTTON';
 
 //Sound effects

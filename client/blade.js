@@ -255,16 +255,6 @@ function playDrawAnimation() {
     	playerFieldSprites.add(playerSprite);
     	enemyFieldSprites.add(enemySprite);
     	currentDeckIndex--;
-
-    	//Initialize stuff
-    	if(!waitingText) {
-	    	waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
-	    	waitingText.anchor.setTo(0.5);
-	        playerScoreText = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, playerScore, { fontSize: '50px' });
-		    playerScoreText.anchor.setTo(0.5);
-	        enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, enemyScore, { fontSize: '50px' });
-		    enemyScoreText.anchor.setTo(0.5);
-    	}
     	startTurn();
     });
 
@@ -274,15 +264,33 @@ function playDrawAnimation() {
     enemyTween.start();
 }
 
+function showReturnButton() {
+    let image = game.add.image(0, game.world.centerX, RETURN_BUTTON);
+    image.inputEnabled = true;
+    image.events.onInputDown.add(function() {
+    	socket.emit('leave_game');
+        game.state.start('menu');
+    });
+}
+
+function resetConn() {
+	socket.removeAllListeners();
+	setupConn();
+}
+
 function startTurn() {
 	playerScoreText.setText(playerScore);
 	enemyScoreText.setText(enemyScore);
 	if (gameover) {
 		if (winner === playerNum) {
 			waitingText.setText("You win!");
+			resetConn();
+			showReturnButton();
 		}
 		else {
 			waitingText.setText("You lose!");
+			resetConn();
+			showReturnButton();
 		}
 	}
 	else if (turn === playerNum) {

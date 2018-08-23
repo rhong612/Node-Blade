@@ -1,21 +1,7 @@
 const socket = io();
 var username = '';
 
-socket.on('display_name', function(name) {
-	username = name;
-});
 
-socket.on('name_taken', function() {
-	alert('Desired name is taken!');
-});
-
-socket.on('not_on_menu', function() {
-	alert('You can only change your screenname on the main menu!');
-})
-
-socket.on('invalid_name', function() {
-	alert('Invalid name!');
-})
 
 
 socket.on('update_players', function(usernames) {
@@ -32,3 +18,23 @@ $(document).ready(function() {
 	});
 });
 */
+
+function setupConn() {
+	socket.on('display_name', function(name) {
+		username = name;
+	});
+
+	socket.on('name_taken', function() {
+		alert('Desired name is taken!');
+	});
+
+	socket.on('not_on_menu', function() {
+		alert('You can only change your screenname on the main menu!');
+	})
+
+	socket.on('invalid_name', function() {
+		alert('Invalid name!');
+	})
+}
+
+setupConn();

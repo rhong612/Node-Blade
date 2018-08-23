@@ -9,6 +9,12 @@ var multiPlayState = {
 		enemyHandSprites = game.add.group();
 		playerFieldSprites = game.add.group();
 		enemyFieldSprites = game.add.group();
+	    waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
+	    waitingText.anchor.setTo(0.5);
+	    playerScoreText = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, 0, { fontSize: '50px' });
+		playerScoreText.anchor.setTo(0.5);
+	    enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, 0, { fontSize: '50px' });
+		enemyScoreText.anchor.setTo(0.5);
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
 		    playerDeckSprites.add(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
 		    playerDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
@@ -20,6 +26,8 @@ var multiPlayState = {
 			enemyDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
 	        enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
+		gameover = false;
+		winner = 0;
 	},
 	create: function() {
 
@@ -31,6 +39,7 @@ var multiPlayState = {
         	gameover = response.gameover;
         	if (gameover) {
         		winner = response.winner;
+        		bgm.stop();
         	}
 
         	turn = response.turn;
