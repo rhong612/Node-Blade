@@ -261,9 +261,9 @@ function initializeDeck() {
 	for (let i = 0; i < 3; i++) {
 		deck.push(cards_list.TWO_CARD);
 	}
-	// for (let i = 0; i < 2; i++) {
-	// 	deck.push(cards_list.WAND);
-	// }
+	for (let i = 0; i < 2; i++) {
+		deck.push(cards_list.WAND);
+	}
 	for (let i = 0; i < 2; i++) {
 		deck.push(cards_list.MIRROR);
 	}

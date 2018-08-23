@@ -73,6 +73,26 @@ const FORCE = new Card('FORCE', 11, 1, function(game) {
 })
 
 const WAND = new Card('WAND', 1, 1, function(game) {
+    if (game.turn === 1) {
+        if (game.playerOneBolt) {
+            game.playerOneBolt.activate(game);
+            game.playerOneBolt = undefined;
+        }
+        else {
+            game.playerOneScore += 1;
+            game.playerOneField.push(this);
+        }
+    }
+    else {
+        if (game.playerTwoBolt) {
+            game.playerTwoBolt.activate(game);
+            game.playerTwoBolt = undefined;
+        }
+        else {
+            game.playerTwoScore += 1;
+            game.playerTwoField.push(this);
+        }
+    }
     
 })
 

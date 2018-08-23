@@ -39,16 +39,19 @@ var multiPlayState = {
         			waitingText.setText("A draw!");
         			playerScoreText.setText(response.drawScore);
         			enemyScoreText.setText(response.drawScore);
-        			playPlayerActivateAnimation(response.index, response.card, function() {
+        			playPlayerActivateAnimation(response.index, function() {
         				dumpField(playDrawAnimation);
         			});
 		    	}
 		    	else {
 		    		if (response.card.name === BOLT) {
-		    			playPlayerBoltAnimation(response.index, response.card, startTurn);
+		    			playPlayerBoltAnimation(response.index, startTurn);
+		    		}
+		    		else if (response.card.name === WAND) {
+		    			playPlayerWandAnimation(response.index, startTurn);
 		    		}
 		    		else {
-	        			playPlayerActivateAnimation(response.index, response.card, startTurn);
+	        			playPlayerActivateAnimation(response.index, startTurn);
 		    		}
 		    	}
         	}
@@ -64,6 +67,9 @@ var multiPlayState = {
 		    	else {
 		    		if (response.card.name === BOLT) {
 		    			playEnemyBoltAnimation(response.index, response.card, startTurn);
+		    		}
+		    		else if (response.card.name === WAND) {
+		    			playEnemyWandAnimation(response.index, response.card, startTurn);
 		    		}
 		    		else {
 	        			playEnemyActivateAnimation(response.index, response.card, startTurn);

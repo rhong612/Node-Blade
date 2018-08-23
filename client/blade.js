@@ -34,7 +34,48 @@ game.state.add('multi_play_menu', multiPlayMenuState)
 game.state.start('load');
 
 
-function playPlayerBoltAnimation(index, card, func) {
+function playPlayerWandAnimation(index, func) {
+	if (playerFieldSprites.getTop().key === BACK) {
+		const SPEED = 800;
+		let sprite = playerHandSprites.getChildAt(index);
+		game.world.bringToTop(playerHandSprites);
+		playerHandSprites.bringToTop(sprite);
+		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+		endOfChain(tween, getFlipTween(playerFieldSprites.getTop(), playerFieldSprites.getTop().name, 0));
+		onChainComplete(tween, function() {
+			playerHandSprites.remove(sprite, true); //Remove and destroy
+			func();
+		});
+		tween.start();
+	}
+	else {
+		playPlayerActivateAnimation(index, func);
+	}
+}
+
+function playEnemyWandAnimation(index, card, func) {
+	if (enemyFieldSprites.getTop().key === BACK) {
+		const SPEED = 800;
+		let sprite = enemyHandSprites.getChildAt(index);
+		game.world.bringToTop(enemyHandSprites);
+		enemyHandSprites.bringToTop(sprite);
+		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+		let flipTween = getFlipTween(sprite, card.name, 0);
+		endOfChain(tween, getFlipTween(enemyFieldSprites.getTop(), enemyFieldSprites.getTop().name, 0));
+		onChainComplete(tween, function() {
+			enemyHandSprites.remove(sprite, true); //Remove and destroy
+			func();
+		});
+		tween.start();
+		flipTween.start();
+	}
+	else {
+		playEnemyActivateAnimation(index, card, func);
+	}
+}
+
+
+function playPlayerBoltAnimation(index, func) {
 	const SPEED = 800;
 	let sprite = playerHandSprites.getChildAt(index);
 	game.world.bringToTop(playerHandSprites);
@@ -63,7 +104,7 @@ function playEnemyBoltAnimation(index, card, func) {
 	flipTween.start();
 }
 
-function playPlayerActivateAnimation(index, card, func = function() {}) {
+function playPlayerActivateAnimation(index, func = function() {}) {
 	const SPEED = 400;
 	let sprite = playerHandSprites.getChildAt(index);
 	game.world.bringToTop(playerHandSprites);
@@ -291,7 +332,6 @@ function playHandSetupAnimation() {
 		//Flip all the cards
 		for (let k = 0; k < INITIAL_HAND_SIZE; k++) {
 			let tween = getFlipTween(playerHandSprites.getChildAt(k), hand[k].name, k * DELAY);
-			playerHandSprites.getChildAt(k).name = hand[k].name; //Set the name property for each card that was drawn
 			if (k == INITIAL_HAND_SIZE - 1) {
 				tween.onComplete.add(playSortAnimation);
 			}
@@ -340,6 +380,10 @@ function getFlipTween(sprite, newCard, delay) {
         sprite.loadTexture(newCard);
     });
     flipTween.chain(flipTween2);
+
+    if (newCard !== BACK) {
+    	sprite.name = newCard; //Set the cards name property for wand/bolt
+    }
     return flipTween;
 }
 
