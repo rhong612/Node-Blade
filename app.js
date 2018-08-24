@@ -346,9 +346,17 @@ class MultiGame {
 			this.playerOneScore = playerOneLastCard.draw_value;
 			this.playerTwoScore = playerTwoLastCard.draw_value;
 			this.turn = this.playerOneScore > this.playerTwoScore ? 2 : 1;
-			io.to(this.playerOneID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-			io.to(this.playerTwoID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
-		}
+			let win = this.checkDrawWin();
+			if (win > 0) {
+				let winningUsername = win === 1 ? this.playerOneUsername : this.playerTwoUsername;
+				console.log('Player ' + win + ': ' + winningUsername + ' won.');
+				io.to(this.playerOneID).emit('client_game_continue', {gameover: true, winner: win, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {gameover: true, winner: win, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+			}
+			else {
+				io.to(this.playerOneID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
+				io.to(this.playerTwoID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});		
+			}}
 		else {
 			let win = this.checkWin(player);
 			//Game over
@@ -368,6 +376,16 @@ class MultiGame {
 			}	
 		}
 		return true;
+	}
+
+	checkDrawWin() {
+		//Player 1 and Player 2 both have no moves left. Their scores are tied.
+		if(this.playerOneField.length === 0 && this.playerTwoField.length === 0 && this.playerOneScore === this.playerTwoScore) {
+			return this.playerOneScore > this.playerTwoScore ? 1 : 2;
+		}
+		else {
+			return 0;
+		}
 	}
 
 	//param: player - the player that just moved
