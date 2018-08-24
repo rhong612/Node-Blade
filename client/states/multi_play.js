@@ -2,35 +2,69 @@
 
 var multiPlayState = {
 
-	preload: function() {
-		playerDeckSprites = game.add.group();
-		enemyDeckSprites = game.add.group();
-		playerHandSprites = game.add.group();
-		enemyHandSprites = game.add.group();
-		playerFieldSprites = game.add.group();
-		enemyFieldSprites = game.add.group();
-	    waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
-	    waitingText.anchor.setTo(0.5);
-	    playerScoreText = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, 0, { fontSize: '50px' });
-		playerScoreText.anchor.setTo(0.5);
-	    enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, 0, { fontSize: '50px' });
-		enemyScoreText.anchor.setTo(0.5);
+	init: function(hand, sortedHand, playerNum) {
+		//Initialize state properties
+		this.playerNum = playerNum;
+		this.playerDeckSprites = game.add.group();
+		this.enemyDeckSprites = game.add.group();
+		this.playerHandSprites = game.add.group();
+		this.enemyHandSprites = game.add.group();
+		this.playerFieldSprites = game.add.group();
+		this.enemyFieldSprites = game.add.group();
+	    this.waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
+	    this.waitingText.anchor.setTo(0.5);
+	    this.playerScoreText = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, 0, { fontSize: '50px' });
+		this.playerScoreText.anchor.setTo(0.5);
+	    this.enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, 0, { fontSize: '50px' });
+		this.enemyScoreText.anchor.setTo(0.5);
+
+		this.playerDraw = [];
+		this.enemyDraw = [];
+		this.tie = false;
+		this.turn = 0;
+		this.playerScore = 0;
+		this.enemyScore = 0;
+		this.playerNum = 0;
+
+		this.gameover = false;
+		this.winner = 0;
+
+		//Add sprites to deck
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-		    playerDeckSprites.add(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
-		    playerDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
-	        playerDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
+		    this.playerDeckSprites.add(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
+		    this.playerDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
+	        this.playerDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
 
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-			enemyDeckSprites.add(game.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
-			enemyDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
-	        enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
+			this.enemyDeckSprites.add(game.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
+			this.enemyDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
+	        this.enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
-		gameover = false;
-		winner = 0;
+
+        const bgm = game.add.audio(BGM);
+        bgm.loopFull();
+        bgm.volume = 0.2;
+        bgm.play();
+
+        autoMoveGroupTween(this.playerDeckSprites, DECK_X_LOCATION, this.playerDeckSprites.getChildAt(0).y, true, 0, 0, function() {
+        	moveTopSprites(this.playerDeckSprites, this.playerHandSprites, INITIAL_HAND_SIZE);
+        	autoMoveGroupTween(this.playerHandSprites, CARD_WIDTH * CARD_SCALE * 2 + DECK_X_LOCATION, this.playerHandSprites.getChildAt(0).y, false, CARD_WIDTH * CARD_SCALE, 0, function() {
+
+        	});
+        }.bind(this));
+        autoMoveGroupTween(this.enemyDeckSprites, GAME_WIDTH - DECK_X_LOCATION, this.enemyDeckSprites.getChildAt(0).y, false, 0, 0, function() {
+        	moveTopSprites(this.enemyDeckSprites, this.enemyHandSprites, INITIAL_HAND_SIZE);
+        	autoMoveGroupTween(this.enemyHandSprites, GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE * 2, this.enemyHandSprites.getChildAt(0).y, false, -1 * CARD_WIDTH * CARD_SCALE, 0, function() {
+        		
+        	});
+
+        }.bind(this));
+
+
 	},
-	create: function() {
 
+	preload: function() {
         socket.on('client_game_continue', function(response) {
         	console.log(JSON.stringify(response));
         	waitingText.setText("");
@@ -109,11 +143,8 @@ var multiPlayState = {
 			dumpField(playDrawAnimation);
         });
 
-
-        const bgm = game.add.audio(BGM);
-        bgm.loopFull();
-        bgm.volume = 0.2;
-        bgm.play();
-        playDeckSetupAnimation();
 	}
 }
+
+
+

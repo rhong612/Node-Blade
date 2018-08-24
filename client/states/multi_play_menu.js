@@ -3,7 +3,6 @@
 var multiPlayMenuState = {
 	create: function() {
 		//Show list of players in the lobby
-		
         socket.on('client_waiting_list', function(player_lobby) {
         	game.world.removeAll(); //Clear the screen
 	        game.stage.backgroundColor = "#4488AA";
@@ -55,13 +54,13 @@ var multiPlayMenuState = {
 
         })
 
-        socket.on('receive_hand_multi', function(cards) {
+        socket.on('receive_hand_multi', function(response) {
         	console.log("Switching state"); 
 
-            hand = cards.hand.slice();
-            sortedHand = cards.sortedHand.slice();
-            playerNum = cards.playerNum;
-        	game.state.start('multi_play');
+            hand = response.hand.slice();
+            sortedHand = response.sortedHand.slice();
+            playerNum = response.playerNum;
+        	game.state.start('multi_play', true, false, hand, sortedHand, playerNum);
         })
 
 
