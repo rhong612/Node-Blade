@@ -1,3 +1,71 @@
+
+/**
+*  Moves all the initialized card sprites to their initial deck position. Then, plays the hand setup animation.
+*/
+function playDeckSetupAnimation() {
+    const playerDeckSprites = game.state.getCurrentState().playerDeckSprites;
+    const enemyDeckSprites = game.state.getCurrentState().enemyDeckSprites;
+    const SPEED = 300;
+    const DELAY = 100;
+    autoMoveGroupTween(playerDeckSprites, PLAYER_DECK_X_LOCATION, playerDeckSprites.getChildAt(0).y, true, SPEED, 0, 0, 0, DELAY, playHandSetupAnimation);
+    autoMoveGroupTween(enemyDeckSprites, ENEMY_DECK_X_LOCATION, enemyDeckSprites.getChildAt(0).y, true, SPEED, 0, 0, 0, DELAY);
+}
+
+
+
+/**
+*	Draws starting hands for both players, flips the cards, then plays the sort animation. This function also moves the top 10 sprites from the deck sprites groups to the hand sprites groups.
+*/
+function playHandSetupAnimation() {
+	let playerDeckSprites = game.state.getCurrentState().playerDeckSprites;
+	let playerHandSprites = game.state.getCurrentState().playerHandSprites;
+	let enemyDeckSprites = game.state.getCurrentState().enemyDeckSprites;
+	let enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
+
+	moveTopSprites(playerDeckSprites, playerHandSprites, INITIAL_HAND_SIZE);
+	moveTopSprites(enemyDeckSprites, enemyHandSprites, INITIAL_HAND_SIZE);
+
+	const SPEED = 300;
+	const DELAY = 100;
+	autoMoveGroupTween(playerHandSprites, CARD_WIDTH * CARD_SCALE * 2 + PLAYER_DECK_X_LOCATION, playerHandSprites.getChildAt(0).y, false, SPEED, CARD_WIDTH * CARD_SCALE, 0, 0, DELAY, function() {
+		autoFlipGroupTweenMulti(playerHandSprites, game.state.getCurrentState().initialHand, 0, DELAY, playSortAnimation);
+	});
+	autoMoveGroupTween(enemyHandSprites, ENEMY_DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE * 2, enemyHandSprites.getChildAt(0).y, false, SPEED, -1 * CARD_WIDTH * CARD_SCALE, 0, 0, DELAY);
+}
+
+
+
+/**
+*	Plays the sort animation. Then, plays the spread animation to spread the cards back out.
+*/
+function playSortAnimation() {
+	const SPEED = 300;
+	const INITIAL_DELAY = 500;
+	const FLIP_DELAY = 300;
+	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+	autoMoveGroupTween(playerHandSprites, GAME_WIDTH / 2, playerHandSprites.getChildAt(0).y, false, SPEED, 0, 0, INITIAL_DELAY, 0, function() {
+		autoFlipGroupTweenSingle(playerHandSprites, BACK, FLIP_DELAY, 0, function() {
+			autoFlipGroupTweenMulti(playerHandSprites, game.state.getCurrentState().sortedInitialHand, FLIP_DELAY, 0, playSpreadAnimation);
+		})
+	})
+}
+
+
+/**
+*	Spreads the cards back out. Then, emits a 'ready' message to the server.
+*/
+function playSpreadAnimation() {
+	const SPEED = 300;
+	const DELAY = 100;
+	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+	autoMoveGroupTween(playerHandSprites, CARD_WIDTH * CARD_SCALE * 2 + PLAYER_DECK_X_LOCATION, playerHandSprites.getChildAt(0).y, false, SPEED, CARD_WIDTH * CARD_SCALE, 0, DELAY, 0, function() {
+		socket.emit('ready');
+	});
+}
+
+
+
+
 /**
 *  Moves the entire group of sprites to a certain position with a delay between each move.
 *	@param group - A Phaser group of sprites
@@ -27,8 +95,6 @@ function autoMoveGroupTween(group, x, y, play_shuffle=false, speed=300, x_buffer
     	const shuffleSound = game.add.audio(SHUFFLE_SOUND);
     	shuffleSound.play();
     }
-
-    console.log(game.state.getCurrentState().tie);
 }
 
 
@@ -381,124 +447,6 @@ function startTurn() {
     	waitingText.setText("Waiting for other player...");
     }
 
-}
-
-/**
-*	Spreads the cards back out. Then, emits a 'ready' message to the server.
-*/
-function playSpreadAnimation() {
-	const SPEED = 300;
-	let spreadTweens = [];
-	let enemySpreadTweens = [];
-	for (let i = 0; i < INITIAL_HAND_SIZE; i++) {
-		spreadTweens.push(game.add.tween(playerHandSprites.getChildAt(i)).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH * CARD_SCALE * 2 + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, 0));
-		enemySpreadTweens.push(game.add.tween(enemyHandSprites.getChildAt(i)).to({ x: (GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE) - (CARD_WIDTH * CARD_SCALE * (i + 1)) }, SPEED, Phaser.Easing.Linear.Out, false, 0));
-	}
-	spreadTweens[INITIAL_HAND_SIZE - 1].onComplete.add(function() {
-        socket.emit('ready');
-	});
-	startAllTweens(spreadTweens);
-	startAllTweens(enemySpreadTweens);
-}
-
-/**
-*	Plays the sort animation. Then, plays the spread animation to spread the cards back out.
-*/
-function playSortAnimation() {
-	const SPEED = 300;
-	const DELAY = 500;
-	let sortTweens = [];
-	let enemySortTweens = [];
-	for (let i = 0; i < INITIAL_HAND_SIZE; i++) {
-		sortTweens.push(game.add.tween(playerHandSprites.getChildAt(i)).to({ x: GAME_WIDTH / 2 }, SPEED, Phaser.Easing.Linear.Out, false, DELAY));
-		enemySortTweens.push(game.add.tween(enemyHandSprites.getChildAt(i)).to({ x:GAME_WIDTH / 2 }, SPEED, Phaser.Easing.Linear.Out, false, DELAY));
-	}
-	sortTweens[INITIAL_HAND_SIZE - 1].onComplete.add(function() {
-		let flipTweens = [];
-		const FLIP_DELAY = 300;
-		for (let j = 0; j < INITIAL_HAND_SIZE; j++) {
-			flipTweens.push(getFlipTween(playerHandSprites.getChildAt(j), BACK, FLIP_DELAY));
-		}
-
-		onChainComplete(flipTweens[INITIAL_HAND_SIZE - 1], function() {
-			cardSort();
-			let backFlipTweens = [];
-			for (let k = 0; k < INITIAL_HAND_SIZE; k++) {
-				backFlipTweens.push(getFlipTween(playerHandSprites.getChildAt(k), hand[k].name, FLIP_DELAY));
-			}
-			onChainComplete(backFlipTweens[INITIAL_HAND_SIZE - 1], playSpreadAnimation);
-			startAllTweens(backFlipTweens);
-		});
-		startAllTweens(flipTweens);
-	});
-
-	startAllTweens(sortTweens);
-	startAllTweens(enemySortTweens);
-}
-
-
-/**
-*	Draws starting hands for both players, flips the cards, then plays the sort animation.
-*/
-function playHandSetupAnimation() {
-	let playerHandTweens = [];
-	let enemyHandTweens = [];
-	const SPEED = 300;
-	const DELAY = 100;
-	for (let i = 0; i < INITIAL_HAND_SIZE; i++) {
-		let topCard = playerDeckSprites.getTop();
-		playerDeckSprites.remove(topCard);
-		playerHandSprites.add(topCard);
-
-		playerHandTweens.push(game.add.tween(topCard).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH * CARD_SCALE * 2 + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
-		playerHandTweens[i].onStart.add(function() {
-			topCard.bringToTop();
-		});
-
-
-		let topCard2 = enemyDeckSprites.getTop();
-		enemyDeckSprites.remove(topCard2);
-		enemyHandSprites.add(topCard2);
-
-		enemyHandTweens.push(game.add.tween(topCard2).to({ x: (GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE) - (CARD_WIDTH * CARD_SCALE * (i + 1)) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
-		enemyHandTweens[i].onStart.add(function() {
-			topCard2.bringToTop();
-		});
-	}
-	playerHandTweens[playerHandTweens.length - 1].onComplete.add(function() {
-		//Flip all the cards
-		for (let k = 0; k < INITIAL_HAND_SIZE; k++) {
-			let tween = getFlipTween(playerHandSprites.getChildAt(k), hand[k].name, k * DELAY);
-			if (k == INITIAL_HAND_SIZE - 1) {
-				tween.onComplete.add(playSortAnimation);
-			}
-			tween.start();
-		}
-
-	});
-	startAllTweens(playerHandTweens);
-	startAllTweens(enemyHandTweens);
-}
-
-/**
-*  Moves all the initialized card sprites to their initial deck position. Then, plays the hand setup animation.
-*/
-function playDeckSetupAnimation() {
-    const SPEED = 300;
-    const DELAY = 100;
-    let playerTweens = [];
-    let enemyTweens = [];
-    for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-        playerTweens.push(game.add.tween(playerDeckSprites.getChildAt(i)).to({ x: DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
-        enemyTweens.push(game.add.tween(enemyDeckSprites.getChildAt(i)).to({ x: GAME_WIDTH - DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
-    }
-
-    playerTweens[playerTweens.length - 1].onComplete.add(playHandSetupAnimation);
-    startAllTweens(playerTweens);
-    startAllTweens(enemyTweens);
-
-    var shuffleSound = game.add.audio(SHUFFLE_SOUND);
-    shuffleSound.play();
 }
 
 function getFlipTween(sprite, newCard, delay) {

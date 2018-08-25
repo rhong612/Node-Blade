@@ -2,9 +2,11 @@
 
 var multiPlayState = {
 
-	init: function(hand, sortedHand, playerNum) {
+	init: function(initialHand, sortedInitialHand, playerNum) {
 		//Initialize state properties
 		this.playerNum = playerNum;
+		this.initialHand = initialHand;
+		this.sortedInitialHand = sortedInitialHand;
 		this.playerDeckSprites = game.add.group();
 		this.enemyDeckSprites = game.add.group();
 		this.playerHandSprites = game.add.group();
@@ -46,6 +48,7 @@ var multiPlayState = {
         bgm.loopFull();
         bgm.volume = 0.2;
         bgm.play();
+        playDeckSetupAnimation();
 	},
 
 	preload: function() {
