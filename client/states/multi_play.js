@@ -20,13 +20,10 @@ var multiPlayState = {
 	    this.enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, 0, { fontSize: '50px' });
 		this.enemyScoreText.anchor.setTo(0.5);
 
-		this.playerDraw = [];
-		this.enemyDraw = [];
 		this.tie = false;
 		this.turn = 0;
 		this.playerScore = 0;
 		this.enemyScore = 0;
-		this.playerNum = 0;
 
 		this.gameover = false;
 		this.winner = 0;
@@ -121,13 +118,19 @@ var multiPlayState = {
 
 
         socket.on('draw', function(response) {
-			playerDraw = response.playerDraw;
-			enemyDraw = response.enemyDraw;
-			turn = response.turn;
-			playerScore = response.playerScore;
-			enemyScore = response.enemyScore;
+        	const currentState = game.state.getCurrentState();
+			currentState.turn = response.turn;
+			currentState.playerScore = response.playerScore;
+			currentState.enemyScore = response.enemyScore;
 			//Dump the field. Then, play the draw animation
-			dumpField(playDrawAnimation);
+			destroyField(function() {
+				playDrawAnimation(response.playerDraw, response.enemyDraw);
+			})
+
+			function destroyField(func) {
+				autoDumpGroupRight(currentState.playerFieldSprites);
+				autoDumpGroupLeft(currentState.enemyFieldSprites, func);
+			}
         });
 
 	}

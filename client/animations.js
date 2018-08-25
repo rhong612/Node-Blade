@@ -145,27 +145,105 @@ function moveTween(sprite, x, y, speed=400, delay=0) {
 	return game.add.tween(sprite).to({x: x, y: y}, speed, Phaser.Easing.Linear.Out, false, delay);
 }
 
-
-function swapFieldTween(func) {
-	let playerX = playerFieldSprites.getTop().x;
-	let playerY = playerFieldSprites.getTop().y;
-	let enemyX = enemyFieldSprites.getTop().x;
-	let enemyY = enemyFieldSprites.getTop().y;
-
-	let swapTweens = [];
-	const SPEED = 800;
-	for (let i = 0; i < playerFieldSprites.length; i++) {
-		swapTweens.push(game.add.tween(playerFieldSprites.getChildAt(i)).to({x: enemyX, y: enemyY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
+//Plays an animation sending all sprites in the group to the left side of the screen. Then, removes the sprites from the group and destroys all the sprites.
+function autoDumpGroupLeft(group, func=()=>{}) {
+	if (group.length >= 1) {
+		let tweens = [];
+		for (let i = 0; i < group.length; i++) {
+			tweens.push(dumpSpriteLeftAnimation(group.getChildAt(i)));
+		}
+		onChainComplete(tweens[tweens.length - 1], function() {
+			group.removeAll(true);
+			func();
+		});
+		startAllTweens(tweens);
 	}
-	for (let i = 0; i < enemyFieldSprites.length; i++) {
-		swapTweens.push(game.add.tween(enemyFieldSprites.getChildAt(i)).to({x: playerX, y: playerY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
+	else {
+		func();
 	}
-
-	swapTweens[swapTweens.length - 1].onComplete.add(func);
-	return swapTweens;
 }
 
+//Plays an animation sending all sprites in the group to the right side of the screen. Then, removes the sprites from the group and destroys all the sprites.
+function autoDumpGroupRight(group, func=()=>{}) {
+	if (group.length >= 1) {
+		let tweens = [];
+		for (let i = 0; i < group.length; i++) {
+			tweens.push(dumpSpriteRightAnimation(group.getChildAt(i)));
+		}
+		onChainComplete(tweens[tweens.length - 1], function() {
+			group.removeAll(true);
+			func();
+		});
+		startAllTweens(tweens);
+	}
+	else {
+		func();
+	}
+}
+
+
+
+/**
+*	Draws the specified number of cards given by the server. Dumps cards when necessary.
+*/
+function playDrawAnimation(playerDraw, enemyDraw) {
+	const playerDeckSprites = game.state.getCurrentState().playerDeckSprites;
+	const enemyDeckSprites = game.state.getCurrentState().enemyDeckSprites;
+	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
+	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+	game.world.bringToTop(playerDeckSprites);
+	game.world.bringToTop(enemyDeckSprites);
+	const DELAY = 300;
+	console.log(playerDraw);
+	console.log(enemyDraw);
+    let playerTween = drawPlayerCardAnimation(playerDeckSprites.getChildAt(playerDeckSprites.length - 1), DELAY); 
+    let enemyTween = drawEnemyCardAnimation(enemyDeckSprites.getChildAt(playerDeckSprites.length - 1), DELAY);
+    endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(playerDeckSprites.length - 1), playerDraw[0], 0));
+    endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(playerDeckSprites.length - 1), enemyDraw[0], 0));
+
+    for (let i = 1; i < playerDraw.length; i++) {
+        endOfChain(playerTween, dumpSpriteRightAnimation(playerDeckSprites.getChildAt(playerDeckSprites.length - 1)));
+        endOfChain(enemyTween, dumpSpriteLeftAnimation(enemyDeckSprites.getChildAt(playerDeckSprites.length - 1)));
+    	playerDeckSprites.removeChildAt(playerDeckSprites.length - 1); //Remove from deck
+    	enemyDeckSprites.removeChildAt(playerDeckSprites.length - 1); //Remove from deck
+
+        endOfChain(playerTween, drawPlayerCardAnimation(playerDeckSprites.getChildAt(playerDeckSprites.length - 1)));
+        endOfChain(enemyTween, drawEnemyCardAnimation(enemyDeckSprites.getChildAt(playerDeckSprites.length - 1)));
+
+        endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(playerDeckSprites.length - 1), playerDraw[i], 0));
+        endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(playerDeckSprites.length - 1), enemyDraw[i], 0));
+    }
+
+    onChainComplete(playerTween, function() {
+    	//The last drawn cards go to the field
+    	let playerSprite = playerDeckSprites.removeChildAt(playerDeckSprites.length - 1);
+    	let enemySprite = enemyDeckSprites.removeChildAt(playerDeckSprites.length - 1);
+    	playerFieldSprites.add(playerSprite);
+    	enemyFieldSprites.add(enemySprite);
+    	startTurn();
+    });
+
+    playerDraw = [];
+    enemyDraw = [];
+    playerTween.start();
+    enemyTween.start();
+
+	function drawPlayerCardAnimation(sprite, delay = 0) {
+	    const SPEED = 400;
+	    return game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, false, delay);
+	}
+
+	function drawEnemyCardAnimation(sprite, delay = 0) {
+	    const SPEED = 400;
+	    return game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * ANCHOR * 4}, SPEED, Phaser.Easing.Linear.Out, false, delay);
+	}
+}
+
+
 function swapFieldTween(func) {
+	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
+	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+
 	let playerX = playerFieldSprites.getTop().x;
 	let playerY = playerFieldSprites.getTop().y;
 	let enemyX = enemyFieldSprites.getTop().x;
@@ -186,6 +264,7 @@ function swapFieldTween(func) {
 
 function playPlayerMirrorAnimation(index, func) {
 	const SPEED = 800;
+	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
 	let sprite = playerHandSprites.getChildAt(index);
 	game.world.bringToTop(playerHandSprites);
 	playerHandSprites.bringToTop(sprite);
@@ -204,6 +283,7 @@ function playPlayerMirrorAnimation(index, func) {
 
 function playEnemyMirrorAnimation(index, card, func) {
 	const SPEED = 800;
+	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
 	let sprite = enemyHandSprites.getChildAt(index);
 	game.world.bringToTop(enemyHandSprites);
 	enemyHandSprites.bringToTop(sprite);
@@ -223,6 +303,8 @@ function playEnemyMirrorAnimation(index, card, func) {
 }
 
 function playPlayerWandAnimation(index, func) {
+	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
 	if (playerFieldSprites.getTop().key === BACK) {
 		const SPEED = 800;
 		let sprite = playerHandSprites.getChildAt(index);
@@ -242,6 +324,8 @@ function playPlayerWandAnimation(index, func) {
 }
 
 function playEnemyWandAnimation(index, card, func) {
+	const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
+	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
 	if (enemyFieldSprites.getTop().key === BACK) {
 		const SPEED = 800;
 		let sprite = enemyHandSprites.getChildAt(index);
@@ -265,6 +349,8 @@ function playEnemyWandAnimation(index, card, func) {
 
 function playPlayerBoltAnimation(index, func) {
 	const SPEED = 800;
+	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
 	let sprite = playerHandSprites.getChildAt(index);
 	game.world.bringToTop(playerHandSprites);
 	playerHandSprites.bringToTop(sprite);
@@ -278,6 +364,8 @@ function playPlayerBoltAnimation(index, func) {
 }
 function playEnemyBoltAnimation(index, card, func) {
 	const SPEED = 800;
+	const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
+	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
 	let sprite = enemyHandSprites.getChildAt(index);
 	game.world.bringToTop(enemyHandSprites);
 	enemyHandSprites.bringToTop(sprite);
@@ -294,6 +382,8 @@ function playEnemyBoltAnimation(index, card, func) {
 
 function playPlayerActivateAnimation(index, func = function() {}) {
 	const SPEED = 400;
+	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
 	let sprite = playerHandSprites.getChildAt(index);
 	game.world.bringToTop(playerHandSprites);
 	playerHandSprites.bringToTop(sprite);
@@ -308,6 +398,8 @@ function playPlayerActivateAnimation(index, func = function() {}) {
 
 function playEnemyActivateAnimation(index, card, func) {
 	const SPEED = 400;
+	const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
+	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
 	let sprite = enemyHandSprites.getChildAt(index);
 	game.world.bringToTop(enemyHandSprites);
 	enemyHandSprites.bringToTop(sprite);
@@ -322,76 +414,7 @@ function playEnemyActivateAnimation(index, card, func) {
 	flipTween.start();
 }
 
-function dumpField(func) {
-	if (playerFieldSprites.length >= 1) {
-		let tweens = [];
-		tweens.push(dumpPlayerCardAnimation(playerFieldSprites.getChildAt(0), 0));
-		for (let i = 1; i < playerFieldSprites.length; i++) {
-			tweens.push(dumpPlayerCardAnimation(playerFieldSprites.getChildAt(i), 0));
-		}
 
-		for (let i = 0; i < enemyFieldSprites.length; i++) {
-			tweens.push(dumpEnemyCardAnimation(enemyFieldSprites.getChildAt(i), 0));
-		}
-
-		onChainComplete(tweens[tweens.length - 1], function() {
-			playerFieldSprites.removeAll(true);
-			enemyFieldSprites.removeAll(true);
-			func();
-		});
-		startAllTweens(tweens);
-	}
-	else {
-		func();
-	}
-}
-
-
-/**
-*	Draws the specified number of cards given by the server. Dumps cards when necessary.
-*/
-function playDrawAnimation() {
-	console.log('Current deck index:' + currentDeckIndex);
-	game.world.bringToTop(playerDeckSprites);
-	game.world.bringToTop(enemyDeckSprites);
-	const DELAY = 300;
-    let playerTween = drawPlayerCardAnimation(playerDeckSprites.getChildAt(currentDeckIndex), DELAY); 
-    let enemyTween = drawEnemyCardAnimation(enemyDeckSprites.getChildAt(currentDeckIndex), DELAY);
-    endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(currentDeckIndex), playerDraw[0].name, 0));
-    endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(currentDeckIndex), enemyDraw[0].name, 0));
-
-    for (let i = 1; i < playerDraw.length; i++) {
-        endOfChain(playerTween, dumpPlayerCardAnimation(playerDeckSprites.getChildAt(currentDeckIndex)));
-        endOfChain(enemyTween, dumpEnemyCardAnimation(enemyDeckSprites.getChildAt(currentDeckIndex)));
-    	playerDeckSprites.removeChildAt(currentDeckIndex); //Remove from deck
-    	enemyDeckSprites.removeChildAt(currentDeckIndex); //Remove from deck
-
-        currentDeckIndex--;
-		console.log('Current deck index:' + currentDeckIndex);
-        endOfChain(playerTween, drawPlayerCardAnimation(playerDeckSprites.getChildAt(currentDeckIndex)));
-        endOfChain(enemyTween, drawEnemyCardAnimation(enemyDeckSprites.getChildAt(currentDeckIndex)));
-
-        endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(currentDeckIndex), playerDraw[i].name, 0));
-        endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(currentDeckIndex), enemyDraw[i].name, 0));
-    	playerDeckSprites.getChildAt(currentDeckIndex).name = playerDraw[i].name;
-    	enemyDeckSprites.getChildAt(currentDeckIndex).name = enemyDraw[i].name;
-    }
-
-    onChainComplete(playerTween, function() {
-    	//The last drawn cards go to the field
-    	let playerSprite = playerDeckSprites.removeChildAt(currentDeckIndex);
-    	let enemySprite = enemyDeckSprites.removeChildAt(currentDeckIndex);
-    	playerFieldSprites.add(playerSprite);
-    	enemyFieldSprites.add(enemySprite);
-    	currentDeckIndex--;
-    	startTurn();
-    });
-
-    playerDraw = [];
-    enemyDraw = [];
-    playerTween.start();
-    enemyTween.start();
-}
 
 function showReturnButton() {
     let image = game.add.image(0, game.world.centerX, RETURN_BUTTON);
@@ -408,6 +431,16 @@ function resetConn() {
 }
 
 function startTurn() {
+	const playerScoreText = game.state.getCurrentState().playerScoreText;
+	const enemyScoreText = game.state.getCurrentState().enemyScoreText;
+	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+	const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
+	const waitingText = game.state.getCurrentState().waitingText;
+	let playerScore = game.state.getCurrentState().playerScore;
+	let enemyScore = game.state.getCurrentState().enemyScore;
+	let gameover = game.state.getCurrentState().gameover;
+	let turn = game.state.getCurrentState().turn;
+	let playerNum = game.state.getCurrentState().playerNum;
 	playerScoreText.setText(playerScore);
 	enemyScoreText.setText(enemyScore);
 	if (gameover) {
@@ -472,9 +505,6 @@ function getFlipTween(sprite, newCard, delay) {
     return flipTween;
 }
 
-function cardSort() {
-	hand = sortedHand;
-}
 
 function startAllTweens(tweens_array) {
 	for (let i = 0; i < tweens_array.length; i++) {
@@ -483,26 +513,12 @@ function startAllTweens(tweens_array) {
 }
 
 
-function drawPlayerCardAnimation(sprite, delay = 0) {
-    const SPEED = 400;
-    return game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, false, delay);
+function dumpSpriteRightAnimation(sprite, speed=400, delay=1500) {
+    return game.add.tween(sprite).to({x: GAME_WIDTH + CARD_WIDTH }, speed, Phaser.Easing.Linear.Out, false, delay);
 }
 
-function drawEnemyCardAnimation(sprite, delay = 0) {
-    const SPEED = 400;
-    return game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * ANCHOR * 4}, SPEED, Phaser.Easing.Linear.Out, false, delay);
-}
-
-function dumpPlayerCardAnimation(sprite, delay) {
-    const SPEED = 400;
-    const DELAY = 1500;
-    return game.add.tween(sprite).to({x: GAME_WIDTH + CARD_WIDTH }, SPEED, Phaser.Easing.Linear.Out, false, DELAY);
-}
-
-function dumpEnemyCardAnimation(sprite, delay) {
-    const SPEED = 400;
-    const DELAY = 1500;
-    return game.add.tween(sprite).to({x: -1 * CARD_WIDTH }, SPEED, Phaser.Easing.Linear.Out, false, DELAY);
+function dumpSpriteLeftAnimation(sprite, speed=400, delay=1500) {
+    return game.add.tween(sprite).to({x: -1 * CARD_WIDTH }, speed, Phaser.Easing.Linear.Out, false, delay);
 }
 
 
