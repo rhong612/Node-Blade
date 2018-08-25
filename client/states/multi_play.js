@@ -46,22 +46,6 @@ var multiPlayState = {
         bgm.loopFull();
         bgm.volume = 0.2;
         bgm.play();
-
-        autoMoveGroupTween(this.playerDeckSprites, DECK_X_LOCATION, this.playerDeckSprites.getChildAt(0).y, true, 0, 0, function() {
-        	moveTopSprites(this.playerDeckSprites, this.playerHandSprites, INITIAL_HAND_SIZE);
-        	autoMoveGroupTween(this.playerHandSprites, CARD_WIDTH * CARD_SCALE * 2 + DECK_X_LOCATION, this.playerHandSprites.getChildAt(0).y, false, CARD_WIDTH * CARD_SCALE, 0, function() {
-
-        	});
-        }.bind(this));
-        autoMoveGroupTween(this.enemyDeckSprites, GAME_WIDTH - DECK_X_LOCATION, this.enemyDeckSprites.getChildAt(0).y, false, 0, 0, function() {
-        	moveTopSprites(this.enemyDeckSprites, this.enemyHandSprites, INITIAL_HAND_SIZE);
-        	autoMoveGroupTween(this.enemyHandSprites, GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE * 2, this.enemyHandSprites.getChildAt(0).y, false, -1 * CARD_WIDTH * CARD_SCALE, 0, function() {
-        		
-        	});
-
-        }.bind(this));
-
-
 	},
 
 	preload: function() {

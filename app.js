@@ -176,8 +176,8 @@ function initializeMultiGame(id1, id2) {
 	newGame.playerOneID = id1;
 	newGame.playerTwoID = id2;	
 
-	io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand, sortedHand: newGame.playerOneHand});
-	io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand, sortedHand: newGame.playerTwoHand});
+	io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand.map(card=>card.name), sortedHand: newGame.playerOneHand.map(card=>card.name)});
+	io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand.map(card=>card.name), sortedHand: newGame.playerTwoHand.map(card=>card.name)});
 }
 
 function findSocketIDInLobby(target_name) {

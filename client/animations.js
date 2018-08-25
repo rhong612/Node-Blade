@@ -1,21 +1,21 @@
-
 /**
-*  Moves the entire group of sprites to a certain position one after another.
+*  Moves the entire group of sprites to a certain position with a delay between each move.
 *	@param group - A Phaser group of sprites
 *	@param x - the x position to move to
 *	@param y - the y position to move to
+*	@param speed - the speed of the movement. Defaults to 300.
 *	@param play_shuffle - plays a shuffle sound if true. Defaults to false.
 *	@param x_buffer - each subsequent sprite will have x_buffer added to the original position. Defaults to 0.
 *	@param y_buffer - each subsequent sprite will have y_buffer added to the original position. Defaults to 0.
+*	@param initial_delay - the delay before starting the movements. Defaults to 0.
+*	@param staggering_delay - the delay between each movement. Defaults to 0.
 *	@param func - a function to be called after the animation is done. Defaults to an empty function that does nothing.
 */
-function autoMoveGroupTween(group, x, y, play_shuffle=false, x_buffer = 0, y_buffer = 0, func=()=>{}) {
-    const SPEED = 300;
-    const DELAY = 100;
+function autoMoveGroupTween(group, x, y, play_shuffle=false, speed=300, x_buffer = 0, y_buffer = 0, initial_delay= 0, staggering_delay = 0, func=()=>{}) {
 	const tweens = [];
 	for (let i = 0; i < group.length; i++) {
 		let sprite = group.getChildAt(i);
-		tweens.push(moveTween(sprite, x + x_buffer * i, y + y_buffer * i, SPEED, i * DELAY));
+		tweens.push(moveTween(sprite, x + x_buffer * i, y + y_buffer * i, speed, initial_delay + i * staggering_delay));
 		tweens[i].onStart.add(function() {
 			sprite.bringToTop();
 		});
@@ -27,6 +27,28 @@ function autoMoveGroupTween(group, x, y, play_shuffle=false, x_buffer = 0, y_buf
     	const shuffleSound = game.add.audio(SHUFFLE_SOUND);
     	shuffleSound.play();
     }
+
+    console.log(game.state.getCurrentState().tie);
+}
+
+
+function autoFlipGroupTweenSingle(group, new_sprite_name, initial_delay = 0, staggering_delay = 0, func=()=>{}) {
+	let tweens = [];
+	for (let i = 0; i < group.length; i++) {
+		tweens.push(getFlipTween(group.getChildAt(i), new_sprite_name, initial_delay + i * staggering_delay));
+	}
+	onChainComplete(tweens[tweens.length - 1], func);
+	startAllTweens(tweens);
+}
+
+
+function autoFlipGroupTweenMulti(group, new_sprite_names, initial_delay = 0, staggering_delay = 0, func=()=>{}) {
+	let tweens = [];
+	for (let i = 0; i < group.length; i++) {
+		tweens.push(getFlipTween(group.getChildAt(i), new_sprite_names[i], initial_delay + i * staggering_delay));
+	}
+	onChainComplete(tweens[tweens.length - 1], func);
+	startAllTweens(tweens);
 }
 
 /**
@@ -44,48 +66,6 @@ function moveTopSprites(groupA, groupB, count) {
 }
 
 
-/**
-*	Draws starting hands for both players and flips the cards.
-*/
-function playHandSetupAnimation() {
-	let playerHandTweens = [];
-	let enemyHandTweens = [];
-	const SPEED = 300;
-	const DELAY = 100;
-	for (let i = 0; i < INITIAL_HAND_SIZE; i++) {
-		let topCard = playerDeckSprites.getTop();
-		playerDeckSprites.remove(topCard);
-		playerHandSprites.add(topCard);
-
-		playerHandTweens.push(game.add.tween(topCard).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH * CARD_SCALE * 2 + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
-		playerHandTweens[i].onStart.add(function() {
-			topCard.bringToTop();
-		});
-
-
-		let topCard2 = enemyDeckSprites.getTop();
-		enemyDeckSprites.remove(topCard2);
-		enemyHandSprites.add(topCard2);
-
-		enemyHandTweens.push(game.add.tween(topCard2).to({ x: (GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE) - (CARD_WIDTH * CARD_SCALE * (i + 1)) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
-		enemyHandTweens[i].onStart.add(function() {
-			topCard2.bringToTop();
-		});
-	}
-	playerHandTweens[playerHandTweens.length - 1].onComplete.add(function() {
-		//Flip all the cards
-		for (let k = 0; k < INITIAL_HAND_SIZE; k++) {
-			let tween = getFlipTween(playerHandSprites.getChildAt(k), hand[k].name, k * DELAY);
-			if (k == INITIAL_HAND_SIZE - 1) {
-				tween.onComplete.add(playSortAnimation);
-			}
-			tween.start();
-		}
-
-	});
-	startAllTweens(playerHandTweens);
-	startAllTweens(enemyHandTweens);
-}
 
 /**
 *	Moves a sprite to a given (x, y) position
@@ -99,6 +79,25 @@ function moveTween(sprite, x, y, speed=400, delay=0) {
 	return game.add.tween(sprite).to({x: x, y: y}, speed, Phaser.Easing.Linear.Out, false, delay);
 }
 
+
+function swapFieldTween(func) {
+	let playerX = playerFieldSprites.getTop().x;
+	let playerY = playerFieldSprites.getTop().y;
+	let enemyX = enemyFieldSprites.getTop().x;
+	let enemyY = enemyFieldSprites.getTop().y;
+
+	let swapTweens = [];
+	const SPEED = 800;
+	for (let i = 0; i < playerFieldSprites.length; i++) {
+		swapTweens.push(game.add.tween(playerFieldSprites.getChildAt(i)).to({x: enemyX, y: enemyY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
+	}
+	for (let i = 0; i < enemyFieldSprites.length; i++) {
+		swapTweens.push(game.add.tween(enemyFieldSprites.getChildAt(i)).to({x: playerX, y: playerY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
+	}
+
+	swapTweens[swapTweens.length - 1].onComplete.add(func);
+	return swapTweens;
+}
 
 function swapFieldTween(func) {
 	let playerX = playerFieldSprites.getTop().x;
@@ -437,6 +436,70 @@ function playSortAnimation() {
 	startAllTweens(enemySortTweens);
 }
 
+
+/**
+*	Draws starting hands for both players, flips the cards, then plays the sort animation.
+*/
+function playHandSetupAnimation() {
+	let playerHandTweens = [];
+	let enemyHandTweens = [];
+	const SPEED = 300;
+	const DELAY = 100;
+	for (let i = 0; i < INITIAL_HAND_SIZE; i++) {
+		let topCard = playerDeckSprites.getTop();
+		playerDeckSprites.remove(topCard);
+		playerHandSprites.add(topCard);
+
+		playerHandTweens.push(game.add.tween(topCard).to({ x: (i * CARD_WIDTH * CARD_SCALE) + (CARD_WIDTH * CARD_SCALE * 2 + DECK_X_LOCATION) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+		playerHandTweens[i].onStart.add(function() {
+			topCard.bringToTop();
+		});
+
+
+		let topCard2 = enemyDeckSprites.getTop();
+		enemyDeckSprites.remove(topCard2);
+		enemyHandSprites.add(topCard2);
+
+		enemyHandTweens.push(game.add.tween(topCard2).to({ x: (GAME_WIDTH - DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE) - (CARD_WIDTH * CARD_SCALE * (i + 1)) }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+		enemyHandTweens[i].onStart.add(function() {
+			topCard2.bringToTop();
+		});
+	}
+	playerHandTweens[playerHandTweens.length - 1].onComplete.add(function() {
+		//Flip all the cards
+		for (let k = 0; k < INITIAL_HAND_SIZE; k++) {
+			let tween = getFlipTween(playerHandSprites.getChildAt(k), hand[k].name, k * DELAY);
+			if (k == INITIAL_HAND_SIZE - 1) {
+				tween.onComplete.add(playSortAnimation);
+			}
+			tween.start();
+		}
+
+	});
+	startAllTweens(playerHandTweens);
+	startAllTweens(enemyHandTweens);
+}
+
+/**
+*  Moves all the initialized card sprites to their initial deck position. Then, plays the hand setup animation.
+*/
+function playDeckSetupAnimation() {
+    const SPEED = 300;
+    const DELAY = 100;
+    let playerTweens = [];
+    let enemyTweens = [];
+    for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
+        playerTweens.push(game.add.tween(playerDeckSprites.getChildAt(i)).to({ x: DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+        enemyTweens.push(game.add.tween(enemyDeckSprites.getChildAt(i)).to({ x: GAME_WIDTH - DECK_X_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, i * DELAY));
+    }
+
+    playerTweens[playerTweens.length - 1].onComplete.add(playHandSetupAnimation);
+    startAllTweens(playerTweens);
+    startAllTweens(enemyTweens);
+
+    var shuffleSound = game.add.audio(SHUFFLE_SOUND);
+    shuffleSound.play();
+}
 
 function getFlipTween(sprite, newCard, delay) {
 	const FLIP_SPEED = 200;
