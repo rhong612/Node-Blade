@@ -143,13 +143,13 @@ function initiateDrawProcess(game) {
 	//Determine whose turn it is
 	if (game.playerOneScore > game.playerTwoScore) {
 		game.turn = 2;
-		io.to(game.playerOneID).emit('draw', {playerDraw: ['BOLT', 'BLADE_PISTOL'], enemyDraw: ['BOLT', 'SWORD']/*draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name)*/, playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
-		io.to(game.playerTwoID).emit('draw', {playerDraw: ['BOLT', 'BLADE_PISTOL'], enemyDraw: ['BOLT', 'SWORD']/*draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name)*/, playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
+		io.to(game.playerOneID).emit('draw', {playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
+		io.to(game.playerTwoID).emit('draw', {playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
 	}
 	else {
 		game.turn = 1;
-		io.to(game.playerOneID).emit('draw', {playerDraw: ['BOLT', 'BLADE_PISTOL'], enemyDraw: ['BOLT', 'SWORD']/*draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name)*/, playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
-		io.to(game.playerTwoID).emit('draw', {playerDraw: ['BOLT', 'BLADE_PISTOL'], enemyDraw: ['BOLT', 'SWORD']/*draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name)*/, playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
+		io.to(game.playerOneID).emit('draw', {playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
+		io.to(game.playerTwoID).emit('draw', {playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
 	}
 }
 

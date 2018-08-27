@@ -198,6 +198,8 @@ function destroyField(groupA, groupB, func) {
 *	Draws the specified number of cards given by the server. Dumps cards when necessary.
 */
 function playDrawAnimation(playerDraw, enemyDraw, func) {
+	const SPEED = 400;
+	const DELAY = 300;
 	const playerDeckSprites = game.state.getCurrentState().playerDeckSprites;
 	const enemyDeckSprites = game.state.getCurrentState().enemyDeckSprites;
 	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
@@ -209,32 +211,33 @@ function playDrawAnimation(playerDraw, enemyDraw, func) {
 	game.world.bringToTop(playerDeckSprites);
 	game.world.bringToTop(enemyDeckSprites);
 
-	let playerSprite = playerDeckSprites.getTop();
-	let enemySprite = enemyDeckSprites.getTop();
-    let playerTween = drawPlayerCardAnimation(playerSprite); 
-    let enemyTween = drawEnemyCardAnimation(enemySprite);
+	let topIndex = playerDeckSprites.length - 1;
+	let playerSprite = playerDeckSprites.getChildAt(topIndex);
+	let enemySprite = enemyDeckSprites.getChildAt(topIndex);
+    let playerTween = moveTween(playerSprite, PLAYER_FIELD_X_LOCATION, PLAYER_FIELD_Y_LOCATION, SPEED, DELAY);
+    let enemyTween = moveTween(enemySprite, ENEMY_FIELD_X_LOCATION, ENEMY_FIELD_Y_LOCATION, SPEED, DELAY);
     endOfChain(playerTween, getFlipTween(playerSprite, playerDraw[0], 0));
     endOfChain(enemyTween, getFlipTween(enemySprite, enemyDraw[0], 0));
 
     for (let i = 1; i < playerDraw.length; i++) {
         endOfChain(playerTween, dumpSpriteRightAnimation(playerSprite));
         endOfChain(enemyTween, dumpSpriteLeftAnimation(enemySprite));
-    	playerDeckSprites.removeChild(playerSprite); //Remove from deck
-    	enemyDeckSprites.removeChild(enemySprite); //Remove from deck
 
-    	playerSprite = playerDeckSprites.getTop();
-    	enemySprite = enemyDeckSprites.getTop();
-        endOfChain(playerTween, drawPlayerCardAnimation(playerSprite));
-        endOfChain(enemyTween, drawEnemyCardAnimation(enemySprite));
+        topIndex--;
+    	playerSprite = playerDeckSprites.getChildAt(topIndex)
+    	enemySprite = enemyDeckSprites.getChildAt(topIndex);
+        endOfChain(playerTween, moveTween(playerSprite, PLAYER_FIELD_X_LOCATION, PLAYER_FIELD_Y_LOCATION, SPEED, DELAY));
+        endOfChain(enemyTween, moveTween(enemySprite, ENEMY_FIELD_X_LOCATION, ENEMY_FIELD_Y_LOCATION, SPEED, DELAY));
         endOfChain(playerTween, getFlipTween(playerSprite, playerDraw[i], 0));
         endOfChain(enemyTween, getFlipTween(enemySprite, enemyDraw[i], 0));
     }
 
     onChainComplete(playerTween, function() {
-    	//The last drawn cards go to the field
-    	playerDeckSprites.removeChild(playerSprite);
-    	enemyDeckSprites.removeChild(enemySprite);
-    	
+    	//The last drawn cards go to the field. Remove the rest.
+    	let initialDeckSize = playerDeckSprites.length - 1;
+    	for (let i = initialDeckSize; i >= topIndex; i--) {
+    		playerDeckSprites.removeChildAt(i);
+    	}    	
     	playerFieldSprites.add(playerSprite);
     	enemyFieldSprites.add(enemySprite);
     	func();
@@ -242,18 +245,6 @@ function playDrawAnimation(playerDraw, enemyDraw, func) {
 
     playerTween.start();
     enemyTween.start();
-
-	function drawPlayerCardAnimation(sprite) {
-		const SPEED = 400;
-		const DELAY = 300;
-	    return moveTween(sprite, PLAYER_FIELD_X_LOCATION, PLAYER_FIELD_Y_LOCATION, SPEED, DELAY);
-	}
-
-	function drawEnemyCardAnimation(sprite) {
-		const SPEED = 400;
-		const DELAY = 300;
-	    return moveTween(sprite, ENEMY_FIELD_X_LOCATION, ENEMY_FIELD_Y_LOCATION, SPEED, DELAY);
-	}
 }
 
 
