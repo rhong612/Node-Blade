@@ -22,8 +22,6 @@ var multiPlayState = {
 
 		this.tie = false;
 		this.turn = 0;
-		this.playerScore = 0;
-		this.enemyScore = 0;
 
 		this.gameover = false;
 		this.winner = 0;
@@ -44,7 +42,7 @@ var multiPlayState = {
         const bgm = game.add.audio(BGM);
         bgm.loopFull();
         bgm.volume = 0.2;
-        bgm.play();
+        //bgm.play();
         playDeckSetupAnimation();
 	},
 
@@ -120,11 +118,12 @@ var multiPlayState = {
         socket.on('draw', function(response) {
         	const currentState = game.state.getCurrentState();
 			currentState.turn = response.turn;
-			currentState.playerScore = response.playerScore;
-			currentState.enemyScore = response.enemyScore;
-			//Dump the field. Then, play the draw animation
+			//Dump the field. Then, play the draw animation. Play the startTurn() function at the end.
 			destroyField(function() {
-				playDrawAnimation(response.playerDraw, response.enemyDraw);
+				playDrawAnimation(response.playerDraw, response.enemyDraw, function() {
+					game.state.getCurrentState().updateScoreText(response.playerScore, response.enemyScore);
+					startTurn();
+				});
 			})
 
 			function destroyField(func) {
@@ -133,6 +132,23 @@ var multiPlayState = {
 			}
         });
 
+	},
+
+	updateScoreText : function(playerScore, enemyScore) {
+		this.playerScoreText.setText(playerScore);
+		this.enemyScoreText.setText(enemyScore);
+	},
+
+	isWinner: function() {
+		return this.winner === this.playerNum;
+	},
+
+	updateWaitingText : function(text) {
+		this.waitingText.setText(text);
+	},
+
+	isPlayerTurn : function() {
+		return this.playerNum === this.turn;
 	}
 }
 

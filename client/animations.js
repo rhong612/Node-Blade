@@ -186,58 +186,127 @@ function autoDumpGroupRight(group, func=()=>{}) {
 /**
 *	Draws the specified number of cards given by the server. Dumps cards when necessary.
 */
-function playDrawAnimation(playerDraw, enemyDraw) {
+function playDrawAnimation(playerDraw, enemyDraw, func) {
 	const playerDeckSprites = game.state.getCurrentState().playerDeckSprites;
 	const enemyDeckSprites = game.state.getCurrentState().enemyDeckSprites;
 	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
 	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
-	game.world.bringToTop(playerDeckSprites);
-	game.world.bringToTop(enemyDeckSprites);
-	const DELAY = 300;
+
 	console.log(playerDraw);
 	console.log(enemyDraw);
-    let playerTween = drawPlayerCardAnimation(playerDeckSprites.getChildAt(playerDeckSprites.length - 1), DELAY); 
-    let enemyTween = drawEnemyCardAnimation(enemyDeckSprites.getChildAt(playerDeckSprites.length - 1), DELAY);
-    endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(playerDeckSprites.length - 1), playerDraw[0], 0));
-    endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(playerDeckSprites.length - 1), enemyDraw[0], 0));
+
+	let playerSprite = playerDeckSprites.getTop();
+	let enemySprite = enemyDeckSprites.getTop();
+    let playerTween = drawPlayerCardAnimation(playerSprite); 
+    let enemyTween = drawEnemyCardAnimation(enemySprite);
+    endOfChain(playerTween, getFlipTween(playerSprite, playerDraw[0], 0));
+    endOfChain(enemyTween, getFlipTween(enemySprite, enemyDraw[0], 0));
 
     for (let i = 1; i < playerDraw.length; i++) {
-        endOfChain(playerTween, dumpSpriteRightAnimation(playerDeckSprites.getChildAt(playerDeckSprites.length - 1)));
-        endOfChain(enemyTween, dumpSpriteLeftAnimation(enemyDeckSprites.getChildAt(playerDeckSprites.length - 1)));
-    	playerDeckSprites.removeChildAt(playerDeckSprites.length - 1); //Remove from deck
-    	enemyDeckSprites.removeChildAt(playerDeckSprites.length - 1); //Remove from deck
+        endOfChain(playerTween, dumpSpriteRightAnimation(playerSprite));
+        endOfChain(enemyTween, dumpSpriteLeftAnimation(enemySprite));
+    	playerDeckSprites.removeChild(playerSprite); //Remove from deck
+    	enemyDeckSprites.removeChild(enemySprite); //Remove from deck
 
-        endOfChain(playerTween, drawPlayerCardAnimation(playerDeckSprites.getChildAt(playerDeckSprites.length - 1)));
-        endOfChain(enemyTween, drawEnemyCardAnimation(enemyDeckSprites.getChildAt(playerDeckSprites.length - 1)));
-
-        endOfChain(playerTween, getFlipTween(playerDeckSprites.getChildAt(playerDeckSprites.length - 1), playerDraw[i], 0));
-        endOfChain(enemyTween, getFlipTween(enemyDeckSprites.getChildAt(playerDeckSprites.length - 1), enemyDraw[i], 0));
+    	playerSprite = playerDeckSprites.getTop();
+    	enemySprite = enemyDeckSprites.getTop();
+        endOfChain(playerTween, drawPlayerCardAnimation(playerSprite));
+        endOfChain(enemyTween, drawEnemyCardAnimation(enemySprite));
+        endOfChain(playerTween, getFlipTween(playerSprite, playerDraw[i], 0));
+        endOfChain(enemyTween, getFlipTween(enemySprite, enemyDraw[i], 0));
     }
 
     onChainComplete(playerTween, function() {
     	//The last drawn cards go to the field
-    	let playerSprite = playerDeckSprites.removeChildAt(playerDeckSprites.length - 1);
-    	let enemySprite = enemyDeckSprites.removeChildAt(playerDeckSprites.length - 1);
+    	playerDeckSprites.removeChild(playerSprite);
+    	enemyDeckSprites.removeChild(enemySprite);
+    	
     	playerFieldSprites.add(playerSprite);
     	enemyFieldSprites.add(enemySprite);
-    	startTurn();
+    	func();
     });
 
-    playerDraw = [];
-    enemyDraw = [];
     playerTween.start();
     enemyTween.start();
 
-	function drawPlayerCardAnimation(sprite, delay = 0) {
-	    const SPEED = 400;
-	    return game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, false, delay);
+	function drawPlayerCardAnimation(sprite) {
+		const SPEED = 400;
+		const DELAY = 300;
+	    return moveTween(sprite, PLAYER_FIELD_X_LOCATION, PLAYER_FIELD_Y_LOCATION, SPEED, DELAY);
 	}
 
-	function drawEnemyCardAnimation(sprite, delay = 0) {
-	    const SPEED = 400;
-	    return game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * ANCHOR * 4}, SPEED, Phaser.Easing.Linear.Out, false, delay);
+	function drawEnemyCardAnimation(sprite) {
+		const SPEED = 400;
+		const DELAY = 300;
+	    return moveTween(sprite, ENEMY_FIELD_X_LOCATION, ENEMY_FIELD_Y_LOCATION, SPEED, DELAY);
 	}
 }
+
+
+
+
+function startTurn() {
+	const currentState = game.state.getCurrentState();
+
+	const playerHandSprites = currentState.playerHandSprites;
+	const enemyHandSprites = currentState.enemyHandSprites;
+
+	if (currentState.gameover) {
+		if (currentState.isWinner()) {
+			currentState.updateWaitingText("You win!");
+			resetConn();
+			showReturnButton();
+		}
+		else {
+			currentState.updateWaitingText("You lose!");
+			resetConn();
+			showReturnButton();
+		}
+	}
+	else if (currentState.isPlayerTurn()) {
+    	currentState.updateWaitingText("");
+    	//Can click on cards
+    	for (let i = 0; i < playerHandSprites.length; i++) {
+    		let sprite = playerHandSprites.getChildAt(i);
+    		sprite.inputEnabled = true;
+    		sprite.events.onInputDown.add(function() {
+		    	for (let j = 0; j < playerHandSprites.length; j++) {
+		    		let s = playerHandSprites.getChildAt(j);
+		    		s.events.onInputDown.removeAll();
+		    		s.events.onInputOver.removeAll();
+		    		s.events.onInputOut.removeAll();
+		    		s.alpha = 1.0;
+		    	}
+    			playerHandSprites.setAll('inputEnabled', false);
+    			socket.emit('server_play_card', i);
+    		});
+       		sprite.events.onInputOver.add(sprite => sprite.alpha = 0.5, this);
+        	sprite.events.onInputOut.add(sprite => sprite.alpha = 1.0, this);
+    	}
+    }
+    else {
+    	currentState.updateWaitingText("Waiting for other player...");
+    }
+
+	function showReturnButton() {
+	    let image = game.add.image(0, game.world.centerX, RETURN_BUTTON);
+	    image.inputEnabled = true;
+	    image.events.onInputDown.add(function() {
+	    	socket.emit('leave_game');
+	        game.state.start('menu');
+    	});
+	}
+}
+
+
+
+
+
+
+
+
+
+
 
 
 function swapFieldTween(func) {
@@ -416,71 +485,7 @@ function playEnemyActivateAnimation(index, card, func) {
 
 
 
-function showReturnButton() {
-    let image = game.add.image(0, game.world.centerX, RETURN_BUTTON);
-    image.inputEnabled = true;
-    image.events.onInputDown.add(function() {
-    	socket.emit('leave_game');
-        game.state.start('menu');
-    });
-}
 
-function resetConn() {
-	socket.removeAllListeners();
-	setupConn();
-}
-
-function startTurn() {
-	const playerScoreText = game.state.getCurrentState().playerScoreText;
-	const enemyScoreText = game.state.getCurrentState().enemyScoreText;
-	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
-	const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
-	const waitingText = game.state.getCurrentState().waitingText;
-	let playerScore = game.state.getCurrentState().playerScore;
-	let enemyScore = game.state.getCurrentState().enemyScore;
-	let gameover = game.state.getCurrentState().gameover;
-	let turn = game.state.getCurrentState().turn;
-	let playerNum = game.state.getCurrentState().playerNum;
-	playerScoreText.setText(playerScore);
-	enemyScoreText.setText(enemyScore);
-	if (gameover) {
-		if (winner === playerNum) {
-			waitingText.setText("You win!");
-			resetConn();
-			showReturnButton();
-		}
-		else {
-			waitingText.setText("You lose!");
-			resetConn();
-			showReturnButton();
-		}
-	}
-	else if (turn === playerNum) {
-    	waitingText.setText("");
-    	//Can click on cards
-    	for (let i = 0; i < playerHandSprites.length; i++) {
-    		let sprite = playerHandSprites.getChildAt(i);
-    		sprite.inputEnabled = true;
-    		sprite.events.onInputDown.add(function() {
-		    	for (let j = 0; j < playerHandSprites.length; j++) {
-		    		let s = playerHandSprites.getChildAt(j);
-		    		s.events.onInputDown.removeAll();
-		    		s.events.onInputOver.removeAll();
-		    		s.events.onInputOut.removeAll();
-		    		s.alpha = 1.0;
-		    	}
-    			playerHandSprites.setAll('inputEnabled', false);
-    			socket.emit('server_play_card', i);
-    		});
-       		sprite.events.onInputOver.add(sprite => sprite.alpha = 0.5, this);
-        	sprite.events.onInputOut.add(sprite => sprite.alpha = 1.0, this);
-    	}
-    }
-    else {
-    	waitingText.setText("Waiting for other player...");
-    }
-
-}
 
 function getFlipTween(sprite, newCard, delay) {
 	const FLIP_SPEED = 200;

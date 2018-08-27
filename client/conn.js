@@ -13,6 +13,10 @@ $(document).ready(function() {
 	});
 });
 */
+function resetConn() {
+	socket.removeAllListeners();
+	setupConn();
+}
 
 function setupConn() {
 	socket.on('display_name', function(name) {
