@@ -143,13 +143,13 @@ function initiateDrawProcess(game) {
 	//Determine whose turn it is
 	if (game.playerOneScore > game.playerTwoScore) {
 		game.turn = 2;
-		io.to(game.playerOneID).emit('draw', {playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
-		io.to(game.playerTwoID).emit('draw', {playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
+		io.to(game.playerOneID).emit('draw', {playerDraw: ['BOLT', 'BLADE_PISTOL'], enemyDraw: ['BOLT', 'SWORD']/*draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name)*/, playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
+		io.to(game.playerTwoID).emit('draw', {playerDraw: ['BOLT', 'BLADE_PISTOL'], enemyDraw: ['BOLT', 'SWORD']/*draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name)*/, playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
 	}
 	else {
 		game.turn = 1;
-		io.to(game.playerOneID).emit('draw', {playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
-		io.to(game.playerTwoID).emit('draw', {playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
+		io.to(game.playerOneID).emit('draw', {playerDraw: ['BOLT', 'BLADE_PISTOL'], enemyDraw: ['BOLT', 'SWORD']/*draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name)*/, playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
+		io.to(game.playerTwoID).emit('draw', {playerDraw: ['BOLT', 'BLADE_PISTOL'], enemyDraw: ['BOLT', 'SWORD']/*draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name)*/, playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
 	}
 }
 
@@ -350,12 +350,12 @@ class MultiGame {
 			if (win > 0) {
 				let winningUsername = win === 1 ? this.playerOneUsername : this.playerTwoUsername;
 				console.log('Player ' + win + ': ' + winningUsername + ' won.');
-				io.to(this.playerOneID).emit('client_game_continue', {gameover: true, winner: win, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-				io.to(this.playerTwoID).emit('client_game_continue', {gameover: true, winner: win, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+				io.to(this.playerOneID).emit('client_game_continue', {gameover: true, winner: win, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card.name});
+				io.to(this.playerTwoID).emit('client_game_continue', {gameover: true, winner: win, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card.name});
 			}
 			else {
-				io.to(this.playerOneID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw, enemyDraw: draw.playerTwoDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-				io.to(this.playerTwoID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw, enemyDraw: draw.playerOneDraw, previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});		
+				io.to(this.playerOneID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card.name});
+				io.to(this.playerTwoID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card.name});		
 			}}
 		else {
 			let win = this.checkWin(player);
@@ -364,15 +364,15 @@ class MultiGame {
 				let winningUsername = win === 1 ? this.playerOneUsername : this.playerTwoUsername;
 				console.log('Player ' + win + ': ' + winningUsername + ' won.');
 				let previousTurn = this.turn;
-				io.to(this.playerOneID).emit('client_game_continue', {gameover: true, winner: win, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-				io.to(this.playerTwoID).emit('client_game_continue', {gameover: true, winner: win, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+				io.to(this.playerOneID).emit('client_game_continue', {gameover: true, winner: win, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card.name});
+				io.to(this.playerTwoID).emit('client_game_continue', {gameover: true, winner: win, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card.name});
 			}
 			//No tie or victory. Continue game
 			else {
 				let previousTurn = this.turn;
 				this.turn = previousTurn === 1 ? 2 : 1;
-				io.to(this.playerOneID).emit('client_game_continue', {gameover: false, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card});
-				io.to(this.playerTwoID).emit('client_game_continue', {gameover: false, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card});
+				io.to(this.playerOneID).emit('client_game_continue', {gameover: false, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card.name});
+				io.to(this.playerTwoID).emit('client_game_continue', {gameover: false, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card.name});
 			}	
 		}
 		return true;

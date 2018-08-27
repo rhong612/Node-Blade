@@ -2,12 +2,14 @@
 /**
 *  Moves all the initialized card sprites to their initial deck position. Then, plays the hand setup animation.
 */
-function playDeckSetupAnimation() {
+function playDeckSetupAnimation(func) {
     const playerDeckSprites = game.state.getCurrentState().playerDeckSprites;
     const enemyDeckSprites = game.state.getCurrentState().enemyDeckSprites;
     const SPEED = 300;
     const DELAY = 100;
-    autoMoveGroupTween(playerDeckSprites, PLAYER_DECK_X_LOCATION, playerDeckSprites.getChildAt(0).y, true, SPEED, 0, 0, 0, DELAY, playHandSetupAnimation);
+    autoMoveGroupTween(playerDeckSprites, PLAYER_DECK_X_LOCATION, playerDeckSprites.getChildAt(0).y, true, SPEED, 0, 0, 0, DELAY, function() {
+    	playHandSetupAnimation(func);
+    });
     autoMoveGroupTween(enemyDeckSprites, ENEMY_DECK_X_LOCATION, enemyDeckSprites.getChildAt(0).y, true, SPEED, 0, 0, 0, DELAY);
 }
 
@@ -16,7 +18,7 @@ function playDeckSetupAnimation() {
 /**
 *	Draws starting hands for both players, flips the cards, then plays the sort animation. This function also moves the top 10 sprites from the deck sprites groups to the hand sprites groups.
 */
-function playHandSetupAnimation() {
+function playHandSetupAnimation(func) {
 	let playerDeckSprites = game.state.getCurrentState().playerDeckSprites;
 	let playerHandSprites = game.state.getCurrentState().playerHandSprites;
 	let enemyDeckSprites = game.state.getCurrentState().enemyDeckSprites;
@@ -28,7 +30,9 @@ function playHandSetupAnimation() {
 	const SPEED = 300;
 	const DELAY = 100;
 	autoMoveGroupTween(playerHandSprites, CARD_WIDTH * CARD_SCALE * 2 + PLAYER_DECK_X_LOCATION, playerHandSprites.getChildAt(0).y, false, SPEED, CARD_WIDTH * CARD_SCALE, 0, 0, DELAY, function() {
-		autoFlipGroupTweenMulti(playerHandSprites, game.state.getCurrentState().initialHand, 0, DELAY, playSortAnimation);
+		autoFlipGroupTweenMulti(playerHandSprites, game.state.getCurrentState().initialHand, 0, DELAY, function() {
+			playSortAnimation(func);
+		});
 	});
 	autoMoveGroupTween(enemyHandSprites, ENEMY_DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE * 2, enemyHandSprites.getChildAt(0).y, false, SPEED, -1 * CARD_WIDTH * CARD_SCALE, 0, 0, DELAY);
 }
@@ -38,14 +42,16 @@ function playHandSetupAnimation() {
 /**
 *	Plays the sort animation. Then, plays the spread animation to spread the cards back out.
 */
-function playSortAnimation() {
+function playSortAnimation(func) {
 	const SPEED = 300;
 	const INITIAL_DELAY = 500;
 	const FLIP_DELAY = 300;
 	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
 	autoMoveGroupTween(playerHandSprites, GAME_WIDTH / 2, playerHandSprites.getChildAt(0).y, false, SPEED, 0, 0, INITIAL_DELAY, 0, function() {
 		autoFlipGroupTweenSingle(playerHandSprites, BACK, FLIP_DELAY, 0, function() {
-			autoFlipGroupTweenMulti(playerHandSprites, game.state.getCurrentState().sortedInitialHand, FLIP_DELAY, 0, playSpreadAnimation);
+			autoFlipGroupTweenMulti(playerHandSprites, game.state.getCurrentState().sortedInitialHand, FLIP_DELAY, 0, function() {
+				playSpreadAnimation(func);
+			});
 		})
 	})
 }
@@ -54,13 +60,11 @@ function playSortAnimation() {
 /**
 *	Spreads the cards back out. Then, emits a 'ready' message to the server.
 */
-function playSpreadAnimation() {
+function playSpreadAnimation(func) {
 	const SPEED = 300;
 	const DELAY = 100;
 	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
-	autoMoveGroupTween(playerHandSprites, CARD_WIDTH * CARD_SCALE * 2 + PLAYER_DECK_X_LOCATION, playerHandSprites.getChildAt(0).y, false, SPEED, CARD_WIDTH * CARD_SCALE, 0, DELAY, 0, function() {
-		socket.emit('ready');
-	});
+	autoMoveGroupTween(playerHandSprites, CARD_WIDTH * CARD_SCALE * 2 + PLAYER_DECK_X_LOCATION, playerHandSprites.getChildAt(0).y, false, SPEED, CARD_WIDTH * CARD_SCALE, 0, DELAY, 0, func);
 }
 
 
@@ -183,6 +187,13 @@ function autoDumpGroupRight(group, func=()=>{}) {
 
 
 
+function destroyField(groupA, groupB, func) {
+	autoDumpGroupRight(groupA);
+	autoDumpGroupLeft(groupB, func);
+}
+
+
+
 /**
 *	Draws the specified number of cards given by the server. Dumps cards when necessary.
 */
@@ -194,6 +205,9 @@ function playDrawAnimation(playerDraw, enemyDraw, func) {
 
 	console.log(playerDraw);
 	console.log(enemyDraw);
+
+	game.world.bringToTop(playerDeckSprites);
+	game.world.bringToTop(enemyDeckSprites);
 
 	let playerSprite = playerDeckSprites.getTop();
 	let enemySprite = enemyDeckSprites.getTop();
@@ -245,60 +259,182 @@ function playDrawAnimation(playerDraw, enemyDraw, func) {
 
 
 
-function startTurn() {
-	const currentState = game.state.getCurrentState();
 
-	const playerHandSprites = currentState.playerHandSprites;
-	const enemyHandSprites = currentState.enemyHandSprites;
 
-	if (currentState.gameover) {
-		if (currentState.isWinner()) {
-			currentState.updateWaitingText("You win!");
-			resetConn();
-			showReturnButton();
-		}
-		else {
-			currentState.updateWaitingText("You lose!");
-			resetConn();
-			showReturnButton();
-		}
+function playCardAnimation(index, card, playerMoved, func) {
+	if (card === BOLT) {
+		playBoltCardAnimation(index, card, playerMoved, func);
 	}
-	else if (currentState.isPlayerTurn()) {
-    	currentState.updateWaitingText("");
-    	//Can click on cards
-    	for (let i = 0; i < playerHandSprites.length; i++) {
-    		let sprite = playerHandSprites.getChildAt(i);
-    		sprite.inputEnabled = true;
-    		sprite.events.onInputDown.add(function() {
-		    	for (let j = 0; j < playerHandSprites.length; j++) {
-		    		let s = playerHandSprites.getChildAt(j);
-		    		s.events.onInputDown.removeAll();
-		    		s.events.onInputOver.removeAll();
-		    		s.events.onInputOut.removeAll();
-		    		s.alpha = 1.0;
-		    	}
-    			playerHandSprites.setAll('inputEnabled', false);
-    			socket.emit('server_play_card', i);
-    		});
-       		sprite.events.onInputOver.add(sprite => sprite.alpha = 0.5, this);
-        	sprite.events.onInputOut.add(sprite => sprite.alpha = 1.0, this);
-    	}
-    }
-    else {
-    	currentState.updateWaitingText("Waiting for other player...");
-    }
-
-	function showReturnButton() {
-	    let image = game.add.image(0, game.world.centerX, RETURN_BUTTON);
-	    image.inputEnabled = true;
-	    image.events.onInputDown.add(function() {
-	    	socket.emit('leave_game');
-	        game.state.start('menu');
-    	});
+	else if (card === MIRROR) {
+		playMirrorCardAnimation(index, card, playerMoved, func);
+	}
+	else if (card === WAND) {
+		playWandCardAnimation(index, card, playerMoved, func);
+	}
+	else {
+		playNormalCardAnimation(index, card, playerMoved, func);
 	}
 }
 
+function playBoltCardAnimation(index, card, playerMoved, func) {
+	const SPEED = 800;
 
+	if (playerMoved) {
+		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+		const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+		let sprite = playerHandSprites.getChildAt(index);
+		game.world.bringToTop(playerHandSprites);
+		playerHandSprites.bringToTop(sprite);
+		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+		endOfChain(tween, getFlipTween(enemyFieldSprites.getTop(), BACK, 0));
+		onChainComplete(tween, function() {
+			playerHandSprites.remove(sprite, true); //Remove and destroy
+			func();
+		});
+		tween.start();
+	}
+	else {
+		const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
+		const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
+		let sprite = enemyHandSprites.getChildAt(index);
+		game.world.bringToTop(enemyHandSprites);
+		enemyHandSprites.bringToTop(sprite);
+		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+		let flipTween = getFlipTween(sprite, card, 0);
+		endOfChain(tween, getFlipTween(playerFieldSprites.getTop(), BACK, 0));
+		onChainComplete(tween, function() {
+			enemyHandSprites.remove(sprite, true); //Remove and destroy
+			func();
+		});
+		tween.start();
+		flipTween.start();
+
+	}
+
+
+}
+
+function playMirrorCardAnimation(index, card, playerMoved, func) {
+	const SPEED = 800;
+
+	if (playerMoved) {
+		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+		let sprite = playerHandSprites.getChildAt(index);
+		game.world.bringToTop(playerHandSprites);
+		playerHandSprites.bringToTop(sprite);
+		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+
+		let swapTweens = swapFieldTween(function() {
+			playerHandSprites.remove(sprite, true); //Remove and destroy
+			func();
+		});
+		tween.onComplete.add(function() {
+			startAllTweens(swapTweens);
+		});
+
+		tween.start();
+	}
+	else {
+		const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
+		let sprite = enemyHandSprites.getChildAt(index);
+		game.world.bringToTop(enemyHandSprites);
+		enemyHandSprites.bringToTop(sprite);
+		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+		let flipTween = getFlipTween(sprite, card, 0);
+
+		let swapTweens = swapFieldTween(function() {
+			enemyHandSprites.remove(sprite, true); //Remove and destroy
+			func();
+		});
+		tween.onComplete.add(function() {
+			startAllTweens(swapTweens);
+		});
+
+		tween.start();
+		flipTween.start();
+	}
+
+}
+
+function playWandCardAnimation(index, card, playerMoved, func) {
+	const SPEED = 800;
+	if (playedMoved) {
+		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+		const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
+		if (playerFieldSprites.getTop().key === BACK) {
+			let sprite = playerHandSprites.getChildAt(index);
+			game.world.bringToTop(playerHandSprites);
+			playerHandSprites.bringToTop(sprite);
+			let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+			endOfChain(tween, getFlipTween(playerFieldSprites.getTop(), playerFieldSprites.getTop().name, 0));
+			onChainComplete(tween, function() {
+				playerHandSprites.remove(sprite, true); //Remove and destroy
+				func();
+			});
+			tween.start();
+		}
+		else {
+			playNormalCardAnimation(index, playedMoved, func);
+		}
+	}
+	else {
+		const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
+		const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+		if (enemyFieldSprites.getTop().key === BACK) {
+			let sprite = enemyHandSprites.getChildAt(index);
+			game.world.bringToTop(enemyHandSprites);
+			enemyHandSprites.bringToTop(sprite);
+			let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+			let flipTween = getFlipTween(sprite, card, 0);
+			endOfChain(tween, getFlipTween(enemyFieldSprites.getTop(), enemyFieldSprites.getTop().name, 0));
+			onChainComplete(tween, function() {
+				enemyHandSprites.remove(sprite, true); //Remove and destroy
+				func();
+			});
+			tween.start();
+			flipTween.start();
+		}
+		else {
+			playNormalCardAnimation(index, card, playedMoved, func);
+		}
+	}
+
+}
+
+function playNormalCardAnimation(index, card, playerMoved, func) {
+	const SPEED = 400;
+	if (playerMoved) {
+		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+		const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
+		let sprite = playerHandSprites.getChildAt(index);
+		game.world.bringToTop(playerHandSprites);
+		playerHandSprites.bringToTop(sprite);
+		let tween = game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+		tween.onComplete.add(function() {
+			playerHandSprites.removeChild(sprite);
+			playerFieldSprites.add(sprite);
+			func();
+		});
+		tween.start();
+
+	}
+	else {
+		const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
+		const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+		let sprite = enemyHandSprites.getChildAt(index);
+		game.world.bringToTop(enemyHandSprites);
+		enemyHandSprites.bringToTop(sprite);
+		let tween = game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * ANCHOR * 4}, SPEED, Phaser.Easing.Linear.Out, false, 0);
+		let flipTween = getFlipTween(sprite, card, 0);
+		tween.onComplete.add(function() {
+			enemyHandSprites.removeChild(sprite);
+			enemyFieldSprites.add(sprite);
+			func();
+		});
+		tween.start();
+		flipTween.start();
+	}
+}
 
 
 
@@ -330,160 +466,6 @@ function swapFieldTween(func) {
 	swapTweens[swapTweens.length - 1].onComplete.add(func);
 	return swapTweens;
 }
-
-function playPlayerMirrorAnimation(index, func) {
-	const SPEED = 800;
-	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
-	let sprite = playerHandSprites.getChildAt(index);
-	game.world.bringToTop(playerHandSprites);
-	playerHandSprites.bringToTop(sprite);
-	let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
-
-	let swapTweens = swapFieldTween(function() {
-		playerHandSprites.remove(sprite, true); //Remove and destroy
-		func();
-	});
-	tween.onComplete.add(function() {
-		startAllTweens(swapTweens);
-	});
-
-	tween.start();
-}
-
-function playEnemyMirrorAnimation(index, card, func) {
-	const SPEED = 800;
-	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
-	let sprite = enemyHandSprites.getChildAt(index);
-	game.world.bringToTop(enemyHandSprites);
-	enemyHandSprites.bringToTop(sprite);
-	let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
-	let flipTween = getFlipTween(sprite, card.name, 0);
-
-	let swapTweens = swapFieldTween(function() {
-		enemyHandSprites.remove(sprite, true); //Remove and destroy
-		func();
-	});
-	tween.onComplete.add(function() {
-		startAllTweens(swapTweens);
-	});
-
-	tween.start();
-	flipTween.start();
-}
-
-function playPlayerWandAnimation(index, func) {
-	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
-	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
-	if (playerFieldSprites.getTop().key === BACK) {
-		const SPEED = 800;
-		let sprite = playerHandSprites.getChildAt(index);
-		game.world.bringToTop(playerHandSprites);
-		playerHandSprites.bringToTop(sprite);
-		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
-		endOfChain(tween, getFlipTween(playerFieldSprites.getTop(), playerFieldSprites.getTop().name, 0));
-		onChainComplete(tween, function() {
-			playerHandSprites.remove(sprite, true); //Remove and destroy
-			func();
-		});
-		tween.start();
-	}
-	else {
-		playPlayerActivateAnimation(index, func);
-	}
-}
-
-function playEnemyWandAnimation(index, card, func) {
-	const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
-	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
-	if (enemyFieldSprites.getTop().key === BACK) {
-		const SPEED = 800;
-		let sprite = enemyHandSprites.getChildAt(index);
-		game.world.bringToTop(enemyHandSprites);
-		enemyHandSprites.bringToTop(sprite);
-		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
-		let flipTween = getFlipTween(sprite, card.name, 0);
-		endOfChain(tween, getFlipTween(enemyFieldSprites.getTop(), enemyFieldSprites.getTop().name, 0));
-		onChainComplete(tween, function() {
-			enemyHandSprites.remove(sprite, true); //Remove and destroy
-			func();
-		});
-		tween.start();
-		flipTween.start();
-	}
-	else {
-		playEnemyActivateAnimation(index, card, func);
-	}
-}
-
-
-function playPlayerBoltAnimation(index, func) {
-	const SPEED = 800;
-	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
-	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
-	let sprite = playerHandSprites.getChildAt(index);
-	game.world.bringToTop(playerHandSprites);
-	playerHandSprites.bringToTop(sprite);
-	let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
-	endOfChain(tween, getFlipTween(enemyFieldSprites.getTop(), BACK, 0));
-	onChainComplete(tween, function() {
-		playerHandSprites.remove(sprite, true); //Remove and destroy
-		func();
-	});
-	tween.start();
-}
-function playEnemyBoltAnimation(index, card, func) {
-	const SPEED = 800;
-	const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
-	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
-	let sprite = enemyHandSprites.getChildAt(index);
-	game.world.bringToTop(enemyHandSprites);
-	enemyHandSprites.bringToTop(sprite);
-	let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
-	let flipTween = getFlipTween(sprite, card.name, 0);
-	endOfChain(tween, getFlipTween(playerFieldSprites.getTop(), BACK, 0));
-	onChainComplete(tween, function() {
-		enemyHandSprites.remove(sprite, true); //Remove and destroy
-		func();
-	});
-	tween.start();
-	flipTween.start();
-}
-
-function playPlayerActivateAnimation(index, func = function() {}) {
-	const SPEED = 400;
-	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
-	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
-	let sprite = playerHandSprites.getChildAt(index);
-	game.world.bringToTop(playerHandSprites);
-	playerHandSprites.bringToTop(sprite);
-	let tween = game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, false, 0);
-	tween.onComplete.add(function() {
-		playerHandSprites.removeChild(sprite);
-		playerFieldSprites.add(sprite);
-		func();
-	});
-	tween.start();
-}
-
-function playEnemyActivateAnimation(index, card, func) {
-	const SPEED = 400;
-	const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
-	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
-	let sprite = enemyHandSprites.getChildAt(index);
-	game.world.bringToTop(enemyHandSprites);
-	enemyHandSprites.bringToTop(sprite);
-	let tween = game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * ANCHOR * 4}, SPEED, Phaser.Easing.Linear.Out, false, 0);
-	let flipTween = getFlipTween(sprite, card.name, 0);
-	tween.onComplete.add(function() {
-		enemyHandSprites.removeChild(sprite);
-		enemyFieldSprites.add(sprite);
-		func();
-	});
-	tween.start();
-	flipTween.start();
-}
-
-
 
 
 

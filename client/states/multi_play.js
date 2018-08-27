@@ -39,77 +39,43 @@ var multiPlayState = {
 	        this.enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
 
-        const bgm = game.add.audio(BGM);
-        bgm.loopFull();
-        bgm.volume = 0.2;
-        //bgm.play();
-        playDeckSetupAnimation();
+        this.bgm = game.add.audio(BGM);
+        this.bgm.loopFull();
+        this.bgm.volume = 0.2;
+        this.bgm.play();
+        playDeckSetupAnimation(function() {
+        	socket.emit('ready');
+        });
 	},
 
 	preload: function() {
         socket.on('client_game_continue', function(response) {
         	console.log(JSON.stringify(response));
-        	waitingText.setText("");
-        	playerScore = response.playerScore;
-        	enemyScore = response.enemyScore;
-        	gameover = response.gameover;
-        	if (gameover) {
-        		winner = response.winner;
-        		bgm.stop();
+        	let currentState = game.state.getCurrentState();
+
+        	currentState.updateWaitingText("");
+        	currentState.gameover = response.gameover;
+        	currentState.turn = response.turn;
+        	currentState.tie = response.tie;
+        	if (currentState.gameover) {
+        		currentState.winner = response.winner;
+        		currentState.bgm.stop();
         	}
 
-        	turn = response.turn;
-        	tie = response.tie;
-        	playerDraw = response.playerDraw;
-        	enemyDraw = response.enemyDraw;
-        	//Move the played card to the center
-        	if (response.previousTurn === playerNum) {
-		    	if (tie) {
-        			waitingText.setText("A draw!");
-        			playerScoreText.setText(response.drawScore);
-        			enemyScoreText.setText(response.drawScore);
-        			playPlayerActivateAnimation(response.index, function() {
-        				dumpField(playDrawAnimation);
-        			});
-		    	}
-		    	else {
-		    		if (response.card.name === BOLT) {
-		    			playPlayerBoltAnimation(response.index, startTurn);
-		    		}
-		    		else if (response.card.name === MIRROR) {
-		    			playPlayerMirrorAnimation(response.index, startTurn);
-		    		}
-		    		else if (response.card.name === WAND) {
-		    			playPlayerWandAnimation(response.index, startTurn);
-		    		}
-		    		else {
-	        			playPlayerActivateAnimation(response.index, startTurn);
-		    		}
-		    	}
+        	let playerMoved = response.previousTurn === currentState.playerNum;
+
+        	if (currentState.tie) {
+        		currentState.updateWaitingText("A draw!");
+        		currentState.updateScoreText(response.drawScore, response.drawScore);
+        		playCardAnimation(response.index, response.card, playerMoved, function() {
+        			currentState.resetField(response.playerDraw, response.enemyDraw, response.playerScore, response.enemyScore);
+        		})
         	}
         	else {
-		    	if (tie) {
-        			waitingText.setText("A draw!");
-        			playerScoreText.setText(response.drawScore);
-        			enemyScoreText.setText(response.drawScore);
-        			playEnemyActivateAnimation(response.index, response.card, function() {
-        				dumpField(playDrawAnimation);
-        			});
-		    	}
-		    	else {
-		    		if (response.card.name === BOLT) {
-		    			playEnemyBoltAnimation(response.index, response.card, startTurn);
-		    		}
-		    		else if (response.card.name === MIRROR) {
-		    			playEnemyMirrorAnimation(response.index, response.card, startTurn);
-		    		}
-		    		else if (response.card.name === WAND) {
-		    			playEnemyWandAnimation(response.index, response.card, startTurn);
-		    		}
-		    		else {
-	        			playEnemyActivateAnimation(response.index, response.card, startTurn);
-		    		}
-		    	}
+        		playCardAnimation(response.index, response.card, playerMoved, function() {
+        			currentState.updateScoreText(response.playerScore, response.enemyScore);
+        			currentState.startTurn();
+        		});
         	}
         })
 
@@ -118,20 +84,14 @@ var multiPlayState = {
         socket.on('draw', function(response) {
         	const currentState = game.state.getCurrentState();
 			currentState.turn = response.turn;
-			//Dump the field. Then, play the draw animation. Play the startTurn() function at the end.
-			destroyField(function() {
-				playDrawAnimation(response.playerDraw, response.enemyDraw, function() {
-					game.state.getCurrentState().updateScoreText(response.playerScore, response.enemyScore);
-					startTurn();
-				});
-			})
-
-			function destroyField(func) {
-				autoDumpGroupRight(currentState.playerFieldSprites);
-				autoDumpGroupLeft(currentState.enemyFieldSprites, func);
-			}
+			currentState.resetField(response.playerDraw, response.enemyDraw, response.playerScore, response.enemyScore);
         });
 
+	},
+
+	shutdown : function() {
+		resetConn();
+	    socket.emit('leave_game');
 	},
 
 	updateScoreText : function(playerScore, enemyScore) {
@@ -149,6 +109,62 @@ var multiPlayState = {
 
 	isPlayerTurn : function() {
 		return this.playerNum === this.turn;
+	},
+
+	resetField : function(playerDraw, enemyDraw, playerScore, enemyScore) {
+		//Dump the field. Then, play the draw animation. Play the startTurn() function at the end.
+		destroyField(this.playerFieldSprites, this.enemyFieldSprites, function() {
+			playDrawAnimation(playerDraw, enemyDraw, function() {
+				this.updateScoreText(playerScore, enemyScore);
+				this.startTurn();
+			}.bind(this));
+		}.bind(this))
+	},
+
+	startTurn: function startTurn() {
+		if (this.gameover) {
+			if (this.isWinner()) {
+				this.updateWaitingText("You win!");
+				this.showReturnButton();
+			}
+			else {
+				this.updateWaitingText("You lose!");
+				this.showReturnButton();
+			}
+		}
+		else if (this.isPlayerTurn()) {
+	    	this.updateWaitingText("");
+	    	//Can click on cards
+	    	for (let i = 0; i < this.playerHandSprites.length; i++) {
+	    		let sprite = this.playerHandSprites.getChildAt(i);
+	    		sprite.inputEnabled = true;
+	    		sprite.events.onInputDown.add(function() {
+			    	for (let j = 0; j < this.playerHandSprites.length; j++) {
+			    		let s = this.playerHandSprites.getChildAt(j);
+			    		s.events.onInputDown.removeAll();
+			    		s.events.onInputOver.removeAll();
+			    		s.events.onInputOut.removeAll();
+			    		s.alpha = 1.0;
+			    	}
+	    			this.playerHandSprites.setAll('inputEnabled', false);
+	    			socket.emit('server_play_card', i);
+	    		}.bind(this));
+	       		sprite.events.onInputOver.add(sprite => sprite.alpha = 0.5, this);
+	        	sprite.events.onInputOut.add(sprite => sprite.alpha = 1.0, this);
+	    	}
+	    }
+	    else {
+	    	this.updateWaitingText("Waiting for other player...");
+	    }
+
+	},
+
+	showReturnButton : function() {
+		let image = game.add.image(0, game.world.centerX, RETURN_BUTTON);
+		image.inputEnabled = true;
+		image.events.onInputDown.add(function() {
+		    game.state.start('menu');
+	    });
 	}
 }
 
