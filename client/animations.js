@@ -419,7 +419,7 @@ function playMirrorCardAnimation(index, card, playerMoved, func) {
 */
 function playWandCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 800;
-	if (playedMoved) {
+	if (playerMoved) {
 		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
 		const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
 		if (playerFieldSprites.getTop().key === BACK) {
