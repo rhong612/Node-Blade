@@ -1,8 +1,9 @@
 
 /**
 *  Moves all the initialized card sprites to their initial deck position. Then, plays the hand setup animation.
+*	@param - func - an optional function to run at the end of the animation
 */
-function playDeckSetupAnimation(func) {
+function playDeckSetupAnimation(func=()=>{}) {
     const playerDeckSprites = game.state.getCurrentState().playerDeckSprites;
     const enemyDeckSprites = game.state.getCurrentState().enemyDeckSprites;
     const SPEED = 300;
@@ -17,8 +18,9 @@ function playDeckSetupAnimation(func) {
 
 /**
 *	Draws starting hands for both players, flips the cards, then plays the sort animation. This function also moves the top 10 sprites from the deck sprites groups to the hand sprites groups.
+*	@param - func - an optional function to run at the end of the animation
 */
-function playHandSetupAnimation(func) {
+function playHandSetupAnimation(func=()=>{}) {
 	let playerDeckSprites = game.state.getCurrentState().playerDeckSprites;
 	let playerHandSprites = game.state.getCurrentState().playerHandSprites;
 	let enemyDeckSprites = game.state.getCurrentState().enemyDeckSprites;
@@ -41,8 +43,9 @@ function playHandSetupAnimation(func) {
 
 /**
 *	Plays the sort animation. Then, plays the spread animation to spread the cards back out.
+*	@param - func - an optional function to run at the end of the animation
 */
-function playSortAnimation(func) {
+function playSortAnimation(func=()=>{}) {
 	const SPEED = 300;
 	const INITIAL_DELAY = 500;
 	const FLIP_DELAY = 300;
@@ -58,9 +61,10 @@ function playSortAnimation(func) {
 
 
 /**
-*	Spreads the cards back out. Then, emits a 'ready' message to the server.
+*	Spreads the cards back out.
+*	@param - func - an optional function to run at the end of the animation
 */
-function playSpreadAnimation(func) {
+function playSpreadAnimation(func=()=>{}) {
 	const SPEED = 300;
 	const DELAY = 100;
 	const playerHandSprites = game.state.getCurrentState().playerHandSprites;
@@ -101,7 +105,14 @@ function autoMoveGroupTween(group, x, y, play_shuffle=false, speed=300, x_buffer
     }
 }
 
-
+/**
+*  Flips the entire group of sprites to the new specified sprite.
+*	@param group - A Phaser group of sprites
+*	@param new_sprite_name - the key of the new sprite
+*	@param initial_delay - the delay before starting the movements. Defaults to 0.
+*	@param staggering_delay - the delay between each movement. Defaults to 0.
+*	@param func - a function to be called after the animation is done. Defaults to an empty function that does nothing.
+*/
 function autoFlipGroupTweenSingle(group, new_sprite_name, initial_delay = 0, staggering_delay = 0, func=()=>{}) {
 	let tweens = [];
 	for (let i = 0; i < group.length; i++) {
@@ -111,7 +122,14 @@ function autoFlipGroupTweenSingle(group, new_sprite_name, initial_delay = 0, sta
 	startAllTweens(tweens);
 }
 
-
+/**
+*  Flips the entire group of sprites and shows new sprites corresponding to a list of sprite names
+*	@param group - A Phaser group of sprites
+*	@param new_sprite_names - an array of sprite names. Must match the group in length
+*	@param initial_delay - the delay before starting the movements. Defaults to 0.
+*	@param staggering_delay - the delay between each movement. Defaults to 0.
+*	@param func - a function to be called after the animation is done. Defaults to an empty function that does nothing.
+*/
 function autoFlipGroupTweenMulti(group, new_sprite_names, initial_delay = 0, staggering_delay = 0, func=()=>{}) {
 	let tweens = [];
 	for (let i = 0; i < group.length; i++) {
@@ -136,20 +154,24 @@ function moveTopSprites(groupA, groupB, count) {
 }
 
 
-
 /**
 *	Moves a sprite to a given (x, y) position
 *	@param sprite - the sprite to move
 *	@param y - the y-coordinate to move to
 *	@param speed - the speed of the movement
 *	@param delay - the delay in ms before starting the move
-*	@returns A Phaser tween. You must call tween.start() to start it
+*	@returns A Phaser tween that has not been started
 */
 function moveTween(sprite, x, y, speed=400, delay=0) {
 	return game.add.tween(sprite).to({x: x, y: y}, speed, Phaser.Easing.Linear.Out, false, delay);
 }
 
-//Plays an animation sending all sprites in the group to the left side of the screen. Then, removes the sprites from the group and destroys all the sprites.
+
+/**
+*	Plays an animation sending all sprites in the group to the left side of the screen. Then, removes the sprites from the group and destroys all the sprites.
+*	@param group - the Phaser group of sprites to destroy
+*	@param func - an optional function to call at the end
+*/
 function autoDumpGroupLeft(group, func=()=>{}) {
 	if (group.length >= 1) {
 		let tweens = [];
@@ -166,8 +188,11 @@ function autoDumpGroupLeft(group, func=()=>{}) {
 		func();
 	}
 }
-
-//Plays an animation sending all sprites in the group to the right side of the screen. Then, removes the sprites from the group and destroys all the sprites.
+/**
+*	Plays an animation sending all sprites in the group to the right side of the screen. Then, removes the sprites from the group and destroys all the sprites.
+*	@param group - the Phaser group of sprites to destroy
+*	@param func - an optional function to call at the end
+*/
 function autoDumpGroupRight(group, func=()=>{}) {
 	if (group.length >= 1) {
 		let tweens = [];
@@ -186,7 +211,12 @@ function autoDumpGroupRight(group, func=()=>{}) {
 }
 
 
-
+/**
+*	Plays an animation sending all sprites in groupA to the left and all sprites in groupB to the right. Removes the sprites and destroys them all afterward.
+*	@param groupA - the Phaser group of sprites to send to the right
+*	@param groupB - the Phaser group of sprites to send to the left
+*	@param func - an optional function to call at the end
+*/
 function destroyField(groupA, groupB, func) {
 	autoDumpGroupRight(groupA);
 	autoDumpGroupLeft(groupB, func);
@@ -195,7 +225,10 @@ function destroyField(groupA, groupB, func) {
 
 
 /**
-*	Draws the specified number of cards given by the server. Dumps cards when necessary.
+*	Draws the cards specified. Dumps cards when necessary.
+*	@param playerDraw - an array of card names that the player drew
+*	@param enemyDraw - an array of cards names that the enemy drew
+*	@param func - an optional function to call at the end
 */
 function playDrawAnimation(playerDraw, enemyDraw, func) {
 	const SPEED = 400;
@@ -250,8 +283,13 @@ function playDrawAnimation(playerDraw, enemyDraw, func) {
 
 
 
-
-
+/**
+*	Plays a different card animation depending on the card played
+*	@param index - the index of the card that was played
+*	@param card - the name of the played card
+*	@param playedMoved - boolean representing if the player is the one who played the card or not
+*	@param func - an optional function to call at the end
+*/
 function playCardAnimation(index, card, playerMoved, func) {
 	if (card === BOLT) {
 		playBoltCardAnimation(index, card, playerMoved, func);
@@ -267,6 +305,13 @@ function playCardAnimation(index, card, playerMoved, func) {
 	}
 }
 
+/**
+*	Plays the bolt animation
+*	@param index - the index of the card that was played
+*	@param card - the name of the played card
+*	@param playedMoved - boolean representing if the player is the one who played the card or not
+*	@param func - an optional function to call at the end
+*/
 function playBoltCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 800;
 
@@ -301,10 +346,15 @@ function playBoltCardAnimation(index, card, playerMoved, func) {
 		flipTween.start();
 
 	}
-
-
 }
 
+/**
+*	Plays the mirror animation
+*	@param index - the index of the card that was played
+*	@param card - the name of the played card
+*	@param playedMoved - boolean representing if the player is the one who played the card or not
+*	@param func - an optional function to call at the end
+*/
 function playMirrorCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 800;
 
@@ -345,8 +395,36 @@ function playMirrorCardAnimation(index, card, playerMoved, func) {
 		flipTween.start();
 	}
 
+	function swapFieldTween(func) {
+		const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
+		const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+
+		let playerX = playerFieldSprites.getTop().x;
+		let playerY = playerFieldSprites.getTop().y;
+		let enemyX = enemyFieldSprites.getTop().x;
+		let enemyY = enemyFieldSprites.getTop().y;
+
+		let swapTweens = [];
+		const SPEED = 800;
+		for (let i = 0; i < playerFieldSprites.length; i++) {
+			swapTweens.push(game.add.tween(playerFieldSprites.getChildAt(i)).to({x: enemyX, y: enemyY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
+		}
+		for (let i = 0; i < enemyFieldSprites.length; i++) {
+			swapTweens.push(game.add.tween(enemyFieldSprites.getChildAt(i)).to({x: playerX, y: playerY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
+		}
+
+		swapTweens[swapTweens.length - 1].onComplete.add(func);
+		return swapTweens;
+	}
 }
 
+/**
+*	Plays the wand animation
+*	@param index - the index of the card that was played
+*	@param card - the name of the played card
+*	@param playedMoved - boolean representing if the player is the one who played the card or not
+*	@param func - an optional function to call at the end
+*/
 function playWandCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 800;
 	if (playedMoved) {
@@ -391,7 +469,13 @@ function playWandCardAnimation(index, card, playerMoved, func) {
 	}
 
 }
-
+/**
+*	Plays the normal card animation
+*	@param index - the index of the card that was played
+*	@param card - the name of the played card
+*	@param playedMoved - boolean representing if the player is the one who played the card or not
+*	@param func - an optional function to call at the end
+*/
 function playNormalCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 400;
 	if (playerMoved) {
@@ -432,34 +516,13 @@ function playNormalCardAnimation(index, card, playerMoved, func) {
 
 
 
-
-
-
-
-function swapFieldTween(func) {
-	const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
-	const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
-
-	let playerX = playerFieldSprites.getTop().x;
-	let playerY = playerFieldSprites.getTop().y;
-	let enemyX = enemyFieldSprites.getTop().x;
-	let enemyY = enemyFieldSprites.getTop().y;
-
-	let swapTweens = [];
-	const SPEED = 800;
-	for (let i = 0; i < playerFieldSprites.length; i++) {
-		swapTweens.push(game.add.tween(playerFieldSprites.getChildAt(i)).to({x: enemyX, y: enemyY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
-	}
-	for (let i = 0; i < enemyFieldSprites.length; i++) {
-		swapTweens.push(game.add.tween(enemyFieldSprites.getChildAt(i)).to({x: playerX, y: playerY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
-	}
-
-	swapTweens[swapTweens.length - 1].onComplete.add(func);
-	return swapTweens;
-}
-
-
-
+/**
+*	Gets a flip tween for a card
+*	@param sprite - the sprite to flip
+*	@param newCard - the new card that will be shown after the flip
+*	@param delay - the delay before beginning the flip after the tween is started
+*	@return a fliptween that has not been started
+*/
 function getFlipTween(sprite, newCard, delay) {
 	const FLIP_SPEED = 200;
     let flipTween = game.add.tween(sprite.scale).to({
@@ -484,22 +547,42 @@ function getFlipTween(sprite, newCard, delay) {
 }
 
 
+/**
+*	Calls start() on all the given tweens
+*	@param - tweens_array - an array of tweens
+*/
 function startAllTweens(tweens_array) {
 	for (let i = 0; i < tweens_array.length; i++) {
 		tweens_array[i].start();
 	}
 }
 
-
+/**
+*	Gets a tween that sends a sprite off the screen to the right
+*	@param sprite - the sprite to send
+*	@param speed - the speed of the animation. Defaults to 400.
+*	@param delay - the time to wait before beginning the animation after it is started. Defaults to 1500.
+*	@returns - a tween that has not been started
+*/
 function dumpSpriteRightAnimation(sprite, speed=400, delay=1500) {
     return game.add.tween(sprite).to({x: GAME_WIDTH + CARD_WIDTH }, speed, Phaser.Easing.Linear.Out, false, delay);
 }
-
+/**
+*	Gets a tween that sends a sprite off the screen to the left
+*	@param sprite - the sprite to send
+*	@param speed - the speed of the animation. Defaults to 400.
+*	@param delay - the time to wait before beginning the animation after it is started. Defaults to 1500.
+*	@returns - a tween that has not been started
+*/
 function dumpSpriteLeftAnimation(sprite, speed=400, delay=1500) {
     return game.add.tween(sprite).to({x: -1 * CARD_WIDTH }, speed, Phaser.Easing.Linear.Out, false, delay);
 }
 
-
+/**
+*	Chains a tween to the end of a chain of tweens
+*	@param chain - the starting tween of a chain
+*	@param newTween - the tween to add to the end of the chain
+*/
 function endOfChain(chain, newTween) {
     let end = chain;
     while (end.chainedTween != undefined) {
@@ -508,6 +591,11 @@ function endOfChain(chain, newTween) {
     end.chain(newTween);
 }
 
+/**
+*	Attaches a function to the last tween of a chain
+*	@param chain - the starting tween of a chain
+*	@param func - the function to attach
+*/
 function onChainComplete(chain, func) {
     let end = chain;
     while (end.chainedTween != undefined) {
