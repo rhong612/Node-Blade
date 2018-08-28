@@ -37,6 +37,14 @@ function playHandSetupAnimation(func=()=>{}) {
 		});
 	});
 	autoMoveGroupTween(enemyHandSprites, ENEMY_DECK_X_LOCATION - CARD_WIDTH * CARD_SCALE * 2, enemyHandSprites.getChildAt(0).y, false, SPEED, -1 * CARD_WIDTH * CARD_SCALE, 0, 0, DELAY);
+
+	function moveTopSprites(groupA, groupB, count) {
+		for (let i = 0; i < count; i++) {
+			let topCard = groupA.getTop();
+			groupA.remove(topCard);
+			groupB.add(topCard);
+		}
+	}
 }
 
 
@@ -139,19 +147,7 @@ function autoFlipGroupTweenMulti(group, new_sprite_names, initial_delay = 0, sta
 	startAllTweens(tweens);
 }
 
-/**
-*	Moves the top sprites from groupA to groupB up to the number specified by count
-*	@param groupA - the group to be removed from
-*	@param groupB - the destination group
-*	@param count - the number of sprites to remove
-*/
-function moveTopSprites(groupA, groupB, count) {
-	for (let i = 0; i < count; i++) {
-		let topCard = groupA.getTop();
-		groupA.remove(topCard);
-		groupB.add(topCard);
-	}
-}
+
 
 
 /**
@@ -364,15 +360,16 @@ function playMirrorCardAnimation(index, card, playerMoved, func) {
 		game.world.bringToTop(playerHandSprites);
 		playerHandSprites.bringToTop(sprite);
 		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
-
-		let swapTweens = swapFieldTween(function() {
-			playerHandSprites.remove(sprite, true); //Remove and destroy
-			func();
-		});
 		tween.onComplete.add(function() {
-			startAllTweens(swapTweens);
+			const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
+			const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+			autoMoveGroupTween(playerFieldSprites, ENEMY_FIELD_X_LOCATION, ENEMY_FIELD_Y_LOCATION, false, SPEED, ENEMY_FIELD_BUFFER, 0, 0, 0, function() {
+				playerHandSprites.remove(sprite, true); //Remove and destroy
+				swapGroups(playerFieldSprites, enemyFieldSprites);
+				func();
+			});
+			autoMoveGroupTween(enemyFieldSprites, PLAYER_FIELD_X_LOCATION, PLAYER_FIELD_Y_LOCATION, false, SPEED, PLAYER_FIELD_BUFFER, 0, 0);
 		});
-
 		tween.start();
 	}
 	else {
@@ -382,39 +379,34 @@ function playMirrorCardAnimation(index, card, playerMoved, func) {
 		enemyHandSprites.bringToTop(sprite);
 		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
 		let flipTween = getFlipTween(sprite, card, 0);
-
-		let swapTweens = swapFieldTween(function() {
-			enemyHandSprites.remove(sprite, true); //Remove and destroy
-			func();
-		});
 		tween.onComplete.add(function() {
-			startAllTweens(swapTweens);
+			const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
+			const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+			autoMoveGroupTween(playerFieldSprites, ENEMY_FIELD_X_LOCATION, ENEMY_FIELD_Y_LOCATION, false, SPEED, ENEMY_FIELD_BUFFER, 0, 0, 0, function() {
+				enemyHandSprites.remove(sprite, true); //Remove and destroy
+				swapGroups(playerFieldSprites, enemyFieldSprites);
+				func();
+			});
+			autoMoveGroupTween(enemyFieldSprites, PLAYER_FIELD_X_LOCATION, PLAYER_FIELD_Y_LOCATION, false, SPEED, PLAYER_FIELD_BUFFER, 0, 0);
 		});
 
 		tween.start();
 		flipTween.start();
 	}
 
-	function swapFieldTween(func) {
-		const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
-		const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
-
-		let playerX = playerFieldSprites.getTop().x;
-		let playerY = playerFieldSprites.getTop().y;
-		let enemyX = enemyFieldSprites.getTop().x;
-		let enemyY = enemyFieldSprites.getTop().y;
-
-		let swapTweens = [];
-		const SPEED = 800;
-		for (let i = 0; i < playerFieldSprites.length; i++) {
-			swapTweens.push(game.add.tween(playerFieldSprites.getChildAt(i)).to({x: enemyX, y: enemyY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
-		}
-		for (let i = 0; i < enemyFieldSprites.length; i++) {
-			swapTweens.push(game.add.tween(enemyFieldSprites.getChildAt(i)).to({x: playerX, y: playerY}, SPEED, Phaser.Easing.Linear.Out, false, 0));
+	function swapGroups(groupA, groupB) {
+		const spritesA = [];
+		const spritesB = [];
+		const originalLength = groupA.length;
+		for (let i = 0; i < originalLength; i++) {
+			spritesA.push(groupA.removeChildAt(0));
+			spritesB.push(groupB.removeChildAt(0));
 		}
 
-		swapTweens[swapTweens.length - 1].onComplete.add(func);
-		return swapTweens;
+		for (let i = 0; i < originalLength; i++) {
+			groupA.addChild(spritesB[i]);
+			groupB.addChild(spritesA[i]);
+		}
 	}
 }
 
@@ -484,7 +476,7 @@ function playNormalCardAnimation(index, card, playerMoved, func) {
 		let sprite = playerHandSprites.getChildAt(index);
 		game.world.bringToTop(playerHandSprites);
 		playerHandSprites.bringToTop(sprite);
-		let tween = game.add.tween(sprite).to({ x: GAME_WIDTH - (2 * CARD_WIDTH), y: (GAME_HEIGHT - (CARD_HEIGHT * CARD_SCALE * ANCHOR * 4)) }, SPEED, Phaser.Easing.Linear.Out, false, 0);
+		let tween = game.add.tween(sprite).to({ x: PLAYER_FIELD_X_LOCATION + PLAYER_FIELD_BUFFER * playerFieldSprites.length, y: PLAYER_FIELD_Y_LOCATION }, SPEED, Phaser.Easing.Linear.Out, false, 0);
 		tween.onComplete.add(function() {
 			playerHandSprites.removeChild(sprite);
 			playerFieldSprites.add(sprite);
@@ -499,7 +491,7 @@ function playNormalCardAnimation(index, card, playerMoved, func) {
 		let sprite = enemyHandSprites.getChildAt(index);
 		game.world.bringToTop(enemyHandSprites);
 		enemyHandSprites.bringToTop(sprite);
-		let tween = game.add.tween(sprite).to({ x: CARD_WIDTH * 2, y: CARD_HEIGHT * CARD_SCALE * ANCHOR * 4}, SPEED, Phaser.Easing.Linear.Out, false, 0);
+		let tween = game.add.tween(sprite).to({ x: ENEMY_FIELD_X_LOCATION + ENEMY_FIELD_BUFFER * enemyFieldSprites.length, y: ENEMY_FIELD_Y_LOCATION}, SPEED, Phaser.Easing.Linear.Out, false, 0);
 		let flipTween = getFlipTween(sprite, card, 0);
 		tween.onComplete.add(function() {
 			enemyHandSprites.removeChild(sprite);
