@@ -70,8 +70,10 @@ io.on('connection', function(socket) {
 	socket.on('challenge', function(names) {
 		console.log(names.challenger + ' is challenging ' + names.target);
 		let id = findSocketIDInLobby(names.target);
-		playerManager.removePlayerFromWaitingLobby(id);
-		playerManager.removePlayerFromWaitingLobby(this.id);
+		let ids = [];
+		ids.push(id);
+		ids.push(this.id);
+		playerManager.removePlayersFromWaitingLobby(ids);
 		console.log(names.challenger + ' and ' + names.target + ' have left the waiting room');
 		io.to(id).emit('client_challenge_prompt', names.challenger);
 	});

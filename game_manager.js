@@ -59,13 +59,16 @@ class GameManager {
     }
 
     removeGame(gameID) {
-        let id1 = this.current_ongoing_games[gameID].playerOneID;
-        let id2 = this.current_ongoing_games[gameID].playerTwoID;
-        this.playerManager.getPlayer(id1).currentGameID = pm.NO_GAME;
-        this.playerManager.getPlayer(id1).status = pm.STATUS_MENU;
-        this.playerManager.getPlayer(id2).currentGameID = pm.NO_GAME;
-        this.playerManager.getPlayer(id2).status = pm.STATUS_MENU;
-        delete this.current_ongoing_games[gameID];
+        let game = this.current_ongoing_games[gameID];
+        if (game) {
+            let id1 = game.playerOneID;
+            let id2 = game.playerTwoID;
+            this.playerManager.getPlayer(id1).currentGameID = pm.NO_GAME;
+            this.playerManager.getPlayer(id1).status = pm.STATUS_MENU;
+            this.playerManager.getPlayer(id2).currentGameID = pm.NO_GAME;
+            this.playerManager.getPlayer(id2).status = pm.STATUS_MENU;
+            delete this.current_ongoing_games[gameID];
+        }
     }
 }
 

@@ -37,9 +37,11 @@ class PlayerManager {
 		this.refreshWaitingList();
 	}
 
-	removePlayerFromWaitingLobby(id) {
-		delete this.playersWaitingLobby[id];
-		this.io.sockets.connected[id].leave('waiting_room');
+	removePlayersFromWaitingLobby(ids) {
+		for (let i = 0; i < ids.length; i++) {
+			delete this.playersWaitingLobby[ids[i]];
+			this.io.sockets.connected[ids[i]].leave('waiting_room');
+		}
 		this.refreshWaitingList();
 	}
 

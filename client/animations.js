@@ -435,7 +435,7 @@ function playWandCardAnimation(index, card, playerMoved, func) {
 			tween.start();
 		}
 		else {
-			playNormalCardAnimation(index, playerMoved, func);
+			playNormalCardAnimation(index, card, playerMoved, func);
 		}
 	}
 	else {
