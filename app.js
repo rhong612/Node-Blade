@@ -1,19 +1,14 @@
 //Boilerplate
 const express = require('express');
 const app = express();
-const http = require('http').Server(app); //Creates a server and passes in app as the request handler
+const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const sanitizer = require('sanitizer');
+const sanitizer = require('sanitizer'); //For sanitizing user input
 
-let num_games = 0;
+const gameManager = require('./game_manager');
+const playerManager = gameManager.getPlayerManager();
+playerManager.attachIO(io);
 
-const current_ongoing_games = [];
-
-const player_lobby = {};
-
-const cards_list = require('./cards');
-
-const active_players = {};
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
@@ -22,14 +17,15 @@ app.get('/', function(req, res) {
 
 http.listen(3000, function() {
 	console.log("Listening on port 3000...");
-}); //Listen on port 3000
+});
 
 app.use(express.static(__dirname + '/client'));
+
 
 io.on('connection', function(socket) {
 	console.log("A user has connected.");
 
-	createGuest(socket);
+	playerManager.addNewPlayer(socket);
 
 	socket.on('disconnect', removePlayer);
 
@@ -40,14 +36,14 @@ io.on('connection', function(socket) {
 		}
 		else {
 			let taken = false;
-			for (let id in active_players) {
-				if (active_players[id].username === sanitized_new_name) {
+			for (let id in playerManager.getOnlinePlayers()) {
+				if (playerManager.getOnlinePlayers()[id].username === sanitized_new_name) {
 					taken = true;
 					break;
 				}
 			}
 			if (!taken) {
-				let player = active_players[this.id];
+				let player = playerManager.getPlayer(this.id);
 				if (player.onMenu) {
 					player.username = sanitized_new_name;
 					socket.emit('display_name', sanitized_new_name);
@@ -66,40 +62,34 @@ io.on('connection', function(socket) {
 
 	socket.on('join_waiting_list', function(username) {
 		console.log(username + ' has joined the waiting list');
+
 		let id = findSocketID(username);
-		io.sockets.connected[id].join('waiting_room');
-		player_lobby[id] = active_players[id];
-		active_players[id].onMenu = false;
-		refreshWaitingList();
+		playerManager.movePlayerToWaitingLobby(id);
 	});
 
 	socket.on('challenge', function(names) {
 		console.log(names.challenger + ' is challenging ' + names.target);
 		let id = findSocketIDInLobby(names.target);
-		this.leave('waiting_room');
-		io.sockets.connected[id].leave('waiting_room');
-		delete player_lobby[this.id];
-		delete player_lobby[id];
+		playerManager.removePlayerFromWaitingLobby(id);
+		playerManager.removePlayerFromWaitingLobby(this.id);
 		console.log(names.challenger + ' and ' + names.target + ' have left the waiting room');
 		io.to(id).emit('client_challenge_prompt', names.challenger);
-		refreshWaitingList();
 	});
 
 	socket.on('join_private_match', function(names) {
 		console.log(names[0] + " and " + names[1] + " have entered a match!");
-
 		let id1 = findSocketID(names[0]);
 		let id2 = findSocketID(names[1]);
-		initializeMultiGame(id1, id2);
+		gameManager.createMultiGame(id1, id2, io);
 	})
 
 	socket.on('server_play_card', function(card_index) {
-		console.log('Card ' + card_index + ' was played by ' + active_players[this.id].username);
-		let gameID = active_players[this.id].currentGameID;
-		let game = current_ongoing_games[gameID];
+		console.log('Card ' + card_index + ' was played by ' + playerManager.getPlayer(this.id).username);
+		let gameID = playerManager.getPlayer(this.id).currentGameID;
+		let game = gameManager.getGame(gameID);
 		let playerNum = game.getPlayerNum(this.id);
 		if (game) {
-			let result = game.executeMove(card_index, playerNum);
+			let result = game.executeMove(card_index, playerNum, io);
 			if (!result) {
 				console.log("An error has occurred");
 			}
@@ -110,79 +100,32 @@ io.on('connection', function(socket) {
 	})
 
 	socket.on('ready', function() {
-		console.log(active_players[this.id].username + ' is joining room ' + active_players[this.id].currentGameID);
-		this.join('room' + active_players[this.id].currentGameID);
-		let room = io.sockets.adapter.rooms['room' + active_players[this.id].currentGameID];
+		console.log(playerManager.getPlayer(this.id).username + ' is joining room ' + playerManager.getPlayer(this.id).currentGameID);
+		this.join('room' + playerManager.getPlayer(this.id).currentGameID);
+		let room = io.sockets.adapter.rooms['room' + playerManager.getPlayer(this.id).currentGameID];
 		if (room.length === 2) {
 			var clients = room.sockets;
 			let ids = [];
 			for (id in clients) {
 				ids.push(id);
 			}
-			console.log('Both players are present. Beginning initial draw for game in room ' + active_players[this.id].currentGameID + ' for ' + active_players[ids[0]].username + ' and ' + active_players[ids[1]].username);
-			initiateDrawProcess(current_ongoing_games[active_players[this.id].currentGameID]);
+			console.log('Both players are present. Beginning initial draw for game in room ' + playerManager.getPlayer(this.id).currentGameID + ' for ' + playerManager.getPlayer(ids[0]).username + ' and ' + playerManager.getPlayer(ids[1]).username);
+			gameManager.getGame(playerManager.getPlayer(this.id).currentGameID).start(io);
 		}
 	})
 
 	socket.on('leave_game', function() {
-		this.leave('room' + active_players[this.id].currentGameID);
-		active_players[this.id].currentGameID = NO_GAME;
-		active_players[this.id].onMenu = true;
-		delete current_ongoing_games[this.gameID];
+		let gameID = playerManager.getPlayer(this.id).currentGameID
+		this.leave('room' + gameID);
+		gameManager.removeGame(gameID);
 	});
 });
 
-function initiateDrawProcess(game) {
-	var draw = game.draw();
-	//From the draw, set initial score
-	let playerOneLastCard = draw.playerOneDraw[draw.playerOneDraw.length - 1];
-	let playerTwoLastCard = draw.playerTwoDraw[draw.playerTwoDraw.length - 1];
-	game.playerOneScore = playerOneLastCard.draw_value;
-	game.playerTwoScore = playerTwoLastCard.draw_value;
 
-	//Determine whose turn it is
-	if (game.playerOneScore > game.playerTwoScore) {
-		game.turn = 2;
-		io.to(game.playerOneID).emit('draw', {playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
-		io.to(game.playerTwoID).emit('draw', {playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
-	}
-	else {
-		game.turn = 1;
-		io.to(game.playerOneID).emit('draw', {playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), playerScore: game.playerOneScore, enemyScore: game.playerTwoScore, turn: game.turn});
-		io.to(game.playerTwoID).emit('draw', {playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), playerScore: game.playerTwoScore, enemyScore: game.playerOneScore, turn: game.turn});
-	}
-}
-
-function initializeMultiGame(id1, id2) {
-	var gameID = num_games++;
-	var newGame = new MultiGame(gameID);
-	current_ongoing_games.push(newGame);
-	active_players[id1].currentGameID = gameID;
-	active_players[id2].currentGameID = gameID;
-	newGame.playerOneDeck = initializeDeck();
-	shuffleDeck(newGame.playerOneDeck);
-	newGame.playerTwoDeck = initializeDeck();
-	shuffleDeck(newGame.playerTwoDeck);
-
-	newGame.playerOneHand = newGame.playerOneDeck.splice(0, 10);
-	let unsortedPlayerOneHand = newGame.playerOneHand.slice();
-	newGame.playerTwoHand = newGame.playerTwoDeck.splice(0, 10);
-	let unsortedPlayerTwoHand = newGame.playerTwoHand.slice();
-	newGame.sort(newGame.playerOneHand);
-	newGame.sort(newGame.playerTwoHand);
-
-	newGame.playerOneUsername = active_players[id1].username;
-	newGame.playerTwoUsername = active_players[id2].username;
-	newGame.playerOneID = id1;
-	newGame.playerTwoID = id2;	
-
-	io.to(newGame.playerOneID).emit('receive_hand_multi', {playerNum: 1, hand: unsortedPlayerOneHand.map(card=>card.name), sortedHand: newGame.playerOneHand.map(card=>card.name)});
-	io.to(newGame.playerTwoID).emit('receive_hand_multi', {playerNum: 2, hand: unsortedPlayerTwoHand.map(card=>card.name), sortedHand: newGame.playerTwoHand.map(card=>card.name)});
-}
 
 function findSocketIDInLobby(target_name) {
-	for (let id in player_lobby) {
-		let username = player_lobby[id].username;
+	for (let id in playerManager.getWaitingLobby()) {
+		let username = playerManager.getWaitingLobby()[id].username;
 		if (username === target_name) {
 			return id;
 		}
@@ -192,8 +135,8 @@ function findSocketIDInLobby(target_name) {
 
 
 function findSocketID(target_name) {
-	for (let id in active_players) {
-		let username = active_players[id].username;
+	for (let id in playerManager.getOnlinePlayers()) {
+		let username = playerManager.getOnlinePlayers()[id].username;
 		if (username === target_name) {
 			return id;
 		}
@@ -201,272 +144,8 @@ function findSocketID(target_name) {
 	return undefined;
 }
 
-function refreshWaitingList() {
-	io.in('waiting_room').emit('client_waiting_list', player_lobby);
-}
-
-function createGuest(socket) {
-	var username = 'guest' + new Date().valueOf();
-	active_players[socket.id] = new Player(username);
-	socket.emit('display_name', username);
-
-	updatePlayerList();
-}
-
 function removePlayer() {
 	console.log('A user has disconnected.');
-	delete current_ongoing_games[active_players[this.id].currentGameID];
-	delete active_players[this.id];
-	delete player_lobby[this.id];
-	updatePlayerList();
-	refreshWaitingList();
-}
-
-function updatePlayerList() {
-	const username_list = [];
-	for (const player in active_players) {
-		username_list.push(active_players[player].username);
-	}
-	io.emit('update_players', username_list);
-}
-
-
-function shuffleDeck(deck) {
-    for (let i = deck.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
-}
-
-
-function initializeDeck() {
-	const deck = [];
-	for (let i = 0; i < 4; i++) {
-		deck.push(cards_list.BOLT);
-	}
-	for (let i = 0; i < 2; i++) {
-		deck.push(cards_list.FORCE);
-	}
-	for (let i = 0; i < 2; i++) {
-		deck.push(cards_list.SEVEN_CARD);
-	}
-	for (let i = 0; i < 3; i++) {
-		deck.push(cards_list.SIX_CARD);
-	}
-	for (let i = 0; i < 4; i++) {
-		deck.push(cards_list.FIVE_CARD);
-	}
-	for (let i = 0; i < 4; i++) {
-		deck.push(cards_list.FOUR_CARD);
-	}
-	for (let i = 0; i < 4; i++) {
-		deck.push(cards_list.THREE_CARD);
-	}
-	for (let i = 0; i < 3; i++) {
-		deck.push(cards_list.TWO_CARD);
-	}
-	for (let i = 0; i < 2; i++) {
-		deck.push(cards_list.WAND);
-	}
-	for (let i = 0; i < 2; i++) {
-		deck.push(cards_list.MIRROR);
-	}
-	return deck;
-}
-
-
-const NO_GAME = -1;
-class Player {
-	constructor(username) {
-		this.username = username;
-		this.currentGameID = NO_GAME;
-		this.onMenu = true;
-	}
-}
-
-
-class MultiGame {
-	constructor(gameID) {
-		this.gameID = gameID;
-		this.playerOneDeck = null;
-		this.playerOneHand = null;
-		this.playerOneScore = 0;
-		this.playerTwoDeck = null;
-		this.playerTwoHand = null;
-		this.playerTwoScore = 0;
-		this.playerOneField = [];
-		this.playerTwoField = [];
-
-		this.playerOneBolt = null;
-		this.playerTwoBolt = null;
-
-		this.playerOneUsername = null;
-		this.playerTwoUsername = null;
-		this.playerOneID = null;
-		this.playerTwoID = null;
-
-		this.turn = null;
-	}
-
-	getPlayerNum(id) {
-		if (id === this.playerOneID) {
-			return 1;
-		}
-		else if (id === this.playerTwoID) {
-			return 2;
-		}
-		else {
-			return 0;
-		}
-	}
-
-	executeMove(card_index, player) {
-		var card = '';
-		if (!this.validateMove(card_index, player)) {
-			return false;
-		}
-		else if (player === 1){
-			card = this.playerOneHand[card_index];
-			this.playerOneHand.splice(card_index, 1);
-			card.activate(this);
-		}
-		else {
-			card = this.playerTwoHand[card_index];
-			this.playerTwoHand.splice(card_index, 1);
-			card.activate(this);
-		}
-
-		if (this.playerOneScore === this.playerTwoScore) {
-			let drawScore = this.playerOneScore;
-			let previousTurn = this.turn;
-			var draw = this.draw();
-			//From the draw, set initial scores
-			let playerOneLastCard = draw.playerOneDraw[draw.playerOneDraw.length - 1];
-			let playerTwoLastCard = draw.playerTwoDraw[draw.playerTwoDraw.length - 1];
-			this.playerOneScore = playerOneLastCard.draw_value;
-			this.playerTwoScore = playerTwoLastCard.draw_value;
-			this.turn = this.playerOneScore > this.playerTwoScore ? 2 : 1;
-			let win = this.checkDrawWin();
-			if (win > 0) {
-				let winningUsername = win === 1 ? this.playerOneUsername : this.playerTwoUsername;
-				console.log('Player ' + win + ': ' + winningUsername + ' won.');
-				io.to(this.playerOneID).emit('client_game_continue', {gameover: true, winner: win, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card.name});
-				io.to(this.playerTwoID).emit('client_game_continue', {gameover: true, winner: win, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card.name});
-			}
-			else {
-				io.to(this.playerOneID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card.name});
-				io.to(this.playerTwoID).emit('client_game_continue', {gameover: false, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card.name});		
-			}}
-		else {
-			let win = this.checkWin(player);
-			//Game over
-			if (win > 0) {
-				let winningUsername = win === 1 ? this.playerOneUsername : this.playerTwoUsername;
-				console.log('Player ' + win + ': ' + winningUsername + ' won.');
-				let previousTurn = this.turn;
-				io.to(this.playerOneID).emit('client_game_continue', {gameover: true, winner: win, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card.name});
-				io.to(this.playerTwoID).emit('client_game_continue', {gameover: true, winner: win, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card.name});
-			}
-			//No tie or victory. Continue game
-			else {
-				let previousTurn = this.turn;
-				this.turn = previousTurn === 1 ? 2 : 1;
-				io.to(this.playerOneID).emit('client_game_continue', {gameover: false, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card.name});
-				io.to(this.playerTwoID).emit('client_game_continue', {gameover: false, tie: false, playerDraw: [], enemyDraw: [], previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card.name});
-			}	
-		}
-		return true;
-	}
-
-	checkDrawWin() {
-		//Player 1 and Player 2 both have no moves left. Their scores are tied.
-		if(this.playerOneField.length === 0 && this.playerTwoField.length === 0 && this.playerOneScore === this.playerTwoScore) {
-			return this.playerOneScore > this.playerTwoScore ? 1 : 2;
-		}
-		else {
-			return 0;
-		}
-	}
-
-	//param: player - the player that just moved
-	checkWin(player) {
-		//Player 1 just played. Player 2 has no valid moves. Player 1's score is higher.
-		if (player === 1 && (this.playerTwoHand.length === 0 || !this.containsNormalCards(this.playerTwoHand)) && this.playerOneScore > this.playerTwoScore) {
-			return 1;
-		}
-		//Player 2 just played. Player 1 has no valid moves. Player 2's score is higher.
-		else if (player === 2 && (this.playerOneHand.length === 0 || !this.containsNormalCards(this.playerOneHand)) && this.playerTwoScore > this.playerOneScore) {
-			return 2;
-		}
-		//Player 1 just played. Player 1 couldn't beat Player 2's score with his/her move.
-		else if (player === 1 && this.playerOneScore < this.playerTwoScore) {
-			return 2;
-		}
-		//Player 2 just played. Player 2 couldn't beat Player 1's score with his/her move.
-		else if (player === 2 && this.playerTwoScore < this.playerOneScore) {
-			return 1;
-		}
-		else {
-			return 0;
-		}
-	}
-
-	containsNormalCards(hand) {
-		for (let i = 0; i < hand.length; i++) {
-			let name = hand[i].name;
-			if (name === cards_list.WAND.name || name === cards_list.TWO_CARD.name || name === cards_list.THREE_CARD.name || name === cards_list.FOUR_CARD.name || name === cards_list.FIVE_CARD.name || name === cards_list.SIX_CARD.name || name === cards_list.SEVEN_CARD.name) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	validateMove(card_index, player) {
-		if (player === this.turn) {
-			if (player === 1) {
-				return card_index < this.playerOneHand.length && card_index >= 0;
-			}
-			else if (player === 2) {
-				return card_index < this.playerTwoHand.length && card_index >= 0;
-			}
-			else {
-				return false;
-			}
-		}
-
-
-	}
-
-	draw() {
-		let playerOneDraw = [];
-		let playerTwoDraw = [];
-		let i = 0;
-		while (this.playerOneDeck.length > 0) {
-			playerOneDraw.push(this.playerOneDeck.shift());
-			playerTwoDraw.push(this.playerTwoDeck.shift());
-
-			if (playerOneDraw[i].draw_value != playerTwoDraw[i].draw_value) {
-				this.playerOneField.push(playerOneDraw[i]);
-				this.playerTwoField.push(playerTwoDraw[i]);
-				break;
-			}
-
-			i++;
-		}
-		return {playerOneDraw: playerOneDraw, playerTwoDraw: playerTwoDraw};
-	}
-
-	sort(hand) {
-		hand.sort(function(card1, card2) {
-			if (card1.sort_value < card2.sort_value) {
-				return -1;
-			}
-			else if (card1.sort_value > card2.sort_value) {
-				return 1;
-			}
-			else {
-				return 0;
-			}
-		});
-	}
+	gameManager.removeGame(playerManager.getPlayer(this.id).currentGameID);
+	playerManager.removePlayer(this.id);
 }

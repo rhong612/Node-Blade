@@ -435,7 +435,7 @@ function playWandCardAnimation(index, card, playerMoved, func) {
 			tween.start();
 		}
 		else {
-			playNormalCardAnimation(index, playedMoved, func);
+			playNormalCardAnimation(index, playerMoved, func);
 		}
 	}
 	else {
@@ -456,7 +456,7 @@ function playWandCardAnimation(index, card, playerMoved, func) {
 			flipTween.start();
 		}
 		else {
-			playNormalCardAnimation(index, card, playedMoved, func);
+			playNormalCardAnimation(index, card, playerMoved, func);
 		}
 	}
 
