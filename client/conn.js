@@ -2,17 +2,6 @@ const socket = io();
 var username = '';
 
 
-
-
-
-/*
-$(document).ready(function() {
-	$("#chat_btn").on('click', function() {
-		socket.emit('chat_msg', $('#chat_input').val());
-		$('#chat_input').val('');
-	});
-});
-*/
 function resetConn() {
 	socket.removeAllListeners();
 	setupConn();
