@@ -9,6 +9,10 @@ class Player {
 		this.currentGameID = NO_GAME;
 		this.status = STATUS_MENU;
 	}
+
+	onMenu() {
+		return this.status === STATUS_MENU;
+	}
 }
 
 

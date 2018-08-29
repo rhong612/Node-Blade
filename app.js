@@ -44,10 +44,10 @@ io.on('connection', function(socket) {
 			}
 			if (!taken) {
 				let player = playerManager.getPlayer(this.id);
-				if (player.onMenu) {
+				if (player.onMenu()) {
 					player.username = sanitized_new_name;
 					socket.emit('display_name', sanitized_new_name);
-					updatePlayerList();
+					playerManager.updateOnlinePlayersList();
 				}
 				else {
 					socket.emit('not_on_menu');
