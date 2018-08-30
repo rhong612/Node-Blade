@@ -22,19 +22,22 @@ http.listen(3000, function() {
 app.use(express.static(__dirname + '/client'));
 
 
-//const TIMEOUT_DURATION = 300000; //5 minutes
-const TIMEOUT_DURATION = 5000;
+const TIMEOUT_DURATION = 300000; //5 minutes
 io.on('connection', function(socket) {
 	console.log("A user has connected.");
+
+	playerManager.addNewPlayer(socket);
 
 	let timeout = setTimeout(function() {
 		socket.emit('timeout');
 		socket.disconnect();
+		removePlayer(socket.id);
 	}, TIMEOUT_DURATION);
 
-	playerManager.addNewPlayer(socket);
 
-	socket.on('disconnect', removePlayer);
+	socket.on('disconnect', function() {
+		removePlayer(this.id);
+	});
 
 	socket.on('change_name', function(new_name) {
 		let sanitized_new_name = sanitizer.sanitize(new_name);
@@ -160,8 +163,8 @@ function findSocketID(target_name) {
 	return undefined;
 }
 
-function removePlayer() {
+function removePlayer(id) {
 	console.log('A user has disconnected.');
-	gameManager.removeGame(playerManager.getPlayer(this.id).currentGameID);
-	playerManager.removePlayer(this.id);
+	gameManager.removeGame(playerManager.getPlayer(id).currentGameID);
+	playerManager.removePlayer(id);
 }
