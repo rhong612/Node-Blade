@@ -68,7 +68,9 @@ class GameManager {
             this.playerManager.getPlayer(id2).currentGameID = pm.NO_GAME;
             this.playerManager.getPlayer(id2).status = pm.STATUS_MENU;
             delete this.current_ongoing_games[gameID];
+            return game;
         }
+        return undefined;
     }
 }
 

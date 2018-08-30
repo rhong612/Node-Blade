@@ -165,6 +165,19 @@ function findSocketID(target_name) {
 
 function removePlayer(id) {
 	console.log('A user has disconnected.');
-	gameManager.removeGame(playerManager.getPlayer(id).currentGameID);
+	let removedGame = gameManager.removeGame(playerManager.getPlayer(id).currentGameID);
+
+	//If in a game, let player know that their opponent disconnected
+	if (removedGame) {
+		let id1 = removedGame.playerOneID;
+		let id2 = removedGame.playerTwoID;
+		if (id === id1) {
+			io.to(id2).emit('enemy_disconnected');
+		}
+		else {
+			io.to(id1).emit('enemy_disconnected');
+		}
+	}
+	
 	playerManager.removePlayer(id);
 }

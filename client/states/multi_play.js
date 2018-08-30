@@ -79,6 +79,13 @@ var multiPlayState = {
         	}
         })
 
+        socket.on('enemy_disconnected', function() {
+        	let currentState = game.state.getCurrentState();
+        	currentState.updateWaitingText("Opponent disconnected. You win!");
+        	currentState.bgm.stop();
+			currentState.showReturnButton();
+        })
+
 
 
         socket.on('draw', function(response) {
