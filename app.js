@@ -30,8 +30,8 @@ io.on('connection', function(socket) {
 
 	let timeout = setTimeout(function() {
 		socket.emit('timeout');
-		socket.disconnect();
 		removePlayer(socket.id);
+		socket.disconnect();
 	}, TIMEOUT_DURATION);
 
 
