@@ -397,14 +397,19 @@ function playMirrorCardAnimation(index, card, playerMoved, func) {
 	function swapGroups(groupA, groupB) {
 		const spritesA = [];
 		const spritesB = [];
-		const originalLength = groupA.length;
-		for (let i = 0; i < originalLength; i++) {
+		const originalLengthA = groupA.length;
+		const originalLengthB = groupB.length;
+		for (let i = 0; i < originalLengthA; i++) {
 			spritesA.push(groupA.removeChildAt(0));
+		}
+		for (let i = 0; i < originalLengthB; i++) {
 			spritesB.push(groupB.removeChildAt(0));
 		}
 
-		for (let i = 0; i < originalLength; i++) {
+		for (let i = 0; i < originalLengthB; i++) {
 			groupA.addChild(spritesB[i]);
+		}
+		for (let i = 0; i < originalLengthA; i++) {
 			groupB.addChild(spritesA[i]);
 		}
 	}

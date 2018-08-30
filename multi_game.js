@@ -62,6 +62,8 @@ class MultiGame {
 			//From the draw, set initial scores
 			let playerOneLastCard = draw.playerOneDraw[draw.playerOneDraw.length - 1];
 			let playerTwoLastCard = draw.playerTwoDraw[draw.playerTwoDraw.length - 1];
+			this.playerOneBolt = undefined;
+			this.playerTwoBolt = undefined;
 			this.playerOneScore = playerOneLastCard.draw_value;
 			this.playerTwoScore = playerTwoLastCard.draw_value;
 			this.turn = this.playerOneScore > this.playerTwoScore ? 2 : 1;

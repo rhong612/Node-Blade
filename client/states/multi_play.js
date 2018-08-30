@@ -7,17 +7,17 @@ var multiPlayState = {
 		this.playerNum = playerNum;
 		this.initialHand = initialHand;
 		this.sortedInitialHand = sortedInitialHand;
-		this.playerDeckSprites = game.add.group();
-		this.enemyDeckSprites = game.add.group();
-		this.playerHandSprites = game.add.group();
-		this.enemyHandSprites = game.add.group();
-		this.playerFieldSprites = game.add.group();
-		this.enemyFieldSprites = game.add.group();
-	    this.waitingText = game.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
+		this.playerDeckSprites = this.add.group();
+		this.enemyDeckSprites = this.add.group();
+		this.playerHandSprites = this.add.group();
+		this.enemyHandSprites = this.add.group();
+		this.playerFieldSprites = this.add.group();
+		this.enemyFieldSprites = this.add.group();
+	    this.waitingText = this.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
 	    this.waitingText.anchor.setTo(0.5);
-	    this.playerScoreText = game.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, 0, { fontSize: '50px' });
+	    this.playerScoreText = this.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, 0, { fontSize: '50px' });
 		this.playerScoreText.anchor.setTo(0.5);
-	    this.enemyScoreText = game.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, 0, { fontSize: '50px' });
+	    this.enemyScoreText = this.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, 0, { fontSize: '50px' });
 		this.enemyScoreText.anchor.setTo(0.5);
 
 		this.tie = false;
@@ -28,13 +28,13 @@ var multiPlayState = {
 
 		//Add sprites to deck
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-		    this.playerDeckSprites.add(game.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
+		    this.playerDeckSprites.add(this.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
 		    this.playerDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
 	        this.playerDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
 
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-			this.enemyDeckSprites.add(game.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
+			this.enemyDeckSprites.add(this.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
 			this.enemyDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
 	        this.enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
@@ -164,7 +164,7 @@ var multiPlayState = {
 	},
 
 	showReturnButton : function() {
-		let image = game.add.image(0, game.world.centerX, RETURN_BUTTON);
+		let image = this.add.image(0, game.world.centerX, RETURN_BUTTON);
 		image.inputEnabled = true;
 		image.events.onInputDown.add(function() {
 		    game.state.start('menu');
