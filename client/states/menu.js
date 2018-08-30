@@ -1,5 +1,7 @@
 var menuState = {
 	create: function() {
+        game.menuBGM.loopFull();
+
         let image = this.add.image(0, game.world.centerX, MULTI_BUTTON);
         image.inputEnabled = true;
         image.events.onInputDown.add(function() {

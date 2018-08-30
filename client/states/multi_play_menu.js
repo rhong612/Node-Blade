@@ -65,5 +65,9 @@ var multiPlayMenuState = {
 
 
         socket.emit('join_waiting_list', username);
+	},
+
+	shutdown : function() {
+		game.menuBGM.stop();
 	}
 }

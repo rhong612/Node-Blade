@@ -23,9 +23,19 @@ var loadState = {
         this.load.audio(SHUFFLE_SOUND, 'assets/sounds/card_shuffle.mp3');
 
         //Music
-        this.load.audio(BGM, 'assets/music/Trails of Cold Steel OST - Game of Blades.mp3');
+        this.load.audio(GAME_BGM, 'assets/music/Trails of Cold Steel OST - Game of Blades.mp3');
+        this.load.audio(MENU_BGM, 'assets/music/Trails of Cold Steel OST - Dining Bar F.mp3');
     },
     create: function() {
+        //Global music variables
+        game.menuBGM = game.add.audio(MENU_BGM);
+        game.menuBGM.volume = 0.2;
+        game.menuBGM.autoplay = false;
+
+        game.gameBGM = game.add.audio(GAME_BGM);
+        game.gameBGM.volume = 0.2;
+        game.gameBGM.autoplay = false;
+
         this.game.stage.disableVisibilityChange = true; //Make game run in background
         this.game.state.start('menu');
     }

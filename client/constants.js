@@ -17,7 +17,8 @@ const MULTI_BUTTON = 'MULTI_BUTTON';
 
 //Sound effects
 const SHUFFLE_SOUND = 'SHUFFLE';
-const BGM = 'BGM';
+const GAME_BGM = 'GAME_BGM';
+const MENU_BGM = 'MENU_BGM';
 
 //Resolution
 const GAME_WIDTH = 1280;

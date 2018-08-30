@@ -36,6 +36,7 @@ io.on('connection', function(socket) {
 
 
 	socket.on('disconnect', function() {
+		clearTimeout(timeout);
 		removePlayer(this.id);
 	});
 
@@ -103,8 +104,8 @@ io.on('connection', function(socket) {
 		console.log('Card ' + card_index + ' was played by ' + playerManager.getPlayer(this.id).username);
 		let gameID = playerManager.getPlayer(this.id).currentGameID;
 		let game = gameManager.getGame(gameID);
-		let playerNum = game.getPlayerNum(this.id);
 		if (game) {
+			let playerNum = game.getPlayerNum(this.id);
 			let result = game.executeMove(card_index, playerNum, io);
 			if (!result) {
 				console.log("An error has occurred");
@@ -178,6 +179,6 @@ function removePlayer(id) {
 			io.to(id1).emit('enemy_disconnected');
 		}
 	}
-	
+
 	playerManager.removePlayer(id);
 }

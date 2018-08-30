@@ -39,10 +39,7 @@ var multiPlayState = {
 	        this.enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
 
-        this.bgm = game.add.audio(BGM);
-        this.bgm.loopFull();
-        this.bgm.volume = 0.2;
-        this.bgm.play();
+        game.gameBGM.loopFull();
         playDeckSetupAnimation(function() {
         	socket.emit('ready');
         });
@@ -59,7 +56,7 @@ var multiPlayState = {
         	currentState.tie = response.tie;
         	if (currentState.gameover) {
         		currentState.winner = response.winner;
-        		currentState.bgm.stop();
+        		game.gameBGM.stop();
         	}
 
         	let playerMoved = response.previousTurn === currentState.playerNum;
@@ -82,7 +79,7 @@ var multiPlayState = {
         socket.on('enemy_disconnected', function() {
         	let currentState = game.state.getCurrentState();
         	currentState.updateWaitingText("Opponent disconnected. You win!");
-        	currentState.bgm.stop();
+        	game.gameBGM.stop();
 			currentState.showReturnButton();
         })
 
