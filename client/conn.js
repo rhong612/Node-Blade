@@ -30,7 +30,11 @@ function setupConn() {
 		for (let i = 0; i < usernames.length; i++) {
 			$("#player_list tbody").append("<tr><td><label data-name='" + usernames[i] + "'>" + usernames[i] + "</label></td></tr>");
 		}
-	});
+	})
+	socket.on('timeout', function() {
+		console.log("Connection timed out due to inactivity");
+		game.state.start('disconnected');	
+	})
 }
 
 setupConn();

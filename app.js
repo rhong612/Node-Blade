@@ -22,8 +22,15 @@ http.listen(3000, function() {
 app.use(express.static(__dirname + '/client'));
 
 
+//const TIMEOUT_DURATION = 300000; //5 minutes
+const TIMEOUT_DURATION = 5000;
 io.on('connection', function(socket) {
 	console.log("A user has connected.");
+
+	let timeout = setTimeout(function() {
+		socket.emit('timeout');
+		socket.disconnect();
+	}, TIMEOUT_DURATION);
 
 	playerManager.addNewPlayer(socket);
 
@@ -58,6 +65,7 @@ io.on('connection', function(socket) {
 				socket.emit('name_taken');
 			}
 		}
+		timeout.refresh();
 	})
 
 	socket.on('join_waiting_list', function(username) {
@@ -65,6 +73,7 @@ io.on('connection', function(socket) {
 
 		let id = findSocketID(username);
 		playerManager.movePlayerToWaitingLobby(id);
+		timeout.refresh();
 	});
 
 	socket.on('challenge', function(names) {
@@ -76,6 +85,7 @@ io.on('connection', function(socket) {
 		playerManager.removePlayersFromWaitingLobby(ids);
 		console.log(names.challenger + ' and ' + names.target + ' have left the waiting room');
 		io.to(id).emit('client_challenge_prompt', names.challenger);
+		timeout.refresh();
 	});
 
 	socket.on('join_private_match', function(names) {
@@ -83,6 +93,7 @@ io.on('connection', function(socket) {
 		let id1 = findSocketID(names[0]);
 		let id2 = findSocketID(names[1]);
 		gameManager.createMultiGame(id1, id2, io);
+		timeout.refresh();
 	})
 
 	socket.on('server_play_card', function(card_index) {
@@ -99,6 +110,7 @@ io.on('connection', function(socket) {
 		else {
 			console.log("Game not found");
 		}
+		timeout.refresh();
 	})
 
 	socket.on('ready', function() {
@@ -114,12 +126,14 @@ io.on('connection', function(socket) {
 			console.log('Both players are present. Beginning initial draw for game in room ' + playerManager.getPlayer(this.id).currentGameID + ' for ' + playerManager.getPlayer(ids[0]).username + ' and ' + playerManager.getPlayer(ids[1]).username);
 			gameManager.getGame(playerManager.getPlayer(this.id).currentGameID).start(io);
 		}
+		timeout.refresh();
 	})
 
 	socket.on('leave_game', function() {
 		let gameID = playerManager.getPlayer(this.id).currentGameID
 		this.leave('room' + gameID);
 		gameManager.removeGame(gameID);
+		timeout.refresh();
 	});
 });
 
