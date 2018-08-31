@@ -196,13 +196,13 @@ class MultiGame {
 		for (let i = 0; i < 4; i++) {
 			deck.push(cards_list.BOLT);
 		}
-		for (let i = 0; i < 2; i++) {
+		for (let i = 0; i < 4; i++) {
 			deck.push(cards_list.FORCE);
 		}
-		for (let i = 0; i < 2; i++) {
+		for (let i = 0; i < 4; i++) {
 			deck.push(cards_list.SEVEN_CARD);
 		}
-		for (let i = 0; i < 3; i++) {
+		for (let i = 0; i < 4; i++) {
 			deck.push(cards_list.SIX_CARD);
 		}
 		for (let i = 0; i < 4; i++) {
@@ -214,13 +214,13 @@ class MultiGame {
 		for (let i = 0; i < 4; i++) {
 			deck.push(cards_list.THREE_CARD);
 		}
-		for (let i = 0; i < 3; i++) {
+		for (let i = 0; i < 4; i++) {
 			deck.push(cards_list.TWO_CARD);
 		}
-		for (let i = 0; i < 2; i++) {
+		for (let i = 0; i < 4; i++) {
 			deck.push(cards_list.WAND);
 		}
-		for (let i = 0; i < 2; i++) {
+		for (let i = 0; i < 4; i++) {
 			deck.push(cards_list.MIRROR);
 		}
 
