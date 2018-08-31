@@ -46,6 +46,11 @@ var multiPlayState = {
 	},
 
 	preload: function() {
+		socket.on('invalid_move', function() {
+			alert('Invalid move!');
+			game.state.getCurrentState().startTurn();
+		})
+
         socket.on('client_game_continue', function(response) {
         	console.log(JSON.stringify(response));
         	let currentState = game.state.getCurrentState();

@@ -109,6 +109,7 @@ io.on('connection', function(socket) {
 			let result = game.executeMove(card_index, playerNum, io);
 			if (!result) {
 				console.log("An error has occurred");
+				socket.emit('invalid_move');
 			}
 		}
 		else {

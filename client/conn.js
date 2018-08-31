@@ -35,6 +35,9 @@ function setupConn() {
 		console.log("Connection timed out due to inactivity");
 		game.state.start('disconnected');	
 	})
+	socket.on('error', function() {
+		
+	})
 }
 
 setupConn();

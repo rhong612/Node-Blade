@@ -47,12 +47,18 @@ class MultiGame {
 		else if (player === 1){
 			card = this.playerOneHand[card_index];
 			this.playerOneHand.splice(card_index, 1);
-			card.activate(this);
+			let activateSuccess = card.activate(this);
+			if (!activateSuccess) {
+				return false;
+			}
 		}
 		else {
 			card = this.playerTwoHand[card_index];
 			this.playerTwoHand.splice(card_index, 1);
-			card.activate(this);
+			let activateSuccess = card.activate(this);
+			if (!activateSuccess) {
+				return false;
+			}
 		}
 
 		if (this.playerOneScore === this.playerTwoScore) {
