@@ -38,6 +38,8 @@ var multiPlayState = {
 			this.enemyDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
 	        this.enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
+        this.add.existing(game.soundSprite);
+        this.add.existing(game.muteSprite);
 
         game.gameBGM.loopFull();
         playDeckSetupAnimation(function() {
@@ -101,6 +103,8 @@ var multiPlayState = {
 	},
 
 	shutdown : function() {
+        this.world.remove(game.soundSprite);
+        this.world.remove(game.muteSprite);
 		resetConn();
 	    socket.emit('leave_game');
 	},

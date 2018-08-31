@@ -14,6 +14,8 @@ const SEVEN_CARD = 'BROADSWORD';
 //Other images
 const RETURN_BUTTON = 'RETURN_BUTTON';
 const MULTI_BUTTON = 'MULTI_BUTTON';
+const SOUND_ICON = 'SOUND_ICON';
+const MUTE_ICON = 'MUTE_ICON';
 
 //Sound effects
 const SHUFFLE_SOUND = 'SHUFFLE';
