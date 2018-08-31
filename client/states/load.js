@@ -43,6 +43,8 @@ var loadState = {
         game.soundSprite = game.make.sprite(0, 0, SOUND_ICON);
         game.muteSprite = game.make.sprite(0, 0, MUTE_ICON);
         game.muteSprite.visible = false;
+        game.stage.addChild(game.soundSprite);
+        game.stage.addChild(game.muteSprite);
 
         game.soundSprite.inputEnabled = true;
         game.soundSprite.events.onInputDown.add(function() {

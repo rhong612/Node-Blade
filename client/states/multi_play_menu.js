@@ -4,7 +4,7 @@ var multiPlayMenuState = {
 	create: function() {
 		//Show list of players in the lobby
         socket.on('client_waiting_list', function(player_lobby) {
-        	game.state.getCurrentState().clearScreen();
+        	game.world.removeAll();
 	        game.stage.backgroundColor = "#4488AA";
 	        let spacing = 50;
         	for (const key in player_lobby) {
@@ -14,7 +14,7 @@ var multiPlayMenuState = {
 			        text.inputEnabled = true;
 			        text.events.onInputDown.add(function() {
 			        	socket.emit('challenge', {target: player_lobby[key].username, challenger: username});
-        				game.state.getCurrentState().clearScreen();
+        				game.world.removeAll();
 			        	let waiting_prompt = game.add.text(game.world.centerX, game.world.centerY, "Waiting for player response...", { fontSize: '50px' });
 			        	waiting_prompt.anchor.setTo(0.5);
 			        	let cancel_btn = game.add.text(game.world.centerX, game.world.centerY + 100, "Cancel", { fontSize: '50px' });
@@ -31,7 +31,7 @@ var multiPlayMenuState = {
         });
 
         socket.on('client_challenge_prompt', function(challenger_username) {
-        	game.state.getCurrentState().clearScreen();
+        	game.world.removeAll();
         	game.stage.backgroundColor = "#4488AA";
         	let text = game.add.text(game.world.centerX, game.world.centerY, "Challenge from " + challenger_username, { fontSize: '50px' });
 	       	text.anchor.setTo(0.5);
@@ -68,14 +68,6 @@ var multiPlayMenuState = {
 	},
 
 	shutdown : function() {
-        this.world.remove(game.soundSprite);
-        this.world.remove(game.muteSprite);
 		game.menuBGM.stop();
-	},
-
-	clearScreen : function() {
-        game.world.removeAll();
-        this.add.existing(game.soundSprite);
-        this.add.existing(game.muteSprite);
 	}
 }
