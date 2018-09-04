@@ -21,7 +21,6 @@ http.listen(3000, function() {
 
 app.use(express.static(__dirname + '/client'));
 
-
 const TIMEOUT_DURATION = 300000; //5 minutes
 io.on('connection', function(socket) {
 	console.log("A user has connected.");
@@ -30,7 +29,6 @@ io.on('connection', function(socket) {
 
 	let timeout = setTimeout(function() {
 		socket.emit('timeout');
-		removePlayer(socket.id);
 		socket.disconnect();
 	}, TIMEOUT_DURATION);
 
