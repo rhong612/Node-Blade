@@ -91,10 +91,11 @@ io.on('connection', function(socket) {
 		timeout.refresh();
 	});
 
-	socket.on('return_to_menu', function() {
-		playerManager.removePlayersFromWaitingLobby([this.id]);
-		playerManager.getPlayer(this.id).status = constants.STATUS_MENU;
-	})
+	// socket.on('return_to_menu', function() {
+	// 	playerManager.removePlayersFromWaitingLobby([this.id]);
+	// 	playerManager.getPlayer(this.id).status = constants.STATUS_MENU;
+	// 	timeout.refresh();
+	// })
 
 	socket.on('join_private_match', function(names) {
 		console.log(names[0] + " and " + names[1] + " have entered a match!");
