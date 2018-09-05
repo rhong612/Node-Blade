@@ -1,5 +1,9 @@
 var menuState = {
 	create: function() {
+        if (!game.menuBGM.isPlaying) {
+            game.menuBGM.loopFull();
+        }
+
         let titleText = this.add.text(game.world.centerX, GAME_HEIGHT / 10, 'Blade', {fontSize: '100px'});
         titleText.anchor.setTo(0.5);
 

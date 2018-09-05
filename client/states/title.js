@@ -1,6 +1,8 @@
 var titleState = {
 	create: function() {
-        game.menuBGM.loopFull();
+        if (!game.menuBGM.isPlaying) {
+            game.menuBGM.loopFull();
+        }
         this.timer = 0;
         this.stage.backgroundColor = "#4488AA";
         this.firstClick = true; //Prevents the sword_slice sound effect from being played multiple times if the user holds the left click btn
