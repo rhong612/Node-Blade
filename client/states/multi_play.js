@@ -20,6 +20,11 @@ var multiPlayState = {
 	    this.enemyScoreText = this.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, 0, { fontSize: '50px' });
 		this.enemyScoreText.anchor.setTo(0.5);
 
+		this.normalCardSound = game.add.audio(NORMAL_CARD_PLAY);
+		this.wandCardSound = game.add.audio(WAND_CARD_PLAY);
+		this.mirrorCardSound = game.add.audio(MIRROR_CARD_PLAY);
+		this.boltCardSound = game.add.audio(BOLT_CARD_PLAY);
+
 		this.tie = false;
 		this.turn = 0;
 

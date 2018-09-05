@@ -310,6 +310,7 @@ function playCardAnimation(index, card, playerMoved, func) {
 */
 function playBoltCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 800;
+	game.state.getCurrentState().boltCardSound.play();
 
 	if (playerMoved) {
 		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
@@ -353,6 +354,7 @@ function playBoltCardAnimation(index, card, playerMoved, func) {
 */
 function playMirrorCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 800;
+	game.state.getCurrentState().mirrorCardSound.play();
 
 	if (playerMoved) {
 		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
@@ -428,6 +430,7 @@ function playWandCardAnimation(index, card, playerMoved, func) {
 		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
 		const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
 		if (playerFieldSprites.getTop().key === BACK) {
+			game.state.getCurrentState().wandCardSound.play();
 			let sprite = playerHandSprites.getChildAt(index);
 			game.world.bringToTop(playerHandSprites);
 			playerHandSprites.bringToTop(sprite);
@@ -447,6 +450,7 @@ function playWandCardAnimation(index, card, playerMoved, func) {
 		const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
 		const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
 		if (enemyFieldSprites.getTop().key === BACK) {
+			game.state.getCurrentState().wandCardSound.play();
 			let sprite = enemyHandSprites.getChildAt(index);
 			game.world.bringToTop(enemyHandSprites);
 			enemyHandSprites.bringToTop(sprite);
@@ -475,6 +479,7 @@ function playWandCardAnimation(index, card, playerMoved, func) {
 */
 function playNormalCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 400;
+	game.state.getCurrentState().normalCardSound.play();
 	if (playerMoved) {
 		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
 		const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;

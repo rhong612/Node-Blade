@@ -25,6 +25,10 @@ var loadState = {
         this.load.audio(SHUFFLE_SOUND, 'assets/sounds/card_shuffle.mp3');
         this.load.audio(SWORD_SLICE, 'assets/sounds/sword_slice.wav');
         this.load.audio(SWOOSH, 'assets/sounds/swoosh.wav');
+        this.load.audio(NORMAL_CARD_PLAY, 'assets/sounds/card_play.wav');
+        this.load.audio(WAND_CARD_PLAY, 'assets/sounds/wand.ogg');
+        this.load.audio(BOLT_CARD_PLAY, 'assets/sounds/bolt.ogg');
+        this.load.audio(MIRROR_CARD_PLAY, 'assets/sounds/mirror.ogg');
 
         //Music
         this.load.audio(GAME_BGM, 'assets/music/Trails of Cold Steel OST - Game of Blades.mp3');
