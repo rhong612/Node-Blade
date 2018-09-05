@@ -362,7 +362,6 @@ function playMirrorCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 800;
 	let currentState = game.state.getCurrentState();
 	currentState.mirrorCardSound.play();
-	currentState.camera.fade(0x3399ff, 500);
 
 	if (playerMoved) {
 		const playerHandSprites = currentState.playerHandSprites;
