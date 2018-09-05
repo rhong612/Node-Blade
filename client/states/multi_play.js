@@ -171,8 +171,10 @@ var multiPlayState = {
 	},
 
 	showReturnButton : function() {
-		let image = this.add.image(0, game.world.centerX, RETURN_BUTTON);
+		let image = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, RETURN_BUTTON);
 		image.inputEnabled = true;
+		image.scale.setTo(0.5);
+		image.anchor.setTo(0.5);
 		image.events.onInputDown.add(function() {
 		    game.state.start('menu');
 	    });
