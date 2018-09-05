@@ -24,6 +24,7 @@ var loadState = {
         //Sound effects
         this.load.audio(SHUFFLE_SOUND, 'assets/sounds/card_shuffle.mp3');
         this.load.audio(SWORD_SLICE, 'assets/sounds/sword_slice.wav');
+        this.load.audio(SWOOSH, 'assets/sounds/swoosh.wav');
 
         //Music
         this.load.audio(GAME_BGM, 'assets/music/Trails of Cold Steel OST - Game of Blades.mp3');

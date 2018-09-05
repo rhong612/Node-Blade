@@ -55,8 +55,6 @@ var multiPlayMenuState = {
         })
 
         socket.on('receive_hand_multi', function(response) {
-        	console.log("Switching state"); 
-
             hand = response.hand.slice();
             sortedHand = response.sortedHand.slice();
             playerNum = response.playerNum;

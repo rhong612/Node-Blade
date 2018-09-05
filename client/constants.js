@@ -20,6 +20,7 @@ const CROSSED_SWORDS = 'CROSSED_SWORDS';
 //Sound effects
 const SWORD_SLICE = 'SWORD_SLICE';
 const SHUFFLE_SOUND = 'SHUFFLE';
+const SWOOSH = 'SWOOSH';
 
 //Music
 const GAME_BGM = 'GAME_BGM';
