@@ -6,6 +6,7 @@ var titleState = {
         this.timer = 0;
         this.stage.backgroundColor = "#4488AA";
         this.firstClick = true; //Prevents the sword_slice sound effect from being played multiple times if the user holds the left click btn
+        this.ready = false; //Determines whether or not the 'Click anywhere to start' prompt is ready to be active
 
         let swords = this.add.image(game.world.centerX, game.world.centerY, CROSSED_SWORDS);
         swords.alpha = 0;
@@ -27,6 +28,7 @@ var titleState = {
     update: function() {
         this.timer += game.time.elapsed;
         if (this.timer >= 1000) {
+            this.ready = true;
             this.timer = 0;
             if (this.clickText.alpha === 1) {
                 this.clickText.alpha = 0;
@@ -36,20 +38,17 @@ var titleState = {
             }
         }
 
-        if (game.input.activePointer.isDown) {
-            if (this.firstClick) {
-                this.firstClick = false;
-                game.add.audio('SWORD_SLICE').play();
-                const SHAKE_INTENSITY = 0.03;
-                const SHAKE_SPEED = 300;            
-                const FADE_OUT_SPEED = 700;
-                this.camera.shake(SHAKE_INTENSITY, SHAKE_SPEED, true, Phaser.Camera.SHAKE_BOTH, true);
-                this.camera.fade(0xffffff, FADE_OUT_SPEED, false);
-                this.camera.onFadeComplete.add(function() {
-                    game.state.start('menu');
-                })
-            }
-
+        if (game.input.activePointer.isDown && this.ready && this.firstClick) {
+            this.firstClick = false;
+            game.add.audio('SWORD_SLICE').play();
+            const SHAKE_INTENSITY = 0.03;
+            const SHAKE_SPEED = 300;            
+            const FADE_OUT_SPEED = 700;
+            this.camera.shake(SHAKE_INTENSITY, SHAKE_SPEED, true, Phaser.Camera.SHAKE_BOTH, true);
+            this.camera.fade(0xffffff, FADE_OUT_SPEED, false);
+            this.camera.onFadeComplete.add(function() {
+                game.state.start('menu');
+            })
         } 
     }
 }
