@@ -310,11 +310,17 @@ function playCardAnimation(index, card, playerMoved, func) {
 */
 function playBoltCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 800;
-	game.state.getCurrentState().boltCardSound.play();
+	let currentState = game.state.getCurrentState();
+	currentState.boltCardSound.play();
+    const SHAKE_INTENSITY = 0.01;
+    const SHAKE_SPEED = 300;
+    const FLASH_DURATION = 500;
+    currentState.camera.shake(SHAKE_INTENSITY, SHAKE_SPEED, true, Phaser.Camera.SHAKE_BOTH, true);
+    currentState.camera.flash(0xffff66, FLASH_DURATION);
 
 	if (playerMoved) {
-		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
-		const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+		const playerHandSprites = currentState.playerHandSprites;
+		const enemyFieldSprites = currentState.enemyFieldSprites;
 		let sprite = playerHandSprites.getChildAt(index);
 		game.world.bringToTop(playerHandSprites);
 		playerHandSprites.bringToTop(sprite);
@@ -327,8 +333,8 @@ function playBoltCardAnimation(index, card, playerMoved, func) {
 		tween.start();
 	}
 	else {
-		const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
-		const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
+		const enemyHandSprites = currentState.enemyHandSprites;
+		const playerFieldSprites = currentState.playerFieldSprites;
 		let sprite = enemyHandSprites.getChildAt(index);
 		game.world.bringToTop(enemyHandSprites);
 		enemyHandSprites.bringToTop(sprite);
@@ -354,17 +360,19 @@ function playBoltCardAnimation(index, card, playerMoved, func) {
 */
 function playMirrorCardAnimation(index, card, playerMoved, func) {
 	const SPEED = 800;
-	game.state.getCurrentState().mirrorCardSound.play();
+	let currentState = game.state.getCurrentState();
+	currentState.mirrorCardSound.play();
+	currentState.camera.fade(0x3399ff, 500);
 
 	if (playerMoved) {
-		const playerHandSprites = game.state.getCurrentState().playerHandSprites;
+		const playerHandSprites = currentState.playerHandSprites;
 		let sprite = playerHandSprites.getChildAt(index);
 		game.world.bringToTop(playerHandSprites);
 		playerHandSprites.bringToTop(sprite);
 		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y - 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
 		tween.onComplete.add(function() {
-			const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
-			const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+			const playerFieldSprites = currentState.playerFieldSprites;
+			const enemyFieldSprites = currentState.enemyFieldSprites;
 			autoMoveGroupTween(playerFieldSprites, ENEMY_FIELD_X_LOCATION, ENEMY_FIELD_Y_LOCATION, false, SPEED, ENEMY_FIELD_BUFFER, 0, 0, 0, function() {
 				playerHandSprites.remove(sprite, true); //Remove and destroy
 				swapGroups(playerFieldSprites, enemyFieldSprites);
@@ -375,15 +383,15 @@ function playMirrorCardAnimation(index, card, playerMoved, func) {
 		tween.start();
 	}
 	else {
-		const enemyHandSprites = game.state.getCurrentState().enemyHandSprites;
+		const enemyHandSprites = currentState.enemyHandSprites;
 		let sprite = enemyHandSprites.getChildAt(index);
 		game.world.bringToTop(enemyHandSprites);
 		enemyHandSprites.bringToTop(sprite);
 		let tween = game.add.tween(sprite).to({ x: sprite.x, y: sprite.y + 100 }, SPEED, Phaser.Easing.Linear.Out, false, 0);
 		let flipTween = getFlipTween(sprite, card, 0);
 		tween.onComplete.add(function() {
-			const playerFieldSprites = game.state.getCurrentState().playerFieldSprites;
-			const enemyFieldSprites = game.state.getCurrentState().enemyFieldSprites;
+			const playerFieldSprites = currentState.playerFieldSprites;
+			const enemyFieldSprites = currentState.enemyFieldSprites;
 			autoMoveGroupTween(playerFieldSprites, ENEMY_FIELD_X_LOCATION, ENEMY_FIELD_Y_LOCATION, false, SPEED, ENEMY_FIELD_BUFFER, 0, 0, 0, function() {
 				enemyHandSprites.remove(sprite, true); //Remove and destroy
 				swapGroups(playerFieldSprites, enemyFieldSprites);

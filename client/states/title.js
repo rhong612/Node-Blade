@@ -44,11 +44,12 @@ var titleState = {
             const SHAKE_INTENSITY = 0.03;
             const SHAKE_SPEED = 300;            
             const FADE_OUT_SPEED = 700;
+            this.camera.onFadeComplete.add(function() {
+                this.camera.onFadeComplete.removeAll();
+                game.state.start('menu');
+            }.bind(this))
             this.camera.shake(SHAKE_INTENSITY, SHAKE_SPEED, true, Phaser.Camera.SHAKE_BOTH, true);
             this.camera.fade(0xffffff, FADE_OUT_SPEED, false);
-            this.camera.onFadeComplete.add(function() {
-                game.state.start('menu');
-            })
         } 
     }
 }

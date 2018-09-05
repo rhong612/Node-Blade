@@ -44,6 +44,11 @@ var multiPlayState = {
 	        this.enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
 
+		//For the mirror card effect
+		this.camera.onFadeComplete.add(function() {
+			this.camera.flash(0x3399ff, 500);
+		}.bind(this))
+
         game.gameBGM.loopFull();
         playDeckSetupAnimation(function() {
         	socket.emit('ready');
