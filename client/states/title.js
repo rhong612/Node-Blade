@@ -3,6 +3,7 @@ var titleState = {
         game.menuBGM.loopFull();
         this.timer = 0;
         this.stage.backgroundColor = "#4488AA";
+        this.firstClick = true; //Prevents the sword_slice sound effect from being played multiple times if the user holds the left click btn
 
         let swords = this.add.image(game.world.centerX, game.world.centerY, CROSSED_SWORDS);
         swords.alpha = 0;
@@ -34,15 +35,18 @@ var titleState = {
         }
 
         if (game.input.activePointer.isDown) {
-            game.add.audio('SWORD_SLICE').play();
-            const SHAKE_INTENSITY = 0.03;
-            const SHAKE_SPEED = 300;            
-            const FADE_OUT_SPEED = 700;
-            this.camera.shake(SHAKE_INTENSITY, SHAKE_SPEED, true, Phaser.Camera.SHAKE_BOTH, true);
-            this.camera.fade(0xffffff, FADE_OUT_SPEED, false);
-            this.camera.onFadeComplete.add(function() {
-                game.state.start('menu');
-            })
+            if (this.firstClick) {
+                this.firstClick = false;
+                game.add.audio('SWORD_SLICE').play();
+                const SHAKE_INTENSITY = 0.03;
+                const SHAKE_SPEED = 300;            
+                const FADE_OUT_SPEED = 700;
+                this.camera.shake(SHAKE_INTENSITY, SHAKE_SPEED, true, Phaser.Camera.SHAKE_BOTH, true);
+                this.camera.fade(0xffffff, FADE_OUT_SPEED, false);
+                this.camera.onFadeComplete.add(function() {
+                    game.state.start('menu');
+                })
+            }
 
         } 
     }

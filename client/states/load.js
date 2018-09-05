@@ -16,7 +16,6 @@ var loadState = {
         this.load.image(SEVEN_CARD, 'assets/images/cards/broadsword.png');
 
         //Other assets
-        this.load.image(MULTI_BUTTON, 'assets/images/multi_button.png');
         this.load.image(RETURN_BUTTON, 'assets/images/return_button.png');
         this.load.image(SOUND_ICON, 'assets/images/sound_icon.png');
         this.load.image(MUTE_ICON, 'assets/images/mute_icon.png');
@@ -39,6 +38,31 @@ var loadState = {
         game.gameBGM = game.add.audio(GAME_BGM);
         game.gameBGM.volume = 0.2;
         game.gameBGM.autoplay = false;
+
+        
+        //Global speaker icon
+        game.soundSprite = game.make.sprite(0, 0, SOUND_ICON);
+        game.muteSprite = game.make.sprite(0, 0, MUTE_ICON);
+        game.muteSprite.visible = false;
+        game.stage.addChild(game.soundSprite);
+        game.stage.addChild(game.muteSprite);
+        game.soundSprite.inputEnabled = true;
+        game.soundSprite.events.onInputDown.add(function() {
+            game.soundSprite.visible = false;
+            game.soundSprite.inputEnabled = false;
+            game.muteSprite.visible = true;
+            game.muteSprite.inputEnabled = true;
+            game.menuBGM.mute = true;
+            game.gameBGM.mute = true;
+        })
+        game.muteSprite.events.onInputDown.add(function() {
+            game.muteSprite.visible = false;
+            game.muteSprite.inputEnabled = false;
+            game.soundSprite.visible = true;
+            game.soundSprite.inputEnabled = true;
+            game.menuBGM.mute = false;
+            game.gameBGM.mute = false;
+        })
 
         this.game.stage.disableVisibilityChange = true; //Make game run in background
         this.game.state.start('title');
