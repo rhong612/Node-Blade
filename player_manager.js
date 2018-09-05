@@ -1,17 +1,14 @@
-const NO_GAME = -1;
-const STATUS_MENU = 0;
-const STATUS_WAITING = 1;
-const STATUS_INGAME = 2;
+const constants = require('./constants')
 
 class Player {
 	constructor(username) {
 		this.username = username;
-		this.currentGameID = NO_GAME;
-		this.status = STATUS_MENU;
+		this.currentGameID = constants.NO_GAME;
+		this.status = constants.STATUS_MENU;
 	}
 
 	onMenu() {
-		return this.status === STATUS_MENU;
+		return this.status === constants.STATUS_MENU;
 	}
 }
 
@@ -36,7 +33,7 @@ class PlayerManager {
 
 	movePlayerToWaitingLobby(id) {
 		this.playersWaitingLobby[id] = this.playersOnline[id];
-		this.playersWaitingLobby[id].status = STATUS_WAITING;
+		this.playersWaitingLobby[id].status = constants.STATUS_WAITING;
 		this.io.sockets.connected[id].join('waiting_room');
 		this.refreshWaitingList();
 	}
@@ -87,9 +84,4 @@ class PlayerManager {
 
 
 
-module.exports = {
-	playerManager :	new PlayerManager(),
-	STATUS_MENU : STATUS_MENU,
-	STATUS_WAITING : STATUS_WAITING,
-	STATUS_INGAME : STATUS_INGAME
-}
+module.exports = new PlayerManager();

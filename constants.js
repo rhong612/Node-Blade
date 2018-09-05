@@ -1,0 +1,12 @@
+const NO_GAME = -1;
+const STATUS_MENU = 0;
+const STATUS_WAITING = 1;
+const STATUS_INGAME = 2;
+
+
+module.exports = {
+    NO_GAME: NO_GAME,
+    STATUS_MENU : STATUS_MENU,
+    STATUS_WAITING : STATUS_WAITING,
+    STATUS_INGAME, STATUS_INGAME
+}

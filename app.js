@@ -5,6 +5,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const sanitizer = require('sanitizer'); //For sanitizing user input
 
+const constants = require('./constants');
 const gameManager = require('./game_manager');
 const playerManager = gameManager.getPlayerManager();
 playerManager.attachIO(io);
@@ -92,7 +93,7 @@ io.on('connection', function(socket) {
 
 	socket.on('return_to_menu', function() {
 		playerManager.removePlayersFromWaitingLobby([this.id]);
-
+		playerManager.getPlayer(this.id).status = constants.STATUS_MENU;
 	})
 
 	socket.on('join_private_match', function(names) {
