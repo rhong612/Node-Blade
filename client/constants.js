@@ -19,7 +19,10 @@ const MUTE_ICON = 'MUTE_ICON';
 const CROSSED_SWORDS = 'CROSSED_SWORDS';
 
 //Sound effects
+const SWORD_SLICE = 'SWORD_SLICE';
 const SHUFFLE_SOUND = 'SHUFFLE';
+
+//Music
 const GAME_BGM = 'GAME_BGM';
 const MENU_BGM = 'MENU_BGM';
 

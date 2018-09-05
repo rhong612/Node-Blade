@@ -34,7 +34,16 @@ var titleState = {
         }
 
         if (game.input.activePointer.isDown) {
-            game.state.start('menu');
-        }
+            game.add.audio('SWORD_SLICE').play();
+            const SHAKE_INTENSITY = 0.03;
+            const SHAKE_SPEED = 300;            
+            const FADE_OUT_SPEED = 700;
+            this.camera.shake(SHAKE_INTENSITY, SHAKE_SPEED, true, Phaser.Camera.SHAKE_BOTH, true);
+            this.camera.fade(0xffffff, FADE_OUT_SPEED, false);
+            this.camera.onFadeComplete.add(function() {
+                game.state.start('menu');
+            })
+
+        } 
     }
 }

@@ -2,7 +2,6 @@
 
 const game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.CANVAS, 'game');
 
-
 game.state.add('disconnected', disconnectedState);
 game.state.add('load', loadState);
 game.state.add('title', titleState);
