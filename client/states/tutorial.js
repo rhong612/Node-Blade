@@ -1,5 +1,0 @@
-var tutorialState = {
-	create: function() {
-        
-    }
-}

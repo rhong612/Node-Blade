@@ -19,17 +19,7 @@ var menuState = {
             this.swooshAudio.play();
         }.bind(this))
 
-        this.tutorialText = this.add.text(game.world.centerX, GAME_HEIGHT / 10 * 5, 'How To Play', {fontSize: '70px'});
-        this.tutorialText.anchor.setTo(0.5);
-        this.tutorialText.inputEnabled = true;
-        this.tutorialText.events.onInputDown.add(function() {
-            game.state.start('tutorial');
-        })
-        this.tutorialText.events.onInputOver.add(function() {
-            this.swooshAudio.play();
-        }.bind(this))
-
-        this.exitText = this.add.text(game.world.centerX, GAME_HEIGHT / 10 * 7, 'Exit', {fontSize: '70px'});
+        this.exitText = this.add.text(game.world.centerX, GAME_HEIGHT / 10 * 5, 'Exit', {fontSize: '70px'});
         this.exitText.anchor.setTo(0.5);
         this.exitText.inputEnabled = true;
         this.exitText.events.onInputDown.add(function() {
@@ -46,13 +36,6 @@ var menuState = {
         }
         else {
             this.playText.addColor("#000000", 0); //black
-        }
-
-        if (this.tutorialText.input.pointerOver()) {
-            this.tutorialText.addColor("#ffffff", 0); //white
-        }
-        else {
-            this.tutorialText.addColor("#000000", 0); //black
         }
 
         if (this.exitText.input.pointerOver()) {
