@@ -31,9 +31,6 @@ app.get('/game', function(req, res) {
 	res.render('game', navbarData);
 })
 
-app.get('/about', function(req, res) {
-	res.render('about', navbarData);
-})
 
 app.get('/tutorial', function(req, res) {
 	res.render('tutorial', navbarData);
