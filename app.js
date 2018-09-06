@@ -5,6 +5,13 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const sanitizer = require('sanitizer'); //For sanitizing user input
 
+//Templating engine
+const path = require('path');
+const expressHbs = require('express-handlebars');
+app.engine('handlebars', expressHbs({defaultLayout: 'main', layoutsDir: path.join(__dirname, 'client', 'views', 'layouts')}));
+app.set('views', path.join(__dirname, 'client', 'views'));
+app.set('view engine', 'handlebars');
+
 const constants = require('./constants');
 const gameManager = require('./game_manager');
 const playerManager = gameManager.getPlayerManager();
@@ -12,8 +19,12 @@ playerManager.attachIO(io);
 
 
 app.get('/', function(req, res) {
-	res.sendFile(__dirname + '/client/index.html');
+	res.render('index');
 });
+
+app.get('/game', function(req, res) {
+	res.render('game');
+})
 
 
 http.listen(3000, function() {
