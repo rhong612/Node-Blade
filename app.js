@@ -14,9 +14,6 @@ app.engine('handlebars', expressHbs({defaultLayout: 'main', layoutsDir: path.joi
 app.set('views', path.join(__dirname, 'client', 'views'));
 app.set('view engine', 'handlebars');
 
-//Favicon
-app.use('/favicon.ico', express.static('favicon.ico'));
-
 
 const constants = require('./constants');
 const gameManager = require('./game_manager');
@@ -24,12 +21,22 @@ const playerManager = gameManager.getPlayerManager();
 playerManager.attachIO(io);
 
 
+const navbarData = {homeURL: '/', playURL: '/game', aboutURL: '/about', tutorialURL: '/tutorial'};
+
 app.get('/', function(req, res) {
-	res.render('index');
+	res.render('index', navbarData);
 });
 
 app.get('/game', function(req, res) {
-	res.render('game');
+	res.render('game', navbarData);
+})
+
+app.get('/about', function(req, res) {
+	res.render('about', navbarData);
+})
+
+app.get('/tutorial', function(req, res) {
+	res.render('tutorial', navbarData);
 })
 
 

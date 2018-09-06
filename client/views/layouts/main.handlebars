@@ -4,9 +4,64 @@
 <head>
 	<link rel="icon" type="image/x-icon" href="myFavicon.ico"/>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<style>
+	    .bg-1 {
+	        background-color: #1abc9c; /* Green */
+	        color: #ffffff;
+	    }
+	    .bg-2 {
+	        background-color: #474e5d; /* Dark Blue */
+	        color: #ffffff;
+	    }
+	    .bg-3 {
+	        background-color: #0C090A; /* Dark Blue */
+	        color: #ffffff;
+	    }
+	    .index-padding {
+	        padding: 70px;
+	    }
+	</style>
+
+
+	<nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
+        <a class="navbar-brand" href="{{{ homeURL }}}">Blade</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar1"
+                aria-controls="navbarsExample09" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbar1">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ playURL }}}">Play<span
+                            class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ aboutURL }}}">About<span
+                            class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ tutorialURL }}}">Tutorial</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#"></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown1" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                    <div class="dropdown-menu" aria-labelledby="dropdown09">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Action</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
 </head>
 
 <body>
