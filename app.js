@@ -4,6 +4,8 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const sanitizer = require('sanitizer'); //For sanitizing user input
+app.use(express.static(__dirname + '/client'));
+
 
 //Templating engine
 const path = require('path');
@@ -11,6 +13,10 @@ const expressHbs = require('express-handlebars');
 app.engine('handlebars', expressHbs({defaultLayout: 'main', layoutsDir: path.join(__dirname, 'client', 'views', 'layouts')}));
 app.set('views', path.join(__dirname, 'client', 'views'));
 app.set('view engine', 'handlebars');
+
+//Favicon
+app.use('/favicon.ico', express.static('favicon.ico'));
+
 
 const constants = require('./constants');
 const gameManager = require('./game_manager');
@@ -31,7 +37,6 @@ http.listen(3000, function() {
 	console.log("Listening on port 3000...");
 });
 
-app.use(express.static(__dirname + '/client'));
 
 const TIMEOUT_DURATION = 300000; //5 minutes
 io.on('connection', function(socket) {

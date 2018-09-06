@@ -1,9 +1,4 @@
 <script src="/socket.io/socket.io.js"></script>
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="style.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <script src="lib/phaser.js"></script>
 <script src="constants.js"></script>
 <script src="conn.js"></script>
@@ -17,36 +12,32 @@
 <script src="states/multi_play_menu.js"></script>
 <script src="blade.js"></script>
 <script>
-function changeNameFormSubmit() {
-	socket.emit('change_name', document.getElementById("new_name_input").value);
-	return false;
-}
+	function changeNameFormSubmit() {
+		socket.emit('change_name', document.getElementById("new_name_input").value);
+		return false;
+	}
 </script>
 
-<html>
-	<body>
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-md-10">
-					<div id = "game"></div>
-				</div>
-				<div class="col-md-2" style="background-color: grey">
-					<table id="player_list">
-						<thead>
-							<th>Player List</th>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-					<table>
-						<form onsubmit="return changeNameFormSubmit()">
-							Change Screenname:
-							<input id="new_name_input" type="text"/>
-							<input type="submit" value="Submit">
-						</form>
-					</table>
-				</div>
-			</div>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-10">
+			<div id = "game"></div>
 		</div>
-	</body>
-</html>
+		<div class="col-md-2" style="background-color: grey">
+			<table id="player_list">
+				<thead>
+					<th>Player List</th>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<table>
+				<form onsubmit="return changeNameFormSubmit()">
+					Change Screenname:
+					<input id="new_name_input" type="text"/>
+					<input type="submit" value="Submit">
+				</form>
+			</table>
+		</div>
+	</div>
+</div>
