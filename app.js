@@ -100,60 +100,65 @@ io.on('connection', function(socket) {
 
 	socket.on('chat_msg', function(msg) {
 		let sanitized_msg = sanitizer.sanitize(msg);
+		let player = playerManager.getPlayer(this.id);
+		let game = gameManager.getGame(player.currentGameID);
 		if (sanitized_msg == '') {
-			socket.emit('invalid_chat');
+			socket.emit('error_message', 'Invalid characters in chat message!');
 		}
-		else {
-			let player = playerManager.getPlayer(this.id);
-			if (player && player.currentGameID !== constants.NO_GAME) {
-				let game = gameManager.getGame(player.currentGameID);
-				if (game) {
-					let id1 = game.playerOneID;
-					let id2 = game.playerTwoID;
-					if (id1 === this.id) {
-						io.in('room' + game.gameID).emit('chat_msg', {username: game.playerOneUsername, message: sanitized_msg});
-					}
-					else if (id2 === this.id){
-						io.in('room' + game.gameID).emit('chat_msg', {username: game.playerTwoUsername, message: sanitized_msg});
-					}
-					else {
-						//TODO: send error msg back to client
-					}
-				}
-				else {
-					//TODO:send error msg back to client
-				}
+		else if (game) {
+			let id1 = game.playerOneID;
+			let id2 = game.playerTwoID;
+			if (id1 === this.id) {
+				io.in('room' + game.gameID).emit('chat_msg', {username: game.playerOneUsername, message: sanitized_msg});
+			}
+			else if (id2 === this.id){
+				io.in('room' + game.gameID).emit('chat_msg', {username: game.playerTwoUsername, message: sanitized_msg});
 			}
 			else {
-				//TODO:send error msg back to client
+				socket.emit('serious_error_message', 'Error: Client ID does not match any IDs in the corresponding game.');
 			}
+		}
+		else {
+			socket.emit('error_message', 'You must be in a game to chat!');
 		}
 		timeout.refresh();
 	})
 
 	socket.on('join_waiting_list', function() {
-		playerManager.movePlayerToWaitingLobby(this.id);
+		let player = playerManager.getPlayer(this.id);
+		if (player.currentGameID === constants.NO_GAME) {
+			playerManager.movePlayerToWaitingLobby(this.id);
+		}
+		else {
+			socket.emit('serious_error_message', 'Error: Cannot join waiting lobby while in a game.');
+		}
 		timeout.refresh();
 	});
 
 	socket.on('challenge', function(targetName) {
 		let player = playerManager.getPlayer(this.id);
 		let targetID = findSocketIDInLobby(targetName);
-		if (player && targetID) {
-			console.log(player.username + ' is challenging ' + targetName);
-			let ids = [];
-			ids.push(targetID);
-			ids.push(this.id);
-			playerManager.removePlayersFromWaitingLobby(ids);
-			console.log(player.username + ' and ' + targetName + ' have left the waiting room');
-			io.to(targetID).emit('client_challenge_prompt', player.username);
+		//Make sure the target is actually in the waiting lobby
+		if (targetID) {
+			if (this.id === targetID) {
+				socket.emit('serious_error_message', 'Error: Cannot play against yourself.');
+			}
+			else {
+				console.log(player.username + ' is challenging ' + targetName);
+				let ids = [];
+				ids.push(targetID);
+				ids.push(this.id);
+				playerManager.removePlayersFromWaitingLobby(ids);
+				console.log(player.username + ' and ' + targetName + ' have left the waiting room');
+				io.to(targetID).emit('client_challenge_prompt', player.username);
 
-			let challenge = new Challenge(this.id, targetID);
-			this.pendingChallenge = challenge;
-			io.sockets.connected[targetID].pendingChallenge = challenge;
+				let challenge = new Challenge(this.id, targetID);
+				this.pendingChallenge = challenge;
+				io.sockets.connected[targetID].pendingChallenge = challenge;
+			}
 		}
 		else {
-			//TODO: Error
+			socket.emit('serious_error_message', 'Error: Opponent not found.');
 		}
 		timeout.refresh();
 	});
@@ -191,7 +196,7 @@ io.on('connection', function(socket) {
 			delete this.pendingChallenge;
 		}
 		else {
-			//TODO: Error
+			socket.emit('serious_error_message', 'Error: No valid challenge found.');
 		}
 		timeout.refresh();
 	})
@@ -204,8 +209,7 @@ io.on('connection', function(socket) {
 			let playerNum = game.getPlayerNum(this.id);
 			let result = game.executeMove(card_index, playerNum, io);
 			if (!result) {
-				console.log("An error has occurred");
-				socket.emit('invalid_move');
+				socket.emit('serious_error_message', 'Error: Invalid move.');	
 			}
 		}
 		else {
@@ -216,21 +220,19 @@ io.on('connection', function(socket) {
 
 	socket.on('ready', function() {
 		let player = playerManager.getPlayer(this.id);
-		if (player && player.currentGameID !== constants.NO_GAME) {
-			let game = gameManager.getGame(player.currentGameID);
-			if (game) {
-				game.readyCounter++;
-				if (game.checkPlayersReady()) {
-					io.in('room' + player.currentGameID).emit('chat_msg', {username: 'System', message: 'Both players are ready!'});
-					gameManager.getGame(player.currentGameID).start(io);
-				}
-				else {
-					socket.emit('chat_msg', {username: 'System', message: 'Waiting for opponent...'});
-				}
+		let game = gameManager.getGame(player.currentGameID);
+		if (game) {
+			game.readyCounter++;
+			if (game.checkPlayersReady()) {
+				io.in('room' + player.currentGameID).emit('chat_msg', {username: 'System', message: 'Both players are ready!'});
+				gameManager.getGame(player.currentGameID).start(io);
 			}
 			else {
-				//TODO: error
+				socket.emit('chat_msg', {username: 'System', message: 'Waiting for opponent...'});
 			}
+		}
+		else {
+			socket.emit('serious_error_message', 'Error: Game not found.');	
 		}
 		timeout.refresh();
 	})

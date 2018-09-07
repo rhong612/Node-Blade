@@ -41,7 +41,7 @@ class MultiGame {
 			return 2;
 		}
 		else {
-			return 0;
+			return undefined;
 		}
 	}
 
@@ -166,8 +166,7 @@ class MultiGame {
 				return false;
 			}
 		}
-
-
+		return false;
 	}
 
 	draw() {

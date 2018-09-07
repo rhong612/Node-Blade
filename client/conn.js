@@ -26,10 +26,10 @@ function setupConn() {
 		console.log("Connection timed out due to inactivity");
 		game.state.start('disconnected');	
 	})
-	socket.on('invalid_chat', function() {
-		alert('Invalid characters in chat message!');
-	})
 	socket.on('error_message', function(error) {
+		alert(error);
+	})
+	socket.on('serious_error_message', function(error) {
 		alert(error);
 	})
 }
