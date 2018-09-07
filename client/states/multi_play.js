@@ -13,7 +13,7 @@ var multiPlayState = {
 		this.enemyHandSprites = this.add.group();
 		this.playerFieldSprites = this.add.group();
 		this.enemyFieldSprites = this.add.group();
-	    this.waitingText = this.add.text(game.world.centerX + CARD_WIDTH, game.world.centerY, "", { fontSize: '50px' });
+	    this.waitingText = this.add.text(game.world.centerX, game.world.centerY, "", { fontSize: '50px' });
 	    this.waitingText.anchor.setTo(0.5);
 	    this.playerScoreText = this.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, 0, { fontSize: '50px' });
 		this.playerScoreText.anchor.setTo(0.5);
@@ -123,6 +123,10 @@ var multiPlayState = {
 		this.waitingText.setText(text);
 	},
 
+	changeWaitingTextColor : function(color) {
+		this.waitingText.addColor(color, 0);
+	},
+
 	isPlayerTurn : function() {
 		return this.playerNum === this.turn;
 	},
@@ -141,10 +145,12 @@ var multiPlayState = {
 		if (this.gameover) {
 			if (this.isWinner()) {
 				this.updateWaitingText("You win!");
+				this.changeWaitingTextColor("#ffff00");
 				this.showReturnButton();
 			}
 			else {
 				this.updateWaitingText("You lose!");
+				this.changeWaitingTextColor("#b22222");
 				this.showReturnButton();
 			}
 		}
