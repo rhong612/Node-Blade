@@ -1,34 +1,68 @@
 
-<div class="index-padding bg-1 text-center">
-        <h3>Tutorial</h3>
+<div class="index-padding bg-1">
+        <h2 class="text-center">Tutorial</h2>
+        <br><br>
+        <h4 class="text-center">Overview:</h4> 
         <p>
-            
+            Blade is a 2-player card game in which you and your opponent take turns playing 1 card at a time. The game is played with a 40 card deck. At the start of the game, the deck is split between both players (20 cards each). Then, each player will draw a hand of 10 cards each from their decks. Each card that you play affects the "score" of  you, your opponent, or both. Most played cards end up in the middle of your screen which we will call the "field." Both players have their own fields.
+        </p>
+        <br>
+        <h4 class="text-center">Game flow:</h4> 
+        <p>
+            When the game begins, a card from the top of each player's deck will be drawn and moved to the field. The player with the lower score will move first. During the draw phase, special cards such as bolt, mirror, wand, force act as normal cards with a value of 1. If there is a tie, both players will redraw until the tie is broken.
+            <br><br>
+            On your turn, you will play 1 card from your hand and your turn will end. At the end of your turn, if your score is higher than your opponent's, the game continues. If your score is less than the opponent, you lose the game. If the scores are tied, both players' fields are discarded and you will once again draw cards from the top of the deck to determine who moves next.
+            <br><br>
+            Additionally, the bolt, mirror, and force cards cannot be played unless you have at least 1 normal card in your hand. In other words, they cannot be played as your last few cards.
+            <br><br>
+            If it is your turn and you have no valid moves left (your hand is empty or it consists of only special cards), you lose the game.
         </p>
 </div>
 
     <div class="index-padding bg-2 text-center">
         <h2>The Cards</h2>
-        <br><br>
-        <div class="row" id="avatar-div">
-            <div class="col-sm-3">
-                <p>Lorem ipsum</p>
-                <br><br>
-                <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+        <br>
+        <p>There are 5 main card types in Blade.</p>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 offset-sm-1">
+                <p>Normal Cards</p>
+                <br><img src="assets/images/cards/sword.png" width=50%><br>
+                <p>Normal cards range from 2-7. Playing a normal card will simply add the shown value to your overall score. It will also be added to your field.</p>
             </div>
-            <div class="col-sm-3">
-                <p>Lorem ipsum</p>
-                <br><br>
-                <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+            <div class="col-sm-2">
+                <p>The Bolt</p>
+                <br><img src="assets/images/cards/bolt.png" width=50%><br>
+                <p>Playing this card will cancel out the last card that your opponent played. That card will be flipped over and is considered "blocked." If the top card of your opponent's field is already "blocked," you are not allowed to play the bolt card. After playing a bolt card, it is discarded and not added to the field. </p>
             </div>
-            <div class="col-sm-3">
-                <p>Lorem ipsum</p>
-                <br><br>
-                <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+            <div class="col-sm-2">
+                <p>The Wand</p>
+                <br><img src="assets/images/cards/wand.png" width=50%><br>
+                <p>If the top card on your playing field is a "blocked" card, playing a wand card will restore it. The wand card will then be discarded. Otherwise, the wand card acts as a normal card with a value of 1 and will be added to your field.</p>
             </div>
-            <div class="col-sm-3">
-                <p>Lorem ipsum</p>
-                <br><br>
-                <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+            <div class="col-sm-2">
+                <p>The Mirror</p>
+                <br><img src="assets/images/cards/mirror.png" width=50%><br>
+                <p>This card swaps your score and field with your opponent's. After palying a mirror card, it is discarded and not added to the field.</p>
+            </div>
+            <div class="col-sm-2">
+                <p>The Force</p>
+                <br><img src="assets/images/cards/force.png" width=50%><br>
+                <p>This card doubles your score. So, if your score was 24, it would be 48 after playing this card. The force card is added to your field after it is played.</p>
             </div>
         </div>
+    </div>    
+    <div class="index-padding bg-3">
+        <h4 class="text-center">Special cases:</h4>
+        <p>
+            1.) Your opponent has no cards left. You have 1 card left and it is your turn. After playing your last card, the scores are tied.
+            <br><br>
+            In this scenario, both players will draw a card from the top of their deck. The player with a higher score wins the game. (Luck of the draw basically) If there is a tie, both players will continue drawing. If the decks are emptied, the game is considered a draw.
+            <br><br>
+            2.) You and your opponent both have plenty of moves left. However, the score is a draw and the deck is empty.
+            <br><br>
+            In this scenario, the game is considered a draw.
+        </p>
     </div>
+
+

@@ -10,6 +10,7 @@
 <script src="states/multi_play.js"></script>
 <script src="states/multi_play_menu.js"></script>
 <script src="blade.js"></script>
+
 <script>
 	function changeNameFormSubmit() {
 		socket.emit('change_name', document.getElementById("new_name_input").value);
@@ -19,24 +20,41 @@
 
 <div class="container-fluid">
 	<div class="row">
-		<div class="col-md-10">
+		<p class="col-md-12">*Game may not work as intended on mobile devices</p>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
 			<div id = "game"></div>
 		</div>
+		<div class="col-md-4" style="background-color: white">
+			<div class="row">
+				<div id = "displayName"></div>
+			</div>
+			<div class="row">
+				<ul id = "messages"></ul>
+			</div>
+			<div class="row">
+				<input id="chat_input" type="text"/>
+				<button id="chat_btn">Send</button>
+			</div>
+		</div>
 		<div class="col-md-2" style="background-color: grey">
-			<table id="player_list">
-				<thead>
-					<th>Player List</th>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-			<table>
-				<form onsubmit="return changeNameFormSubmit()">
-					Change Screenname:
-					<input id="new_name_input" type="text"/>
-					<input type="submit" value="Submit">
-				</form>
-			</table>
+			<div>
+				<table id ="player_list">
+					<thead>
+						<th>Player List</th>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<table>
+					<form onsubmit="return changeNameFormSubmit()">
+						Change Screenname:
+						<input id="new_name_input" type="text"/>
+						<input type="submit" value="Submit">
+					</form>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>
