@@ -31,6 +31,9 @@ function setupConn() {
 			$("#player_list tbody").append("<tr><td><label data-name='" + usernames[i] + "'>" + usernames[i] + "</label></td></tr>");
 		}
 	})
+	socket.on('chat_msg', function(chat) {
+		$('#messages').append("<li>" + chat['username'] + ':' + chat['message'] + "</li>");
+	});
 	socket.on('timeout', function() {
 		console.log("Connection timed out due to inactivity");
 		game.state.start('disconnected');	

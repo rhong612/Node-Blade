@@ -16,6 +16,13 @@
 		socket.emit('change_name', document.getElementById("new_name_input").value);
 		return false;
 	}
+
+	$(document).ready(function() {
+		$("#chat_btn").on('click', function() {
+			socket.emit('chat_msg', $('#chat_input').val());
+			$('#chat_input').val('');
+		});
+	});
 </script>
 
 <div class="container-fluid">

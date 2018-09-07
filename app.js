@@ -91,6 +91,32 @@ io.on('connection', function(socket) {
 		timeout.refresh();
 	})
 
+	socket.on('chat_msg', function(msg) {
+		let player = playerManager.getPlayer(this.id);
+		if (player && player.status === constants.STATUS_INGAME) {
+			let game = gameManager.getGame(player.currentGameID);
+			if (game) {
+				let id1 = game.playerOneID;
+				let id2 = game.playerTwoID;
+				if (id1 === this.id) {
+					io.in('room' + game.gameID).emit('chat_msg', {username: game.playerOneUsername, message: msg});
+				}
+				else if (id2 === this.id){
+					io.in('room' + game.gameID).emit('chat_msg', {username: game.playerTwoUsername, message: msg});
+				}
+				else {
+					//TODO: send error msg back to client
+				}
+			}
+			else {
+				//TODO:send error msg back to client
+			}
+		}
+		else {
+			//TODO:send error msg back to client
+		}
+	})
+
 	socket.on('join_waiting_list', function(username) {
 		console.log(username + ' has joined the waiting list');
 
