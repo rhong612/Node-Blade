@@ -78,14 +78,7 @@ io.on('connection', function(socket) {
 			socket.emit('name_over_length');
 		}
 		else {
-			let taken = false;
-			for (let id in playerManager.getOnlinePlayers()) {
-				if (playerManager.getOnlinePlayers()[id].username === sanitized_new_name) {
-					taken = true;
-					break;
-				}
-			}
-			if (!taken) {
+			if (!playerManager.contains(sanitized_new_name)) {
 				let player = playerManager.getPlayer(this.id);
 				if (player.onMenu()) {
 					player.username = sanitized_new_name;

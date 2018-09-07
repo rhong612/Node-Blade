@@ -25,7 +25,10 @@ class PlayerManager {
 	}
 
 	addNewPlayer(socket) {
-		const username = ('guest' + new Date().valueOf()).substring(0, constants.MAX_USERNAME_LENGTH - 1);
+		let username = ('guest' + Math.floor(Math.random() * 10000));
+		while (this.contains(username)) {
+			username = ('guest' + Math.floor(Math.random() * 10000));
+		}
 		this.playersOnline[socket.id] = new Player(username);
 		socket.emit('display_name', username);
 		this.io.emit('update_players', this.getListOfPlayerNames());
@@ -79,6 +82,15 @@ class PlayerManager {
 
 	updateOnlinePlayersList() {
 		this.io.emit('update_players', this.getListOfPlayerNames());
+	}
+
+	contains(username) {
+		for (let id in this.getOnlinePlayers()) {
+				if (this.getOnlinePlayers()[id].username === username) {
+					return true;
+			}
+		}
+		return false;
 	}
 }
 
