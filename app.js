@@ -92,28 +92,34 @@ io.on('connection', function(socket) {
 	})
 
 	socket.on('chat_msg', function(msg) {
-		let player = playerManager.getPlayer(this.id);
-		if (player && player.status === constants.STATUS_INGAME) {
-			let game = gameManager.getGame(player.currentGameID);
-			if (game) {
-				let id1 = game.playerOneID;
-				let id2 = game.playerTwoID;
-				if (id1 === this.id) {
-					io.in('room' + game.gameID).emit('chat_msg', {username: game.playerOneUsername, message: msg});
-				}
-				else if (id2 === this.id){
-					io.in('room' + game.gameID).emit('chat_msg', {username: game.playerTwoUsername, message: msg});
+		let sanitized_msg = sanitizer.sanitize(msg);
+		if (sanitized_msg == '') {
+			socket.emit('invalid_chat');
+		}
+		else {
+			let player = playerManager.getPlayer(this.id);
+			if (player && player.status === constants.STATUS_INGAME) {
+				let game = gameManager.getGame(player.currentGameID);
+				if (game) {
+					let id1 = game.playerOneID;
+					let id2 = game.playerTwoID;
+					if (id1 === this.id) {
+						io.in('room' + game.gameID).emit('chat_msg', {username: game.playerOneUsername, message: sanitized_msg});
+					}
+					else if (id2 === this.id){
+						io.in('room' + game.gameID).emit('chat_msg', {username: game.playerTwoUsername, message: sanitized_msg});
+					}
+					else {
+						//TODO: send error msg back to client
+					}
 				}
 				else {
-					//TODO: send error msg back to client
+					//TODO:send error msg back to client
 				}
 			}
 			else {
 				//TODO:send error msg back to client
 			}
-		}
-		else {
-			//TODO:send error msg back to client
 		}
 		timeout.refresh();
 	})
