@@ -13,6 +13,8 @@ class MultiGame {
 		this.playerOneField = [];
 		this.playerTwoField = [];
 
+		this.readyCounter = 0;
+
 		this.playerOneBolt = null;
 		this.playerTwoBolt = null;
 
@@ -25,6 +27,10 @@ class MultiGame {
 
 		this.initializeDecks();
 		this.initializeHands();
+	}
+
+	checkPlayersReady() {
+		return this.readyCounter === 2;
 	}
 
 	getPlayerNum(id) {

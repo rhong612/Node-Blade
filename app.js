@@ -61,7 +61,7 @@ io.on('connection', function(socket) {
 
 	socket.on('change_name', function(new_name) {
 		let sanitized_new_name = sanitizer.sanitize(new_name);
-		if (sanitized_new_name == '') {
+		if (sanitized_new_name == '' || sanitized_new_name === 'System') {
 			socket.emit('invalid_name');
 		}
 		else {
@@ -115,6 +115,7 @@ io.on('connection', function(socket) {
 		else {
 			//TODO:send error msg back to client
 		}
+		timeout.refresh();
 	})
 
 	socket.on('join_waiting_list', function(username) {
@@ -142,6 +143,19 @@ io.on('connection', function(socket) {
 		let id1 = findSocketID(names[0]);
 		let id2 = findSocketID(names[1]);
 		gameManager.createMultiGame(id1, id2, io);
+
+		let player1 = playerManager.getPlayer(id1);
+		console.log(player1.username + ' is joining room ' + player1.currentGameID);
+		io.sockets.connected[id1].join('room' + player1.currentGameID);
+
+		let player2 = playerManager.getPlayer(id2);
+		console.log(player2.username + ' is joining room ' + player2.currentGameID);
+		io.sockets.connected[id2].join('room' + player2.currentGameID);
+
+		io.in('room' + player1.currentGameID).emit('chat_msg', {username: 'System', message: player1.username + ' has entered the chat room!'});
+		io.in('room' + player2.currentGameID).emit('chat_msg', {username: 'System', message: player2.username + ' has entered the chat room!'});
+
+
 		timeout.refresh();
 	})
 
@@ -164,17 +178,19 @@ io.on('connection', function(socket) {
 	})
 
 	socket.on('ready', function() {
-		console.log(playerManager.getPlayer(this.id).username + ' is joining room ' + playerManager.getPlayer(this.id).currentGameID);
-		this.join('room' + playerManager.getPlayer(this.id).currentGameID);
-		let room = io.sockets.adapter.rooms['room' + playerManager.getPlayer(this.id).currentGameID];
-		if (room.length === 2) {
-			var clients = room.sockets;
-			let ids = [];
-			for (id in clients) {
-				ids.push(id);
+		let player = playerManager.getPlayer(this.id);
+		if (player && player.status === constants.STATUS_INGAME) {
+			let game = gameManager.getGame(player.currentGameID);
+			if (game) {
+				game.readyCounter++;
+				if (game.checkPlayersReady()) {
+					io.in('room' + player.currentGameID).emit('chat_msg', {username: 'System', message: 'Both players are ready!'});
+					gameManager.getGame(player.currentGameID).start(io);
+				}
 			}
-			console.log('Both players are present. Beginning initial draw for game in room ' + playerManager.getPlayer(this.id).currentGameID + ' for ' + playerManager.getPlayer(ids[0]).username + ' and ' + playerManager.getPlayer(ids[1]).username);
-			gameManager.getGame(playerManager.getPlayer(this.id).currentGameID).start(io);
+			else {
+				io.in('room' + player.currentGameID).emit('chat_msg', {username: 'System', message: 'Waiting for opponent...'});
+			}
 		}
 		timeout.refresh();
 	})
