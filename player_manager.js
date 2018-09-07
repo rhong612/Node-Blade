@@ -25,7 +25,7 @@ class PlayerManager {
 	}
 
 	addNewPlayer(socket) {
-		const username = 'guest' + new Date().valueOf();
+		const username = ('guest' + new Date().valueOf()).substring(0, constants.MAX_USERNAME_LENGTH - 1);
 		this.playersOnline[socket.id] = new Player(username);
 		socket.emit('display_name', username);
 		this.io.emit('update_players', this.getListOfPlayerNames());

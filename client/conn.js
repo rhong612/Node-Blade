@@ -21,6 +21,9 @@ function setupConn() {
 	socket.on('not_on_menu', function() {
 		alert('You can only change your screenname on the main menu!');
 	})
+	socket.on('name_over_length', function() {
+		alert('Usernames can only contain 13 characters maximum!');
+	})
 
 	socket.on('invalid_name', function() {
 		alert('Invalid name!');

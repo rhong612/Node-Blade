@@ -6,11 +6,13 @@ var multiPlayMenuState = {
         socket.on('client_waiting_list', function(player_lobby) {
         	game.world.removeAll();
 	        game.stage.backgroundColor = "#4488AA";
+        	let lobbyText = game.add.text(0, GAME_HEIGHT * 1/10, 'Waiting Lobby', {fontSize: '50px'});
+        	let instructionText = game.add.text(0, GAME_HEIGHT * 2/10, 'Click on the name of a player that you want to challenge.', {fontSize: '30px'});
 	        let spacing = 50;
         	for (const key in player_lobby) {
         		if (player_lobby[key].username !== username) {
-	        		let text = game.add.text(game.world.centerX, game.world.centerY + spacing, player_lobby[key].username, { fontSize: '50px' });
-	        		text.anchor.setTo(0.5);
+	        		let text = game.add.text(game.world.centerX, game.world.centerY + spacing, player_lobby[key].username, { fontSize: '30px' });
+	        		text.anchor.setTo(0, 0.5);
 			        text.inputEnabled = true;
 			        text.events.onInputDown.add(function() {
 			        	socket.emit('challenge', player_lobby[key].username);

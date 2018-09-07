@@ -74,6 +74,9 @@ io.on('connection', function(socket) {
 		if (sanitized_new_name == '' || sanitized_new_name === 'System') {
 			socket.emit('invalid_name');
 		}
+		else if(sanitized_new_name.length > constants.MAX_USERNAME_LENGTH) {
+			socket.emit('name_over_length');
+		}
 		else {
 			let taken = false;
 			for (let id in playerManager.getOnlinePlayers()) {
