@@ -239,6 +239,7 @@ io.on('connection', function(socket) {
 		let gameID = playerManager.getPlayer(this.id).currentGameID
 		this.leave('room' + gameID);
 		gameManager.removeGame(gameID);
+        io.sockets.connected[this.id].leave('room' + gameID);
 		timeout.refresh();
 	});
 });
