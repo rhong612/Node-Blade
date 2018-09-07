@@ -11,9 +11,11 @@ var multiPlayMenuState = {
 	        let spacing = 50;
         	for (const key in player_lobby) {
         		if (player_lobby[key].username !== username) {
-	        		let text = game.add.text(game.world.centerX, game.world.centerY + spacing, player_lobby[key].username, { fontSize: '30px' });
-	        		text.anchor.setTo(0, 0.5);
+	        		let text = game.add.text(GAME_WIDTH * 3/4, spacing, player_lobby[key].username, { fontSize: '30px' });
+	        		text.anchor.setTo(0, 0);
 			        text.inputEnabled = true;
+	       			text.events.onInputOver.add(text => text.addColor('#ffffff', 0));
+	        		text.events.onInputOut.add(text => text.addColor('#000000', 0));
 			        text.events.onInputDown.add(function() {
 			        	socket.emit('challenge', player_lobby[key].username);
         				game.world.removeAll();
