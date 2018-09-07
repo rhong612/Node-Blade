@@ -13,21 +13,6 @@ function setupConn() {
 	socket.on('display_name', function(name) {
 		username = name;
 	});
-
-	socket.on('name_taken', function() {
-		alert('Desired name is taken!');
-	});
-
-	socket.on('not_in_game', function() {
-		alert('You cannot change your username while in a match!');
-	})
-	socket.on('name_over_length', function() {
-		alert('Usernames can only contain 13 characters maximum!');
-	})
-
-	socket.on('invalid_name', function() {
-		alert('Invalid name!');
-	})
 	socket.on('update_players', function(usernames) {
 		$("#player_list tbody").empty();
 		for (let i = 0; i < usernames.length; i++) {
@@ -44,8 +29,8 @@ function setupConn() {
 	socket.on('invalid_chat', function() {
 		alert('Invalid characters in chat message!');
 	})
-	socket.on('error', function() {
-		
+	socket.on('error_message', function(error) {
+		alert(error);
 	})
 }
 

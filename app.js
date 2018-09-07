@@ -72,10 +72,10 @@ io.on('connection', function(socket) {
 	socket.on('change_name', function(new_name) {
 		let sanitized_new_name = sanitizer.sanitize(new_name);
 		if (sanitized_new_name == '' || sanitized_new_name === 'System') {
-			socket.emit('invalid_name');
+			socket.emit('error_message', 'Invalid name!');
 		}
 		else if(sanitized_new_name.length > constants.MAX_USERNAME_LENGTH) {
-			socket.emit('name_over_length');
+			socket.emit('error_message', 'Usernames can only contain 13 characters maximum!');
 		}
 		else {
 			if (!playerManager.contains(sanitized_new_name)) {
@@ -87,12 +87,12 @@ io.on('connection', function(socket) {
 					playerManager.refreshWaitingList();
 				}
 				else {
-					socket.emit('not_in_game');
+					socket.emit('error_message', 'You cannot change your username while in a match!');
 				}
 
 			}
 			else {
-				socket.emit('name_taken');
+				socket.emit('error_message', 'Desired name is taken!');
 			}
 		}
 		timeout.refresh();
