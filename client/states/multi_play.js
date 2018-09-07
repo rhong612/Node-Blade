@@ -190,6 +190,7 @@ var multiPlayState = {
 		image.scale.setTo(0.5);
 		image.anchor.setTo(0, 1);
 		image.events.onInputDown.add(function() {
+			$("#messages").empty();
 		    game.state.start('menu');
 	    });
 	}
