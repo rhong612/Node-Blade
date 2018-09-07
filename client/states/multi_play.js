@@ -30,6 +30,7 @@ var multiPlayState = {
 
 		this.gameover = false;
 		this.winner = 0;
+		this.opponentDisconnected = false;
 
 		//Add sprites to deck
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
@@ -92,6 +93,8 @@ var multiPlayState = {
 	        	currentState.updateWaitingText("Opponent disconnected. You win!");
 	        	game.gameBGM.stop();
 				currentState.showReturnButton();
+				currentState.gameover = true;
+				currentState.opponentDisconnected = true;
         	}
         })
 
@@ -142,7 +145,7 @@ var multiPlayState = {
 	},
 
 	startTurn: function startTurn() {
-		if (this.gameover) {
+		if (this.gameover && !this.opponentDisconnected) {
 			if (this.isWinner()) {
 				this.updateWaitingText("You win!");
 				this.changeWaitingTextColor("#ffff00");
