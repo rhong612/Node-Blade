@@ -13,7 +13,7 @@ var multiPlayMenuState = {
 	        		text.anchor.setTo(0.5);
 			        text.inputEnabled = true;
 			        text.events.onInputDown.add(function() {
-			        	socket.emit('challenge', {target: player_lobby[key].username, challenger: username});
+			        	socket.emit('challenge', player_lobby[key].username);
         				game.world.removeAll();
 			        	let waiting_prompt = game.add.text(game.world.centerX, game.world.centerY, "Waiting for player response...", { fontSize: '50px' });
 			        	waiting_prompt.anchor.setTo(0.5);
@@ -21,8 +21,7 @@ var multiPlayMenuState = {
 			        	cancel_btn.anchor.setTo(0.5);
 			        	cancel_btn.inputEnabled = true;
 			        	cancel_btn.events.onInputDown.add(function() {
-							socket.emit('join_waiting_list', username);
-							socket.emit('join_waiting_list', player_lobby[key].username);
+							socket.emit('cancel_challenge');
 			        	});
 			        });
 	        		spacing += 50;
@@ -45,11 +44,10 @@ var multiPlayMenuState = {
 			declineBtn.inputEnabled = true;
 
 			acceptBtn.events.onInputDown.add(function() {
-				socket.emit('join_private_match', [username, challenger_username]);
+				socket.emit('accept_challenge');
 			});
 			declineBtn.events.onInputDown.add(function() {
-				socket.emit('join_waiting_list', username);
-				socket.emit('join_waiting_list', challenger_username);
+				socket.emit('cancel_challenge');
 			});
 
         })
@@ -62,7 +60,7 @@ var multiPlayMenuState = {
         })
 
 
-        socket.emit('join_waiting_list', username);
+        socket.emit('join_waiting_list');
 	},
 
 	shutdown : function() {
