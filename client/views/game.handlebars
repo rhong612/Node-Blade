@@ -23,6 +23,15 @@
 			$('#chat_input').val('');
 		});
 	});
+
+	//Allow chat_btn to be pressed with enter key
+	$(document).ready(function() {
+		$("#chat_input").keyup(function(event) {
+		    if (event.keyCode === 13) {
+		        $("#chat_btn").trigger('click');
+		    }
+		});
+	})
 </script>
 
 <div class="container-fluid">
