@@ -224,9 +224,12 @@ io.on('connection', function(socket) {
 					io.in('room' + player.currentGameID).emit('chat_msg', {username: 'System', message: 'Both players are ready!'});
 					gameManager.getGame(player.currentGameID).start(io);
 				}
+				else {
+					socket.emit('chat_msg', {username: 'System', message: 'Waiting for opponent...'});
+				}
 			}
 			else {
-				io.in('room' + player.currentGameID).emit('chat_msg', {username: 'System', message: 'Waiting for opponent...'});
+				//TODO: error
 			}
 		}
 		timeout.refresh();

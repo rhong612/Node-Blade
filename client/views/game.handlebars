@@ -35,13 +35,19 @@
 </script>
 
 <style>
+	table {
+		table-layout: fixed;
+	}
 	thead, tbody {
 		display: block;
 	}
 	tbody {
 		max-height: 300px;
 		overflow-y: auto;
-		width: 200px;
+		word-wrap: break-word;
+	}
+	#messages {
+		max-height: 370px;
 	}
 </style>
 
@@ -55,7 +61,13 @@
 				<div id = "displayName"></div>
 			</div>
 			<div class="row">
-				<ul id = "messages"></ul>
+				<table class="table">
+					<thead>
+						<th>Chat</th>
+					</thead>
+					<tbody id="messages">
+					</tbody>
+				</table>
 			</div>
 			<div class="row">
 				<input id="chat_input" type="text"/>
@@ -64,7 +76,7 @@
 		</div>
 		<div class="col-md-2" style="background-color: grey">
 			<div>
-				<table id ="player_list">
+				<table class="table" id ="player_list">
 					<thead>
 						<th>Player List</th>
 					</thead>
