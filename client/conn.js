@@ -32,7 +32,7 @@ function setupConn() {
 		}
 	})
 	socket.on('chat_msg', function(chat) {
-		$('#messages').append("<li>" + chat['username'] + ':' + chat['message'] + "</li>");
+		$('#messages').append("<li>" + "<b>" + chat['username'] + ':' + "</b>" + chat['message'] + "</li>");
 	});
 	socket.on('timeout', function() {
 		console.log("Connection timed out due to inactivity");
