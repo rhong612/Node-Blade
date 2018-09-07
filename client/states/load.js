@@ -1,6 +1,9 @@
 var loadState = {
     preload: function() {
-        this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.stage.backgroundColor = '#DECCCC';
+        let preloadBarBackground = this.add.image(GAME_WIDTH / 2 - game.cache.getImage(PRELOAD_BAR_BACKGROUND).width / 2, GAME_HEIGHT / 2, PRELOAD_BAR_BACKGROUND);
+        let preloadBar = this.add.sprite(GAME_WIDTH / 2 - game.cache.getImage(PRELOAD_BAR).width / 2, GAME_HEIGHT / 2 + 10, PRELOAD_BAR);
+        this.load.setPreloadSprite(preloadBar);
 
         //Cards
         this.load.image(BACK, 'assets/images/cards/back.png');
