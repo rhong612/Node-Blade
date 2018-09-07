@@ -4,11 +4,6 @@ class Player {
 	constructor(username) {
 		this.username = username;
 		this.currentGameID = constants.NO_GAME;
-		this.status = constants.STATUS_MENU;
-	}
-
-	onMenu() {
-		return this.status === constants.STATUS_MENU;
 	}
 }
 
@@ -36,7 +31,6 @@ class PlayerManager {
 
 	movePlayerToWaitingLobby(id) {
 		this.playersWaitingLobby[id] = this.playersOnline[id];
-		this.playersWaitingLobby[id].status = constants.STATUS_WAITING;
 		this.io.sockets.connected[id].join('waiting_room');
 		this.refreshWaitingList();
 	}

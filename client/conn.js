@@ -18,8 +18,8 @@ function setupConn() {
 		alert('Desired name is taken!');
 	});
 
-	socket.on('not_on_menu', function() {
-		alert('You can only change your screenname on the main menu!');
+	socket.on('not_in_game', function() {
+		alert('You cannot change your username while in a match!');
 	})
 	socket.on('name_over_length', function() {
 		alert('Usernames can only contain 13 characters maximum!');

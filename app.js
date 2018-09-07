@@ -80,13 +80,14 @@ io.on('connection', function(socket) {
 		else {
 			if (!playerManager.contains(sanitized_new_name)) {
 				let player = playerManager.getPlayer(this.id);
-				if (player.onMenu()) {
+				if (player.currentGameID === constants.NO_GAME) {
 					player.username = sanitized_new_name;
 					socket.emit('display_name', sanitized_new_name);
 					playerManager.updateOnlinePlayersList();
+					playerManager.refreshWaitingList();
 				}
 				else {
-					socket.emit('not_on_menu');
+					socket.emit('not_in_game');
 				}
 
 			}
@@ -104,7 +105,7 @@ io.on('connection', function(socket) {
 		}
 		else {
 			let player = playerManager.getPlayer(this.id);
-			if (player && player.status === constants.STATUS_INGAME) {
+			if (player && player.currentGameID !== constants.NO_GAME) {
 				let game = gameManager.getGame(player.currentGameID);
 				if (game) {
 					let id1 = game.playerOneID;
@@ -215,7 +216,7 @@ io.on('connection', function(socket) {
 
 	socket.on('ready', function() {
 		let player = playerManager.getPlayer(this.id);
-		if (player && player.status === constants.STATUS_INGAME) {
+		if (player && player.currentGameID !== constants.NO_GAME) {
 			let game = gameManager.getGame(player.currentGameID);
 			if (game) {
 				game.readyCounter++;

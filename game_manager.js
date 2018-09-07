@@ -30,8 +30,6 @@ class GameManager {
 
         this.playerManager.getPlayer(id1).currentGameID = gameID;
         this.playerManager.getPlayer(id2).currentGameID = gameID;
-        this.playerManager.getPlayer(id1).status = constants.STATUS_INGAME;
-        this.playerManager.getPlayer(id2).status = constants.STATUS_INGAME;
 
         let unsortedPlayerOneHand = newGame.playerOneHand.slice();
         let unsortedPlayerTwoHand = newGame.playerTwoHand.slice();
@@ -65,9 +63,7 @@ class GameManager {
             let id1 = game.playerOneID;
             let id2 = game.playerTwoID;
             this.playerManager.getPlayer(id1).currentGameID = constants.NO_GAME;
-            this.playerManager.getPlayer(id1).status = constants.STATUS_MENU;
             this.playerManager.getPlayer(id2).currentGameID = constants.NO_GAME;
-            this.playerManager.getPlayer(id2).status = constants.STATUS_MENU;
             delete this.current_ongoing_games[gameID];
             return game;
         }
