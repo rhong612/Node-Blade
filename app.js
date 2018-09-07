@@ -276,9 +276,11 @@ function removePlayer(id) {
 		let id2 = removedGame.playerTwoID;
 		if (id === id1) {
 			io.to(id2).emit('enemy_disconnected');
+			io.to(id2).emit('chat_msg', {username: 'System', message: playerManager.getPlayer(id).username + ' has disconnected.'});
 		}
 		else {
 			io.to(id1).emit('enemy_disconnected');
+			io.to(id1).emit('chat_msg', {username: 'System', message: playerManager.getPlayer(id).username + ' has disconnected.'});
 		}
 	}
 
