@@ -75,6 +75,7 @@ var loadState = {
         })
 
         game.stage.disableVisibilityChange = true; //Make game run in background
+        console.log("Create complete. Changing state to title");
         game.state.start('title');
     }
 }
