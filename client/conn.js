@@ -20,8 +20,7 @@ function setupConn() {
 		}
 	})
 	socket.on('global_chat_msg', function(chat) {
-		console.log(chat.message);
-		//$('#global_messages').append('<li><b>' + chat.username + ': </b>' + chat.message + '</li>');
+		$('#global_messages').append('<li><b>' + chat.username + ': </b>' + chat.message + '</li>');
 
 		//Auto scroll to newest message
 		var chatDiv = document.getElementById("global_messages");

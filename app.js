@@ -101,7 +101,7 @@ io.on('connection', function(socket) {
 	socket.on('global_chat_msg', function(msg) {
 		let sanitized_msg = sanitizer.sanitize(msg);
 		let player = playerManager.getPlayer(this.id);
-		if (sanitizied_msg == '') {
+		if (sanitized_msg == '') {
 			socket.emit('error_message', 'Invalid characters in chat message!');
 		}
 		else {
