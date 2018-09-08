@@ -39,8 +39,8 @@ app.get('/tutorial', function(req, res) {
 })
 
 
-http.listen(3000, function() {
-	console.log("Listening on port 3000...");
+http.listen(80, function() {
+	console.log("Listening on port 80...");
 });
 
 
