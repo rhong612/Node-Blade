@@ -62,10 +62,16 @@ body {
   font-size: 20px;
 }
 
-.messages {
+#messages {
     list-style: none;
     padding-left: 5px;
+    padding-bottom: 100px;
+    max-height: 100%;
+    overflow-y: auto;
 }
+
+
+
 
 
 .bottom_wrapper {
@@ -133,7 +139,7 @@ body {
 				<div class="top_menu">
 					<div class="title">Chat</div>
 				</div>
-				<ul class="messages"></ul>
+				<ul id="messages"></ul>
 				<div class="bottom_wrapper clearfix">
 					<div class="message_input_wrapper">
 						<input class="message_input" placeholder="Type your message here..." />
