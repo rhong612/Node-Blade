@@ -15,9 +15,9 @@ var multiPlayState = {
 		this.enemyFieldSprites = this.add.group();
 	    this.waitingText = this.add.text(game.world.centerX, game.world.centerY, "", { fontSize: '50px' });
 	    this.waitingText.anchor.setTo(0.5);
-	    this.playerScoreText = this.add.text(game.world.centerX, game.world.centerY + CARD_HEIGHT / 2, 0, { fontSize: '50px' });
+	    this.playerScoreText = this.add.text(game.world.centerX, PLAYER_FIELD_Y_LOCATION, 0, { fontSize: '50px' });
 		this.playerScoreText.anchor.setTo(0.5);
-	    this.enemyScoreText = this.add.text(game.world.centerX, game.world.centerY - CARD_HEIGHT / 2, 0, { fontSize: '50px' });
+	    this.enemyScoreText = this.add.text(game.world.centerX, ENEMY_FIELD_Y_LOCATION, 0, { fontSize: '50px' });
 		this.enemyScoreText.anchor.setTo(0.5);
 
 		this.normalCardSound = game.add.audio(NORMAL_CARD_PLAY);

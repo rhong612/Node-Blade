@@ -33,8 +33,10 @@ const GAME_BGM = 'GAME_BGM';
 const MENU_BGM = 'MENU_BGM';
 
 //Resolution
-const GAME_WIDTH = 1280;
-const GAME_HEIGHT = 720;
+// const GAME_WIDTH = 1280;
+// const GAME_HEIGHT = 720;
+const GAME_WIDTH = 1200;
+const GAME_HEIGHT = 900;
 
 //Card related constants
 const ANCHOR = 0.5;
