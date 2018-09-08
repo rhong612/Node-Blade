@@ -34,13 +34,13 @@ var multiPlayState = {
 
 		//Add sprites to deck
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-		    this.playerDeckSprites.add(this.add.sprite(-1 * CARD_WIDTH, GAME_HEIGHT - (CARD_SCALE * CARD_HEIGHT * ANCHOR), BACK));
+		    this.playerDeckSprites.add(this.add.sprite(-1 * CARD_WIDTH, PLAYER_DECK_Y_LOCATION, BACK));
 		    this.playerDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
 	        this.playerDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
 
 		for (let i = 0; i < INITIAL_DECK_SIZE; i++) {
-			this.enemyDeckSprites.add(this.add.sprite(GAME_WIDTH + CARD_WIDTH, CARD_HEIGHT * CARD_SCALE * ANCHOR, BACK));
+			this.enemyDeckSprites.add(this.add.sprite(GAME_WIDTH + CARD_WIDTH, ENEMY_DECK_Y_LOCATION, BACK));
 			this.enemyDeckSprites.getChildAt(i).scale.setTo(CARD_SCALE, CARD_SCALE);
 	        this.enemyDeckSprites.getChildAt(i).anchor.setTo(ANCHOR);
 		}
@@ -158,7 +158,7 @@ var multiPlayState = {
 			}
 		}
 		else if (this.isPlayerTurn()) {
-	    	this.updateWaitingText("");
+	    	this.updateWaitingText("Your turn!");
 	    	//Can click on cards
 	    	for (let i = 0; i < this.playerHandSprites.length; i++) {
 	    		let sprite = this.playerHandSprites.getChildAt(i);
@@ -174,8 +174,12 @@ var multiPlayState = {
 	    			this.playerHandSprites.setAll('inputEnabled', false);
 	    			socket.emit('server_play_card', i);
 	    		}.bind(this));
-	       		sprite.events.onInputOver.add(sprite => sprite.alpha = 0.5, this);
-	        	sprite.events.onInputOut.add(sprite => sprite.alpha = 1.0, this);
+	       		sprite.events.onInputOver.add(function() {
+	       			moveTween(sprite, sprite.x, PLAYER_DECK_Y_LOCATION - 30, 200).start();
+	       		}, this);
+	        	sprite.events.onInputOut.add(function() {
+	        		moveTween(sprite, sprite.x, PLAYER_DECK_Y_LOCATION, 200).start();
+	        	}, this);
 	    	}
 	    }
 	    else {
