@@ -36,8 +36,10 @@ var loadState = {
         //Music
         this.load.audio(GAME_BGM, 'assets/music/Trails of Cold Steel OST - Game of Blades.mp3');
         this.load.audio(MENU_BGM, 'assets/music/Trails of Cold Steel OST - Dining Bar F.mp3');
+        console.log("Loading");
     },
     create: function() {
+        console.log("Create started");
         //Global music variables
         game.menuBGM = game.add.audio(MENU_BGM);
         game.menuBGM.volume = 0.2;
@@ -72,7 +74,7 @@ var loadState = {
             game.gameBGM.mute = false;
         })
 
-        this.game.stage.disableVisibilityChange = true; //Make game run in background
-        this.game.state.start('title');
+        game.stage.disableVisibilityChange = true; //Make game run in background
+        game.state.start('title');
     }
 }
