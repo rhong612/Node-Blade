@@ -157,10 +157,7 @@ io.on('connection', function(socket) {
 			}
 			else {
 				console.log(player.username + ' is challenging ' + targetName);
-				let ids = [];
-				ids.push(targetID);
-				ids.push(this.id);
-				playerManager.removePlayersFromWaitingLobby(ids);
+				playerManager.removePlayersFromWaitingLobby([targetID, this.id]);
 				console.log(player.username + ' and ' + targetName + ' have left the waiting room');
 				io.to(targetID).emit('client_challenge_prompt', player.username);
 
