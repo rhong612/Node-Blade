@@ -3,6 +3,9 @@
 var multiPlayState = {
 
 	init: function(initialHand, sortedInitialHand, playerNum) {
+
+		$("#private_button").trigger('click');
+		
 		//Initialize state properties
 		this.playerNum = playerNum;
 		this.initialHand = initialHand;
@@ -46,9 +49,6 @@ var multiPlayState = {
 		}
 
         game.gameBGM.loopFull();
-        playDeckSetupAnimation(function() {
-        	socket.emit('ready');
-        });
 	},
 
 	preload: function() {
@@ -106,6 +106,12 @@ var multiPlayState = {
 			currentState.resetField(response.playerDraw, response.enemyDraw, response.playerScore, response.enemyScore);
         });
 
+	},
+
+	create: function() {
+        playDeckSetupAnimation(function() {
+        	socket.emit('ready');
+        });
 	},
 
 	shutdown : function() {
@@ -195,6 +201,7 @@ var multiPlayState = {
 		image.anchor.setTo(0, 1);
 		image.events.onInputDown.add(function() {
 			$("#messages").empty();
+			$("#global_button").trigger('click');
 		    game.state.start('menu');
 	    });
 	}

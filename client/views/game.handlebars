@@ -18,6 +18,21 @@
 		return false;
 	}
 
+  // function openChat(event, tab) {
+  //   let tabContent = document.getElementsByClassName("tabcontent");
+  //   for (let i = 0; i < tabContent.length; i++) {
+  //     tabContent[i].style.display = "none";
+  //   }
+
+  //   let tabLinks = document.getElementsByClassName("tablinks");
+  //   for (let i = 0; i < tabLinks.length; i++) {
+  //     tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+  //   }
+
+  //   document.getElementById(tab).style.display = "block";
+  //   event.currentTarget.className += " active";
+  // }
+
 	$(document).ready(function() {
 		$('.send_message').click(function(event) {
 			socket.emit('chat_msg', $('.message_input').val());
@@ -29,6 +44,24 @@
 				$(".send_message").trigger('click');
 			}
 		})
+
+    //Chat Tab Setup
+    $('#messages').hide();
+
+    $('#global_button').on('click', function() {
+      $('#messages').hide();
+      $('#private_button').removeClass("active");
+      $('#global_button').addClass("active");
+      $('#global_messages').fadeIn();
+    });
+
+    $('#private_button').on('click', function() {
+      $('#global_messages').hide();
+      $('#global_button').removeClass("active");
+      $('#private_button').addClass("active");
+      $('#messages').fadeIn();
+    })
+
 	})
 
 </script>
@@ -61,6 +94,33 @@ body {
   color: #bcbdc0;
   font-size: 20px;
 }
+
+
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+.tab button:hover {
+    background-color: #ddd;
+}
+
+.tab button.active {
+    background-color: #ccc;
+}
+
+
 
 #messages {
     list-style: none;
@@ -138,8 +198,13 @@ body {
 			<div class="chat_window">
 				<div class="top_menu">
 					<div class="title">Chat</div>
+          <div class="tab">
+            <button id="global_button" class="tablinks active">Global</button>
+            <button id="private_button" class="tablinks">Private</button>
+          </div>
 				</div>
-				<ul id="messages"></ul>
+        <ul class="tabcontent" id="global_messages"></ul>
+				<ul class="tabcontent" id="messages"></ul>
 				<div class="bottom_wrapper clearfix">
 					<div class="message_input_wrapper">
 						<input class="message_input" placeholder="Type your message here..." />

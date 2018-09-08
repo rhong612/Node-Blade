@@ -98,6 +98,18 @@ io.on('connection', function(socket) {
 		timeout.refresh();
 	})
 
+	socket.on('global_chat_msg', function(msg) {
+		let sanitized_msg = sanitizer.sanitize(msg);
+		let player = playerManager.getPlayer(this.id);
+		if (sanitizied_msg == '') {
+			socket.emit('error_message', 'Invalid characters in chat message!');
+		}
+		else {
+			io.emit('global_chat_msg', {username: player.username, message: sanitized_msg});
+		}
+		timeout.refresh();
+	})
+
 	socket.on('chat_msg', function(msg) {
 		let sanitized_msg = sanitizer.sanitize(msg);
 		let player = playerManager.getPlayer(this.id);
@@ -119,7 +131,7 @@ io.on('connection', function(socket) {
 			}
 		}
 		else {
-			socket.emit('error_message', 'You must be in a game to chat!');
+			socket.emit('error_message', 'You must be in a game to use private chat!');
 		}
 		timeout.refresh();
 	})

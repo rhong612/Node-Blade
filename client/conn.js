@@ -19,6 +19,14 @@ function setupConn() {
 			$("#player_list tbody").append("<tr><td><label data-name='" + usernames[i] + "'>" + usernames[i] + "</label></td></tr>");
 		}
 	})
+	socket.on('global_chat_msg', function(chat) {
+		console.log(chat.message);
+		//$('#global_messages').append('<li><b>' + chat.username + ': </b>' + chat.message + '</li>');
+
+		//Auto scroll to newest message
+		var chatDiv = document.getElementById("global_messages");
+		chatDiv.scrollTop = chatDiv.scrollHeight;
+	})
 	socket.on('chat_msg', function(chat) {
 		$('#messages').append('<li><b>' + chat.username + ': </b>' + chat.message + '</li>');
 
