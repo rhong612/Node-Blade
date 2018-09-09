@@ -1,3 +1,4 @@
+"use strict";
 var disconnectedState = {
 	create: function() {
         this.stage.backgroundColor = "#4488AA";

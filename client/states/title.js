@@ -1,3 +1,4 @@
+"use strict";
 var titleState = {
 	create: function() {
         if (!game.menuBGM.isPlaying) {

@@ -1,4 +1,4 @@
-
+"use strict";
 
 const game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.CANVAS, 'game');
 

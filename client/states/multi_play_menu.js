@@ -1,4 +1,4 @@
-
+"use strict";
 
 var multiPlayMenuState = {
 	create: function() {
@@ -57,9 +57,9 @@ var multiPlayMenuState = {
         })
 
         socket.on('receive_hand_multi', function(response) {
-            hand = response.hand.slice();
-            sortedHand = response.sortedHand.slice();
-            playerNum = response.playerNum;
+            let hand = response.hand.slice();
+            let sortedHand = response.sortedHand.slice();
+            let playerNum = response.playerNum;
         	game.state.start('multi_play', true, false, hand, sortedHand, playerNum);
         })
 

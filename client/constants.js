@@ -1,3 +1,4 @@
+"use strict";
 //List of cards
 const BACK = 'BACK';
 const BOLT = 'BOLT';

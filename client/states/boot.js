@@ -1,3 +1,4 @@
+"use strict";
 var bootState = {
     preload: function() {
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;

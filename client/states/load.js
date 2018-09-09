@@ -1,3 +1,4 @@
+"use strict";
 var loadState = {
     preload: function() {
         this.stage.backgroundColor = '#DECCCC';

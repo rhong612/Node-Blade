@@ -1,4 +1,4 @@
-
+"use strict";
 /**
 *  Moves all the initialized card sprites to their initial deck position. Then, plays the hand setup animation.
 *	@param - func - an optional function to run at the end of the animation

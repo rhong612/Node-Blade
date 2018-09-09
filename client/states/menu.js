@@ -1,3 +1,4 @@
+"use strict";
 var menuState = {
 	create: function() {
         if (!game.menuBGM.isPlaying) {

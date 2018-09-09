@@ -13,6 +13,7 @@
 <script src="blade.js"></script>
 
 <script>
+	"use strict";
 	function changeNameFormSubmit() {
 		socket.emit('change_name', document.getElementById("new_name_input").value);
 		return false;
