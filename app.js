@@ -219,7 +219,7 @@ io.on('connection', function(socket) {
 			let playerNum = game.getPlayerNum(this.id);
 			let result = game.executeMove(card_index, playerNum, io);
 			if (!result) {
-				socket.emit('serious_error_message', 'Error: Invalid move.');	
+				socket.emit('invalid_move');	
 			}
 		}
 		else {

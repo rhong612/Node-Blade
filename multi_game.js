@@ -71,6 +71,12 @@ class MultiGame {
 			let drawScore = this.playerOneScore;
 			let previousTurn = this.turn;
 			var draw = this.draw();
+			if (draw.playerOneDraw.length === 0 || !draw.break) {
+				//Deck was empty. End the game.
+				io.to(this.playerOneID).emit('client_game_continue', {gameover: true, winner: 3, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card.name});
+				io.to(this.playerTwoID).emit('client_game_continue', {gameover: true, winner: 3, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card.name});
+			}
+
 			//From the draw, set initial scores
 			let playerOneLastCard = draw.playerOneDraw[draw.playerOneDraw.length - 1];
 			let playerTwoLastCard = draw.playerTwoDraw[draw.playerTwoDraw.length - 1];
@@ -185,6 +191,7 @@ class MultiGame {
 		let playerOneDraw = [];
 		let playerTwoDraw = [];
 		let i = 0;
+		let drawBreak = false;
 		while (this.playerOneDeck.length > 0) {
 			playerOneDraw.push(this.playerOneDeck.shift());
 			playerTwoDraw.push(this.playerTwoDeck.shift());
@@ -192,12 +199,13 @@ class MultiGame {
 			if (playerOneDraw[i].draw_value != playerTwoDraw[i].draw_value) {
 				this.playerOneField.push(playerOneDraw[i]);
 				this.playerTwoField.push(playerTwoDraw[i]);
+				drawBreak = true;
 				break;
 			}
 
 			i++;
 		}
-		return {playerOneDraw: playerOneDraw, playerTwoDraw: playerTwoDraw};
+		return {break: drawBreak, playerOneDraw: playerOneDraw, playerTwoDraw: playerTwoDraw};
 	}
 
 	sort(hand) {

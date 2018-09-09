@@ -143,11 +143,21 @@ var multiPlayState = {
 	resetField : function(playerDraw, enemyDraw, playerScore, enemyScore) {
 		//Dump the field. Then, play the draw animation. Play the startTurn() function at the end.
 		destroyField(this.playerFieldSprites, this.enemyFieldSprites, function() {
-			playDrawAnimation(playerDraw, enemyDraw, function() {
+			if (playerDraw.length !== 0) {
+				playDrawAnimation(playerDraw, enemyDraw, function() {
+					this.updateScoreText(playerScore, enemyScore);
+					this.startTurn();
+				}.bind(this));
+			}
+			else {
 				this.updateScoreText(playerScore, enemyScore);
 				this.startTurn();
-			}.bind(this));
+			}
 		}.bind(this))
+	},
+
+	isDraw: function() {
+		return this.winner === 3;
 	},
 
 	startTurn: function startTurn() {
@@ -155,6 +165,11 @@ var multiPlayState = {
 			if (this.isWinner()) {
 				this.updateWaitingText("You win!");
 				this.changeWaitingTextColor("#ffff00");
+				this.showReturnButton();
+			}
+			else if (this.isDraw()) {
+				this.updateWaitingText("The game is a tie!");
+				this.changeWaitingTextColor("#b22222");
 				this.showReturnButton();
 			}
 			else {
