@@ -1,3 +1,4 @@
+"use strict";
 let MultiGame = require('./multi_game');
 let pm = require('./player_manager');
 let constants = require('./constants');

@@ -1,3 +1,4 @@
+"use strict";
 const constants = require('./constants')
 
 class Player {

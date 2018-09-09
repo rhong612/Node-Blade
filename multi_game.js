@@ -1,4 +1,4 @@
-
+"use strict";
 const cards_list = require('./cards');
 
 class MultiGame {

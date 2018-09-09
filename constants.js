@@ -1,3 +1,4 @@
+"use strict";
 const NO_GAME = -1;
 const MAX_USERNAME_LENGTH = 13;
 
