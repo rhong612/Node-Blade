@@ -1,4 +1,4 @@
-"use strict";
+
 //Boilerplate
 const express = require('express');
 const app = express();
