@@ -75,7 +75,8 @@ var loadState = {
             game.gameBGM.mute = false;
         })
 
-        game.stage.disableVisibilityChange = true; //Make game run in background
+    	let reloadText = this.add.text(game.world.centerX, game.world.centerY, 'An error occurred while loading assets. Please refresh the page.');
+    	reloadText.anchor.setTo(0.5);
         console.log("Create complete. Changing state to title");
         game.state.start('title');
     }
