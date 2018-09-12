@@ -1,4 +1,4 @@
-# Node-Blade
+# Blade
 A web application containing an online multiplayer card game
 
 # Demo
