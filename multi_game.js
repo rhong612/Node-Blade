@@ -75,6 +75,7 @@ class MultiGame {
 				//Deck was empty. End the game.
 				io.to(this.playerOneID).emit('client_game_continue', {gameover: true, winner: 3, tie: true, drawScore: drawScore, playerDraw: draw.playerOneDraw.map(card=>card.name), enemyDraw: draw.playerTwoDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerOneScore, enemyScore: this.playerTwoScore, index: card_index, card: card.name});
 				io.to(this.playerTwoID).emit('client_game_continue', {gameover: true, winner: 3, tie: true, drawScore: drawScore, playerDraw: draw.playerTwoDraw.map(card=>card.name), enemyDraw: draw.playerOneDraw.map(card=>card.name), previousTurn: previousTurn, turn: this.turn, playerScore: this.playerTwoScore, enemyScore: this.playerOneScore, index: card_index, card: card.name});
+				return true;
 			}
 
 			//From the draw, set initial scores
